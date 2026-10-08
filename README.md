@@ -5,10 +5,6 @@
 
 SpatialOmicsLab: an integrated research environment for AI co-scientists in spatial transcriptomics
 
-> [!NOTE]
-> This repository contains the ST-Coscientist agent, its analysis tools and the setup installer. You use the agent
-> from a terminal or from Python; there is no web portal.
-
 Jiang, Y., Zhan, X., Quan, P., Wang, R., Wu, F., Mi, J., Yao, J., Yao, B., Xiao, G., Shi, W., & Xie, Y.
 
 # Table of Contents
