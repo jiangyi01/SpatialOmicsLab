@@ -1,0 +1,481 @@
+.buildplan
+debug*
+
+# Local dot-entries. Do NOT re-introduce a blanket `.*` rule here: it also matched
+# .github/, .dockerignore, .readthedocs.yaml and every nested .gitignore, so those files
+# could never be `git add`ed — the add just succeeded silently and staged nothing.
+# `.env*` (not `.env.*`): the secret files on real machines include .env_more and
+# .env.bak_<stamp>, and only the first form has a dot after "env".
+.env*
+!.env.example
+.sog_setup/
+.spatopic_tool_id.txt
+.worktrees/
+.history/
+
+# Byte-compiled / optimized / DLL files
+biomni_release/biomni_env/biomni_tools/
+open_source_process.ipynb
+biomni_env/biomni_tools/*
+.gradio/
+*xlsx
+scripts/*.png
+notebooks/figures/*
+notebooks/tmp_dir/*
+notebooks/tmp_directory/*
+notebooks/save_folder/*
+notebooks/cache
+notebooks/\[draft*
+notebooks/\[scratch*
+notebooks/labbench/*
+scripts/save_folder/*
+scripts/\[draft*
+scripts/tmp_dir/*
+scripts/tmp_directory/*
+scripts/figures/*
+*/scripts/outputs/*
+*/scripts/wandb/*
+*/results/*
+bioagentos/agent/popper_agent.py
+bioagentos/scripts/biorxiv_results
+bioagentos/tool/data_tool/old_data_tool/*
+examples/*.png
+examples/*.csv
+examples/*.fa
+scratch/
+packages/
+data
+dataset
+logs
+scripts/gradio
+data_lake
+__pycache__/
+*.py[cod]
+*$py.class
+res/
+examples/tmp*
+bioagentos/task/lab_bench.py
+*database/
+.history/
+
+temp.*
+
+scripts/analysis/all_tools.txt
+
+BIOMNI_GRADIO/biomni/tool/files/*
+
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+test.ipynb
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+#   For a library or package, you might want to ignore these files since the code is
+#   intended to run in multiple environments; otherwise, check them in:
+# .python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# poetry
+#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
+#   This is especially recommended for binary packages to ensure reproducibility, and is more
+#   commonly ignored for libraries.
+#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
+#poetry.lock
+
+# pdm
+#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
+#pdm.lock
+#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
+#   in version control.
+#   https://pdm.fming.dev/latest/usage/project/#working-with-version-control
+.pdm.toml
+.pdm-python
+.pdm-build/
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.envrc
+uv.lock
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+*.jsonl
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# DDInter data files
+data/ddinter_raw/
+
+# PyCharm
+#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
+#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+#  and can be added to the global gitignore or merged into this file.  For a more nuclear
+#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
+#.idea/
+
+# VSCode
+/.vscode
+
+# Sphinx build
+/docs/build/
+/docs/source/api/
+
+# Ruff cache
+.ruff_cache/
+
+# Smoke and benchmark run output
+smoke_test_*.json
+agent/benchmarks/results/
+
+# Generated/temp files at project root
+Rplots.pdf
+embedding.tsv
+/skill_usage.html
+file_tmp/
+
+# Third-party tools (submodules with their own .git, data, notebooks)
+agent/tools/third_party/
+
+# Intermediate/repaired benchmark data (generated during runs)
+agent/benchmarks/benchmark_data/**/*_repaired*.h5ad
+agent/benchmarks/benchmark_data/**/*_prepared*.h5ad
+agent/benchmarks/benchmark_data/**/*_countsint*.h5ad
+agent/benchmarks/benchmark_data/**/*_countsfloat*.h5ad
+agent/benchmarks/benchmark_data/**/*_augfix*.h5ad
+agent/benchmarks/benchmark_data/**/*_filtered*.h5ad
+agent/benchmarks/benchmark_data/**/*_top*.h5ad
+agent/benchmarks/benchmark_data/**/*_with_*.h5ad
+agent/benchmarks/benchmark_data/**/*_hsfiltered*.h5ad
+agent/benchmarks/benchmark_data/**/*_mcp*.h5ad
+
+# Slide-seqV2 raw data (keep standardized only)
+agent/benchmarks/benchmark_data/Slide-seqV2_Dataset/
+
+# Large binary data
+*.h5
+*.h5ad
+*.rds
+*.pkl
+*.npy
+# ...but the tool layer's DB schema pickles are source, not bulk data: without this
+# un-ignore a regenerated schema silently fails to stage. Keep the path in sync with the package.
+!agent/spatialomicsgym/tool/schema_db/*.pkl
+# DDInter bulk downloads land in that same directory and stay out (after the un-ignore).
+agent/spatialomicsgym/tool/schema_db/ddinter_*.pkl
+
+# Benchmark data (large datasets, not code)
+agent/benchmarks/benchmark_data/**/*.h5ad
+agent/benchmarks/benchmark_data/**/*.h5
+agent/benchmarks/benchmark_data/**/*.csv
+agent/benchmarks/benchmark_data/Slide-seqV2_Dataset/
+agent/benchmarks/benchmark_data/mock/
+
+# The curated tests/test_data/ re-include list that lived here (smoke_outputs fixtures, the Zhuang
+# mini-3D block, creation_demo) was retired on 2026-10-07 when the suite moved to an untracked test/
+# directory: `/test/` at the end of this file ignores the whole tree, so git never descends into it
+# and no re-include under it can take effect. The list is in the history of this file at b3b7239a.
+
+# Input data: STAGE's upstream loader writes input_data/used_gene.txt relative to its working directory.
+agent/spatialomicsgym/input_data/
+human_standard/
+
+# User-created tool repos and runtime files
+agent/tools_user/repos/
+agent/tools_user/*.lock
+agent/tools_user/usage_log.jsonl
+agent/tools_user/*_env.yaml
+agent/tools_user/*_requirements.txt
+agent/tools_user/install_log.json
+agent/tools_user/__pycache__/
+# Runtime state written by the tracked knowledge_manager.py / memory_manager.py. Ignored as
+# directories, not shape-by-shape, so the next file written there is covered too. Nothing in them
+# is authored by hand; the seeded content is reproducible via
+# `cd agent && SOG_MEMORY_ENABLED=true python -m tools_user.seed_tool_creation_memory`.
+# .memory/.secret is a per-install HMAC key (secrets.token_hex(32), mode 400) and must never be
+# committed -- it was untracked AND unignored before this rule existed.
+agent/tools_user/.knowledge/
+agent/tools_user/.memory/
+agent/MCP_server/mcp_config_user.yaml
+agent/MCP_server/mcp_config_user.yaml.bak_*
+tmp_install_*
+
+# Benchmark data (large datasets — keep only registry, scripts, mock_registry)
+agent/benchmarks/benchmark_data/MERFISH_*/
+agent/benchmarks/benchmark_data/Visium_*/
+agent/benchmarks/benchmark_data/Slide-seqV2*/
+agent/benchmarks/benchmark_data/mini/*.h5ad
+agent/benchmarks/benchmark_data/mini/*.csv
+agent/benchmarks/benchmark_data/mock/**/*.h5ad
+agent/benchmarks/benchmark_data/mock/**/*.csv
+
+
+# Manuscript figures and slides
+manuscript/
+
+# Development-purpose files (logs, test runs, dev benchmarks, tutorials)
+dev_logs/
+dev_test/
+runs/
+tutorial_dev/
+test_e2e_mcp_system.py
+test_health_check_system.py
+
+# ===================================================================
+# Project wrap-up (2026-06): tracked exceptions + local-only artifacts
+# (placed last so these rules override the broad patterns above)
+# ===================================================================
+
+# Empirical routing leaderboard: runtime DATA the recommender reads at import.
+# The broad `data` rule above would drop it, silently disabling empirical
+# re-ranking on a fresh clone. Keep it tracked.
+!agent/spatialomicsgym/data/
+!agent/spatialomicsgym/data/empirical_leaderboard.json
+
+# Manuscript deliverable: version-control the small (~12MB) headline artifacts
+# (tables, figures, summaries, aggregation/figure code, reproducibility runbook).
+# The `manuscript/` rule above ignores the whole tree; re-include it but keep OUT
+# the absolute-path symlink trees (they point into the 669GB results + external
+# 101GB) — raw per-cell results stay ignored and live on disk only.
+!agent/benchmarks/manuscript/
+agent/benchmarks/manuscript/per_cell_results/
+agent/benchmarks/manuscript/tool_outputs/
+agent/benchmarks/manuscript/code/evaluation/
+agent/benchmarks/manuscript/code/manual_runners/
+
+# The SpatialBench paper itself (2.7 MB of third-party PDF) sits at agent/benchmarks/SpatialBench.pdf so
+# the Fig-7 scripts beside it can be read against their source. It is not our artifact and not
+# source: the rule above version-controls the ~12 MB of *our* headline deliverables, and a
+# redistributable copy of someone else's paper is neither of those things. Kept on disk, cited in
+# agent/benchmarks/manuscript/figures/fig7_caption.md.
+agent/benchmarks/SpatialBench.pdf
+
+# Large local-only artifacts — kept on disk, catalogued in docs/REPO_MAP.md and
+# demo_outputs/MANIFEST.md, never committed (too big / not source).
+demo_outputs/
+demo_datasets_for_3D_analysis/
+# The curated 63-sample spatial library (27 GB of .h5ad), moved into the checkout from
+# /workspace/spatial_library_backup on 2026-10-06. Its catalog is tracked in
+# agent/spatialomicsgym/data/spatial_library/registry.json; the data never is.
+/spatial_library/
+# The deployment's tool-output root (SOG_WORK_DIR in .env), in the checkout since 2026-10-06 instead
+# of /workspace/work. Run output, never source.
+/work/
+# _safety/ is a local run-log scratch tree (2.2 GB here, nothing that belongs in the repo). It used
+# to be listed one file pattern at a time, which covered the logs that existed and nothing else: a
+# notes.json, results.txt, scratch.py or plot.png written there was untracked, unignored, and
+# offered to the next `git add -A`. Ignoring the directory covers the shapes nobody predicted; the
+# specific rules below are kept because they document what lives in there. Two files (_PINNED_STATUS.md
+# and test_mcp_tool_routing.py) had been committed out of this tree and were removed with the rest of
+# the scratch cleanup -- so this rule now contradicts nothing, which
+# test_repo_hygiene.py::test_no_tracked_file_is_ignored enforces.
+_safety/
+_safety/_logs/
+_safety/_brain_demo_logs/
+_safety/live_a1_default_tool_results*/
+_safety/mcp_3d_tool_tests_*/
+_safety/_live_smoke_*.log
+
+# Archived scratch/backups (kept locally, not committed)
+_archive/
+
+# Scratch test outputs + stray artifacts (kept locally, not committed)
+agent/benchmarks/system_tests/
+agent/benchmarks/creation_deletion/
+agent/tools/*.pt
+# Machine-local timestamped snapshots of the generated setup config (superseded
+# copies kept beside the live file); never committed.
+install/recipes/mcp_config.setup.yaml.stale-*
+
+# Pre-edit backups left beside the file they are a copy of -- `cluster_comparison.py.pre_v8`,
+# `...pre_v12`. Four exist in this tree right now, and each is a byte-copy of a file that IS
+# tracked, so a `git add -A` ships the same source twice under a name nothing imports, nothing
+# tests and no reader can date. Checked before the rule was written: NOTHING matching it is
+# tracked. That order matters -- a pattern that shadows an already-tracked path does not untrack
+# anything, it only tells the next reader a lie about what git is doing.
+*.pre_v[0-9]*
+
+# `node_modules/` at ANY depth.
+node_modules/
+_safety/live_a1_default_tool_test.py
+_safety/run_live_a1_default_tool_test.sh
+
+# User-created tool runtime artifacts (generated by the creation system; regenerated on reproduce)
+agent/tools_user/*_worker.py
+agent/tools_user/*_worker.R
+agent/tools_user/*_mcp_server.py
+agent/tools_user/vendor_*/
+
+# agent/benchmarks/data is CODE (data_registry imported by benchmarks/__init__), not data —
+# the broad `data` rule drops it, breaking a fresh clone. Keep it tracked.
+!agent/benchmarks/data/
+!agent/benchmarks/data/*.py
+!agent/benchmarks/data/*.md
+
+# In-repo dataset-library catalog (broad `data` rule would drop it). Keep it tracked so
+# search_spatial_datasets + the instance-table generators work without the external library.
+!agent/spatialomicsgym/data/
+!agent/spatialomicsgym/data/spatial_library/
+!agent/spatialomicsgym/data/spatial_library/registry.json
+
+# sog-setup wizard: per-run test results + generated wiring are throwaway (regenerated
+# each run). Durable state lives in .sog_setup/ (its own rule near the top of this file).
+# install/recipes/tool_specs/ is intentionally NOT ignored — those committed recipes are the
+# fresh-clone build inputs. test/installation/ is also inside the wholly ignored /test/ below;
+# the line stays so the wizard's artifact dir is covered on its own terms.
+test/installation/
+install/recipes/mcp_config.setup.yaml
+install/recipes/env_overrides.env
+# The generic `env/` rule near the top of this file also swallows the wizard's
+# committed export recipes; force the directory (and its files) back in — they
+# are the fresh-clone build inputs and MUST be tracked.
+!install/recipes/tool_specs/env/
+!install/recipes/tool_specs/env/*.env.yaml
+_live_out/
+
+# huggingface_data/: the builders, the docs and the stats ARE source and are tracked. What they
+# emit is a build artifact whose home is the Hub, not git history -- the JSONL corpus, and the
+# `hub_repo/` the packager reshapes it into (parquet shards and a generated card). The global
+# `*.jsonl` rule covers only the first of those; this rule is about the directory, so no future
+# output format silently becomes committable either.
+huggingface_data/data/
+# Same reasoning for the paper release, this folder's default product: the filter script, the
+# runbook and both stats twins are tracked; the filtered slice (JSONL + selection sidecar) and
+# the packed upload folder `hub_repo/` are artifacts.
+huggingface_data/filtered/
+huggingface_data/hub_repo/
+# huggingface_data_instance/: the instance release (63-sample library + 4,614 task instances). Its
+# scripts, README and stats twin are source; `hub_repo/` is the ~27 GB upload folder (library copies,
+# parquet, card) and belongs on the Hub only. Most of its payload (png, json, csv, tif) matches no
+# global rule, so without this line one `git add` would pull gigabytes into the index.
+huggingface_data_instance/hub_repo/
+
+
+# 2026-10-07 slimming: the repository carries what the project needs to RUN. The test suite lives in
+# test/ on disk (bash agent/spatialomicsgym/spatialomicsgym_env/run_core_tests.sh runs it here) and is
+# not tracked at all -- no exceptions: running code that wants the smoke harness or the core-module
+# list loads them from test/ by file path and says so when test/ is absent. Per-developer tool state
+# is never tracked either.
+/test/
+/.worktrees/

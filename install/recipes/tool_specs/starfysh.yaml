@@ -1,0 +1,19 @@
+server_key: starfysh
+worker_kind: python
+env_prefix: STARFYSH
+override_vars:
+  STARFYSH_PYTHON: /opt/conda/envs/Starfysh/bin/python
+worker_var: STARFYSH_WORKER
+worker_file: starfysh_worker.py
+server_file: starfysh_mcp_server.py
+source_env: Starfysh
+import_check: starfysh
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/starfysh.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: starfysh_deconvolution
+  category: deconvolution

@@ -1,0 +1,25 @@
+server_key: spatial3d
+worker_kind: python
+env_prefix: SPATIAL3D
+override_vars:
+  SPATIAL3D_PYTHON: /opt/conda/envs/spatialomicsgym_env/bin/python
+worker_var: SPATIAL3D_WORKER
+worker_file: spatial3d_worker.py
+server_file: spatial3d_mcp_server.py
+source_env: null
+import_check: spatialomicsgym.spatial3d
+# Agent-core server, the same contract as spatial_viz and viz_inspector: numpy, scipy, pandas and
+# anndata are already in the agent environment, so there is nothing to build. Verified on this box
+# by running the whole Phase-1 diagnosis through the worker's own CLI against the three
+# serial-section fixtures and against the 147-section Zhuang-ABCA-1 atlas.
+#
+# A recipe here would build a second copy of the environment the portal already runs inside.
+build_strategy: none
+recipe: null
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: diagnose_3d_stack
+  category: spatial_alignment

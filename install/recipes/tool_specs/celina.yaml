@@ -1,0 +1,19 @@
+server_key: celina
+worker_kind: rscript
+env_prefix: CELINA
+override_vars:
+  CELINA_PYTHON: /opt/conda/envs/celina_env/bin/Rscript
+worker_var: CELINA_WORKER
+worker_file: celina_worker.R
+server_file: celina_mcp_server.py
+source_env: celina_env
+import_check: CELINA
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/celina.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_celina
+  category: svg_detection

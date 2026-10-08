@@ -1,0 +1,26 @@
+# Ruff configuration for tools/ -- the per-tool MCP workers.
+#
+# These files are NOT run by the repo's interpreter. Each `*_worker.py` is executed by its own
+# conda env's python, named in the sibling `*_mcp_server.py` via `get_worker_paths()`, and the
+# oldest of those is 3.7 (PROST_ENV, miso, spaotsc, spotgf, dstg). The repo's `requires-python =
+# ">=3.11"` is true of the package and false of this directory, and ruff believes it: without this
+# file it targets 3.11 here and `ruff check --fix --unsafe-fixes` -- which `pre-commit run
+# --all-files` runs -- rewrites these workers into code their own interpreters reject.
+#
+# Two ways that has actually happened:
+#   UP045   `Optional[str]` -> `str | None` in a signature   -> TypeError at import (3.7/3.8/3.9)
+#   B905    `zip(a, b)` -> `zip(a, b, strict=False)`         -> TypeError mid-run (3.7/3.8/3.9)
+#
+# The second one is the nastier of the two: the module imports fine, the model trains, the outputs
+# are written, and only the summary line at the end raises.
+#
+# `target-version` is what gates those rules, so setting it correctly disarms the whole family --
+# including rules that do not exist yet. `test/test_workers_are_old_python_safe.py` enforces it,
+# and also enforces `from __future__ import annotations` in every worker as defence in depth for
+# annotations a contributor writes by hand.
+#
+# `extend` is required: a config file in a subdirectory REPLACES the parent's settings rather than
+# merging with them, so without it these files would be linted against ruff's defaults instead of
+# the repo's rule selection and line length.
+extend = "../../pyproject.toml"
+target-version = "py37"

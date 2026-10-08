@@ -1,0 +1,667 @@
+servers:
+  bass:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: bass_env
+    strategy: conda_clone
+    worker_kind: rscript
+  bayestme:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: bayestme
+    strategy: conda_clone
+    worker_kind: python
+  bidcell:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: bidcell_env
+    strategy: conda_clone
+    worker_kind: python
+  bsp:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: bsp
+    strategy: conda_clone
+    worker_kind: python
+  bulk2space:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: bulk2space_env
+    strategy: conda_clone
+    worker_kind: python
+  card:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: card_env
+    strategy: conda_clone
+    worker_kind: rscript
+  cast:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: cast
+    strategy: conda_clone
+    worker_kind: python
+  celina:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: celina_env
+    strategy: conda_clone
+    worker_kind: rscript
+  cell2location:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: cell2loc_env
+    strategy: conda_clone
+    worker_kind: python
+  cellcharter:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: cellcharter-env
+    strategy: conda_clone
+    worker_kind: python
+  celldart:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: celldart_env
+    strategy: conda_clone
+    worker_kind: python
+  celloscope:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: celloscope_env
+    strategy: conda_clone
+    worker_kind: python
+  cellpie:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: cellpie_env
+    strategy: conda_clone
+    worker_kind: python
+  cellpose_seg:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: cellpose_env
+    strategy: conda_clone
+    worker_kind: python
+  celltrek:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: celltrek
+    strategy: conda_clone
+    worker_kind: rscript
+  clustermap:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: clustermap_env
+    strategy: conda_clone
+    worker_kind: python
+  commot:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: COMMOT
+    strategy: conda_clone
+    worker_kind: python
+  cytospace:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: cytospace_env
+    strategy: conda_clone
+    worker_kind: python
+  data_converter:
+    has_override: true
+    service_keys: []
+    shared_env: true
+    source_env: novosparc
+    strategy: conda_clone
+    worker_kind: python
+  deepcell_seg:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: deepcell_env
+    strategy: conda_clone
+    worker_kind: python
+  deeplinc:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: deeplinc
+    strategy: conda_clone
+    worker_kind: python
+  deepst:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: deepst-env
+    strategy: conda_clone
+    worker_kind: python
+  destvi:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: destvi_env
+    strategy: conda_clone
+    worker_kind: python
+  dstg:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: dstg_env
+    strategy: conda_clone
+    worker_kind: python
+  gist:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: gist_env
+    strategy: conda_clone
+    worker_kind: rscript
+  gpsa:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: gpsa
+    strategy: conda_clone
+    worker_kind: python
+  graphst:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: GraphST
+    strategy: conda_clone
+    worker_kind: python
+  hotspot:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: hotspot
+    strategy: conda_clone
+    worker_kind: python
+  iris_spatial:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: iris_spatial_env
+    strategy: conda_clone
+    worker_kind: rscript
+  istar:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: istar
+    strategy: conda_clone
+    worker_kind: python
+  mist:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: ReST
+    strategy: conda_clone
+    worker_kind: python
+  mistyr:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: mistyr
+    strategy: conda_clone
+    worker_kind: rscript
+  moscot:
+    has_override: true
+    service_keys: []
+    shared_env: true
+    source_env: moscot
+    strategy: conda_clone
+    worker_kind: python
+  ncem:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: ncem
+    strategy: conda_clone
+    worker_kind: python
+  neighborseq:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: neighborseq
+    strategy: conda_clone
+    worker_kind: rscript
+  novosparc:
+    has_override: true
+    service_keys: []
+    shared_env: true
+    source_env: novosparc
+    strategy: conda_clone
+    worker_kind: python
+  paste:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: paste_env
+    strategy: conda_clone
+    worker_kind: python
+  paste2:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: paste2
+    strategy: conda_clone
+    worker_kind: python
+  pathway_enrichment:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: pathway_enrichment
+    strategy: conda_clone
+    worker_kind: python
+  precast:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: precast
+    strategy: conda_clone
+    worker_kind: rscript
+  prost:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: PROST_ENV
+    strategy: conda_clone
+    worker_kind: python
+  redeconve:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: redeconve
+    strategy: conda_clone
+    worker_kind: rscript
+  scanpy_spatial:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: SpaGCN
+    strategy: conda_clone
+    worker_kind: python
+  scdot:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: scdot
+    strategy: conda_clone
+    worker_kind: python
+  scresolve:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: scresolve
+    strategy: conda_clone
+    worker_kind: python
+  sedr:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: sedr_env
+    strategy: conda_clone
+    worker_kind: python
+  seurat:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: seurat_env
+    strategy: conda_clone
+    worker_kind: rscript
+  slat:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: slat
+    strategy: conda_clone
+    worker_kind: python
+  smart_spatial:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: smart_env
+    strategy: conda_clone
+    worker_kind: rscript
+  somde:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: somde
+    strategy: conda_clone
+    worker_kind: python
+  spaceflow:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spaceflow_env
+    strategy: conda_clone
+    worker_kind: python
+  spacel:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spacel_env
+    strategy: conda_clone
+    worker_kind: python
+  spacet:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spacet
+    strategy: conda_clone
+    worker_kind: rscript
+  spacexr:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spacexr
+    strategy: conda_clone
+    worker_kind: rscript
+  spagft:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spagft_env
+    strategy: conda_clone
+    worker_kind: python
+  spaotsc:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spaotsc
+    strategy: conda_clone
+    worker_kind: python
+  spark_spatial:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spark_spatial
+    strategy: conda_clone
+    worker_kind: rscript
+  spatial3d:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: null
+    strategy: none
+    worker_kind: python
+  spatial3d_inspector:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: null
+    strategy: none
+    worker_kind: python
+  spatial_library:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: null
+    strategy: none
+    worker_kind: python
+  spatial_miso:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: miso
+    strategy: conda_clone
+    worker_kind: python
+  spatial_viz:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: null
+    strategy: none
+    worker_kind: python
+  spatialde:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: SpatialDE
+    strategy: conda_clone
+    worker_kind: python
+  spatialdecon:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spatialdecon_env
+    strategy: conda_clone
+    worker_kind: rscript
+  spatialglue:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spatialglue
+    strategy: conda_clone
+    worker_kind: python
+  spatialpca:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spatialpca_env
+    strategy: conda_clone
+    worker_kind: rscript
+  spatialprompt:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spatialpromptENV
+    strategy: conda_clone
+    worker_kind: python
+  spatialscope:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spatialscope_env
+    strategy: conda_clone
+    worker_kind: python
+  spatrio:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spatrio
+    strategy: conda_clone
+    worker_kind: python
+  spicemix:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spicemix_env
+    strategy: conda_clone
+    worker_kind: python
+  spiral:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spiral
+    strategy: conda_clone
+    worker_kind: python
+  spotclean:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spotclean_env
+    strategy: conda_clone
+    worker_kind: rscript
+  spotgf:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: SpotGF
+    strategy: conda_clone
+    worker_kind: python
+  spotlight:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spotlight_env
+    strategy: conda_clone
+    worker_kind: rscript
+  spotsweeper:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spotsweeper_env2
+    strategy: conda_clone
+    worker_kind: rscript
+  spvc:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spvc
+    strategy: conda_clone
+    worker_kind: rscript
+  squidpy:
+    has_override: true
+    service_keys: []
+    shared_env: true
+    source_env: moscot
+    strategy: conda_clone
+    worker_kind: python
+  st_gears:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: st_gears
+    strategy: conda_clone
+    worker_kind: python
+  stacker:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: stacker
+    strategy: conda_clone
+    worker_kind: python
+  stagate:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: stagate_pyg
+    strategy: conda_clone
+    worker_kind: python
+  stage:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: stage_env
+    strategy: conda_clone
+    worker_kind: python
+  stalign:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: stalign
+    strategy: conda_clone
+    worker_kind: python
+  starfysh:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: Starfysh
+    strategy: conda_clone
+    worker_kind: python
+  stdeconvolve:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: stdeconvolve_env
+    strategy: conda_clone
+    worker_kind: rscript
+  stdgcn:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: stdgcn_env
+    strategy: conda_clone
+    worker_kind: python
+  stlearn:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: stlearn
+    strategy: conda_clone
+    worker_kind: python
+  stplus:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: stplus_env
+    strategy: conda_clone
+    worker_kind: python
+  stride:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: stride
+    strategy: conda_clone
+    worker_kind: python
+  svca:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: spatialomicsgym_e1
+    strategy: conda_clone
+    worker_kind: python
+  svgbit:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: svgbit
+    strategy: conda_clone
+    worker_kind: python
+  tacco:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: TACCO_env
+    strategy: conda_clone
+    worker_kind: python
+  tangram:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: tangram-env
+    strategy: conda_clone
+    worker_kind: python
+  ucdeconvolve:
+    has_override: true
+    service_keys:
+    - UCD_TOKEN
+    shared_env: false
+    source_env: ucdenv
+    strategy: conda_clone
+    worker_kind: python
+  viz_inspector:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: null
+    strategy: none
+    worker_kind: python
+  xfuse:
+    has_override: true
+    service_keys: []
+    shared_env: false
+    source_env: xfuse
+    strategy: conda_clone
+    worker_kind: python

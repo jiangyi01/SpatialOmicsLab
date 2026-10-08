@@ -1,0 +1,19 @@
+server_key: gist
+worker_kind: rscript
+env_prefix: GIST
+override_vars:
+  GIST_PYTHON: /opt/conda/envs/gist_env/bin/Rscript
+worker_var: GIST_WORKER
+worker_file: gist_worker.R
+server_file: gist_mcp_server.py
+source_env: gist_env
+import_check: GIST
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/gist.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_gist
+  category: deconvolution

@@ -1,0 +1,19 @@
+server_key: bass
+worker_kind: rscript
+env_prefix: BASS
+override_vars:
+  BASS_PYTHON: /opt/conda/envs/bass_env/bin/Rscript
+worker_var: BASS_WORKER
+worker_file: bass_worker.R
+server_file: bass_mcp_server.py
+source_env: bass_env
+import_check: BASS
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/bass.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_bass
+  category: spatial_clustering

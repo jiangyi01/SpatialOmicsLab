@@ -1,0 +1,19 @@
+server_key: spatialdecon
+worker_kind: rscript
+env_prefix: SPATIALDECON
+override_vars:
+  SPATIALDECON_PYTHON: /opt/conda/envs/spatialdecon_env/bin/Rscript
+worker_var: SPATIALDECON_WORKER
+worker_file: spatialdecon_worker.R
+server_file: spatialdecon_mcp_server.py
+source_env: spatialdecon_env
+import_check: SpatialDecon
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spatialdecon.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_spatialdecon
+  category: deconvolution

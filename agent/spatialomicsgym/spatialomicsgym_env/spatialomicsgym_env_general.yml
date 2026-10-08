@@ -1,0 +1,97 @@
+# General-purpose fallback env for the ST-Coscientist agent: the agent-core recipe
+# (spatialomicsgym_env.yml) with an analysis stack appended, so that when a tool's own
+# worker env fails to import mid-turn the model can redo the step in-process here
+# (spatialomicsgym/tool/general_env.py -> run_in_general_env). It is NOT a tool env: no
+# portal points at it, sog-setup never auto-repairs or removes it (constants.PROTECTED_ENVS),
+# and it must never be used to present a substitute under a tool's name.
+# Create (from the repository root, so both lines resolve from the same directory):
+#          conda env create -n spatialomicsgym_env_general -f agent/spatialomicsgym/spatialomicsgym_env/spatialomicsgym_env_general.yml
+#          /opt/conda/envs/spatialomicsgym_env_general/bin/pip install -e . --no-deps
+# The pip list up to the analysis block is the core recipe's, byte for byte -- keep it so.
+# It had drifted once: the core moved to anndata 0.12.10 and gained the in-process bio block, and this
+# copy kept 0.12.6, whose backed-sparse X slices crash under scipy 1.17 -- in the fallback env, the one
+# place a model reaches for backed='r' on a large slide (hunt 2026-09-30, u38a-packaging-3). The
+# equality is now a test: test/test_the_general_env_recipe_starts_with_the_core_recipe_verbatim.py.
+name: spatialomicsgym_env_general
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      # --- LLM / agent orchestration ---
+      - langchain==0.3.27
+      - langchain-core==0.3.79
+      # Imported directly by agent/env_collection.py; it was only ever present here because
+      # langchain 0.3 happened to pull it. Pinned explicitly so the recipe states its own closure.
+      - langchain-text-splitters==0.3.11
+      - langchain-anthropic==0.3.22
+      - langchain-openai==0.3.35
+      - langgraph==0.3.18
+      - langsmith==0.4.42
+      - anthropic==0.72.1
+      - openai==2.38.0
+      - tiktoken==0.12.0
+      # --- config / IO ---
+      - pydantic==2.11.10
+      - pydantic_core==2.33.2
+      - python-dotenv==1.2.1
+      - PyYAML
+      - httpx
+      - requests
+      - tenacity
+      - rich==14.2.0
+      - tqdm==4.67.1
+      # --- data profiling (spatial h5ad) ---
+      - numpy==2.2.6
+      - pandas
+      - pyarrow==21.0.0
+      - scipy
+      - scikit-learn==1.7.2
+      - numexpr==2.14.1
+      # 0.12.6 with the unpinned scipy (1.17) broke backed-sparse reads -- '_validate_indices' -- so the
+      # tissue premise check crashed in this env (2026-09-30); 0.12.10 is what the portal's python has.
+      - anndata==0.12.10
+      - scanpy==1.11.5
+      # clustering/integration backends so inline sc.tl.leiden + harmony work
+      # (agent REPL fallback path; worker envs carry their own copies)
+      - python-igraph==1.0.0
+      - leidenalg==0.12.0
+      - harmonypy==0.0.10  # 2.x breaks scanpy harmony_integrate orientation
+      - h5py==3.15.1
+      - jsonpatch==1.33
+      # --- in-process bio tools (spatialomicsgym/tool/*) ---
+      # The agent's catalogue advertises them and they run in THIS interpreter; without these,
+      # 32 of the 41 tools in five modules failed on import or on call (hunt 2026-09-30,
+      # uT5-molbio-48; user decision: add the dependencies rather than hide the tools).
+      - biopython==1.88
+      - beautifulsoup4==4.15.0
+      - scikit-image==0.26.0
+      - opencv-python-headless==5.0.0.93
+      - trackpy==0.7
+      - rdkit==2025.9.1   # pharmacology's RDKit tools (hunt 2026-09-30, uT2-pharmacology-22/30)
+      - fcsparser==0.2.4   # FCS reader for cell_biology's two flow tools (hunt 2026-09-30, uT5-molbio-45/48)
+      # --- MCP client + web portal ---
+      - mcp==1.27.0
+      - fastmcp==3.2.3
+      - nest_asyncio==1.6.0   # required by add_mcp() to register MCP tools as REPL callables
+      - gradio==5.49.1
+      # sog-web's dataset upload. It arrives transitively today (gradio depends on it), which is
+      # precisely why it is named here: the portal must not lose its upload button to somebody
+      # else's dependency bump.
+      - python-multipart==0.0.32
+      # --- tests / lint ---
+      - pytest==9.0.1
+      - ruff==0.14.5
+      # --- analysis stack for the in-process fallback (RL-1 swept by attribution; see
+      # CHINA_EXCLUSION_REPO.md) -- everything above this line is the core recipe verbatim ---
+      - squidpy==1.8.2            # needs spatialdata>=0.7.2 (anndata 0.12-compatible)
+      - omnipath==1.0.12
+      - decoupler==1.9.2          # NOT 2.x: marsilea (HK PolyU / U. Macau) is a hard dep there
+      - gseapy==1.3.1
+      - numba==0.61.2             # decoupler 1.9.2 pins numba<0.62; scanpy 1.11.5 accepts it
+      - seaborn==0.13.2
+      - statsmodels==0.14.5
+      # scikit-image is the core block's (0.26.0, above); squidpy 1.8.2 needs >=0.25. A second pin
+      # here would be a conflicting requirement pip refuses to resolve.
+      - umap-learn==0.5.9.post2

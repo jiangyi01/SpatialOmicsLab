@@ -1,0 +1,21 @@
+server_key: spiral
+worker_kind: python
+env_prefix: SPIRAL
+override_vars:
+  SPIRAL_PYTHON: /opt/conda/envs/spiral/bin/python
+worker_var: SPIRAL_WORKER
+worker_file: spiral_worker.py
+server_file: spiral_mcp_server.py
+source_env: spiral
+import_check: spiral
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spiral.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: spiral_integrate
+  category: spatial_alignment
+- name: spiral_align
+  category: spatial_alignment

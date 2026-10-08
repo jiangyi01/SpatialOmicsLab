@@ -1,0 +1,27 @@
+server_key: paste2
+worker_kind: python
+env_prefix: PASTE2
+override_vars:
+  PASTE2_PYTHON: /opt/conda/envs/paste2/bin/python
+worker_var: PASTE2_WORKER
+worker_file: paste2_worker.py
+server_file: paste2_mcp_server.py
+source_env: paste2
+# NOT `paste2`. paste2/__init__.py is entirely commented out upstream, so `import paste2` succeeds
+# even when numpy, POT or scanpy are broken -- the check would pass on an environment that cannot
+# run the tool. paste2.PASTE2 is the module the worker actually calls.
+import_check: paste2.PASTE2
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/paste2.env.yaml
+gpu: false
+# An env of its own, not paste_env. Installing paste2 there would pull pot past the pinned 0.9.0
+# and silently change the numerics of a shipped tool; installing it --no-deps would leave the
+# recipe claiming a POT below paste2's declared floor. Neither is a recipe that tells the truth.
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: paste2_partial_align
+  category: spatial_alignment
+- name: paste2_estimate_overlap
+  category: spatial_alignment

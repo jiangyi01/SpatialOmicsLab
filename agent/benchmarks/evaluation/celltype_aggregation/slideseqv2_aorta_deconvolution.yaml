@@ -1,0 +1,33 @@
+# Cell-type aggregation table — slideseqv2_aorta_deconvolution
+#
+# Dataset: Slide-seqV2 human aorta (slide_seqV2_aorta)
+# GT: spatial.h5ad obs['cell_type'] — 7 vascular lineages
+#   • blood vessel smooth muscle cell, fibroblast, macrophage,
+#     endothelial cell of artery, microcirculation associated smooth muscle cell,
+#     lymphocyte, unknown
+# SC reference: scRNA_seq_vascular_tissue (113,304 cells, same 7 cell_type categories)
+#
+# This is an IDENTITY mapping — GT and SC reference share the same label set,
+# so no aggregation is needed semantically. The YAML is present so the
+# evaluate_deconvolution_auto dispatcher routes through the unified path.
+#
+# Coverage check: 7 GT classes = 7 mapping entries.
+
+dataset: slideseqv2_aorta_deconvolution
+gt_classes:
+  - "blood vessel smooth muscle cell"
+  - "fibroblast"
+  - "macrophage"
+  - "endothelial cell of artery"
+  - "microcirculation associated smooth muscle cell"
+  - "lymphocyte"
+  - "unknown"
+
+mapping:
+  "blood vessel smooth muscle cell":              "blood vessel smooth muscle cell"
+  "fibroblast":                                   "fibroblast"
+  "macrophage":                                   "macrophage"
+  "endothelial cell of artery":                   "endothelial cell of artery"
+  "microcirculation associated smooth muscle cell": "microcirculation associated smooth muscle cell"
+  "lymphocyte":                                   "lymphocyte"
+  "unknown":                                      "unknown"

@@ -1,0 +1,28 @@
+# Default benchmark configuration
+project_root: "."
+data_dir: "benchmark_data"
+output_dir: "benchmark_results"
+mcp_config_path: "MCP_server/mcp_config.yaml"  # under project_root, else project_root/agent
+
+tool_filter:
+  include: []          # Empty = all tools
+  exclude: []
+  task_types:
+    - spatial_clustering
+    - svg_detection
+    - deconvolution
+  languages:
+    - python
+    - r
+
+timeout_seconds: 600
+max_workers: 4
+save_intermediate: true
+
+metrics:
+  - ARI
+  - NMI
+  - Jaccard
+  - RMSE
+  - Pearson
+  - Spearman

@@ -1,0 +1,19 @@
+server_key: precast
+worker_kind: rscript
+env_prefix: PRECAST
+override_vars:
+  PRECAST_PYTHON: /opt/conda/envs/precast/bin/Rscript
+worker_var: PRECAST_WORKER
+worker_file: precast_worker.R
+server_file: precast_mcp_server.py
+source_env: precast
+import_check: PRECAST
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/precast.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: precast_spatial_clustering
+  category: spatial_clustering

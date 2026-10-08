@@ -1,0 +1,21 @@
+server_key: pathway_enrichment
+worker_kind: python
+env_prefix: PATHWAY_ENRICHMENT
+override_vars:
+  PATHWAY_ENRICHMENT_PYTHON: /opt/conda/envs/pathway_enrichment/bin/python
+worker_var: PATHWAY_ENRICHMENT_WORKER
+worker_file: pathway_enrichment_worker.py
+server_file: pathway_enrichment_mcp_server.py
+source_env: pathway_enrichment
+import_check: decoupler
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/pathway_enrichment.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_pathway_enrichment
+  category: spatial_analysis
+- name: run_pathway_activity
+  category: spatial_analysis

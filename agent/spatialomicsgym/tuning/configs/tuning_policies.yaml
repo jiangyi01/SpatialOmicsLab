@@ -1,0 +1,188 @@
+# Tuning policies: per-tool and per-task-type rules for when to tune.
+#
+# Read by mode_router.select_mode, and only these fields are read:
+#   task_policies.<task>          the task is a known one (its presence is what is checked)
+#   tool_policies.<tool>.tuning_useful    false routes the tool to default_fallback
+#   tool_policies.<tool>.skip_conditions  the first entry is the reason given for that fallback
+# Everything else is a note. Budgets, metrics and improvement thresholds live in core.py
+# (MODE_BUDGETS, TASK_METRICS, IMPROVEMENT_THRESHOLDS). This file used to also carry compute budgets,
+# allowed/recommended modes, escalation rules and per-task metrics that nothing read -- an operator
+# raising a budget here changed nothing -- and spelled the deconvolution metrics rmse/pearson_mean,
+# the spellings core.py records as having tied every deconvolution trial at perfect
+# (hunt 2026-09-30, u32-tuning-24).
+
+# ============================================================
+# TASK-LEVEL POLICIES
+# ============================================================
+
+task_policies:
+  spatial_clustering:
+    tuning_useful: true
+    notes: "Scored by ARI (secondary NMI). Resolution and n_neighbors have high impact on clustering quality"
+
+  svg_detection:
+    tuning_useful: true
+    notes: "Scored by jaccard (secondary f1). SVG detection parameters affect the sensitivity/specificity tradeoff"
+
+  deconvolution:
+    tuning_useful: true
+    notes: "Scored by RMSE, lower is better (secondary mean_pearson_r). Quality depends on N_cells_per_location and training epochs"
+
+# ============================================================
+# TOOL-LEVEL POLICIES
+# ============================================================
+
+tool_policies:
+  # --- HIGH-VALUE TUNING TARGETS (significant parameter sensitivity) ---
+
+  run_scanpy_spatial_domain:
+    tuning_useful: true
+    notes: "Resolution is the most impactful single parameter across all clustering tools. Not worth tuning when n_clusters is known and the resolution pre-determined (not enforced)"
+
+  run_cell2location:
+    tuning_useful: true
+    notes: "N_cells_per_location and detection_alpha are platform-dependent and highly impactful. Each trial is a full training run, so a dataset too large for repeated training (>100k spots) is better left at defaults (not enforced)"
+
+  tangram_map_sc_to_spatial:
+    tuning_useful: true
+    notes: "density_prior and num_epochs affect mapping quality"
+
+  hotspot_spatial_modules:
+    tuning_useful: true
+    notes: "n_neighbors and model selection affect SVG detection sensitivity"
+
+  deepst_identify_domains:
+    tuning_useful: true
+    notes: "Epochs and PCA components affect embedding quality"
+
+  stagate_spatial_domains:
+    tuning_useful: true
+    notes: "rad_cutoff and n_epochs are the key tunable parameters"
+
+  stlearn_spatial_clustering:
+    tuning_useful: true
+
+  cellcharter_cluster_spatial_domains:
+    tuning_useful: true
+
+  # --- MODERATE-VALUE TUNING TARGETS ---
+
+  graphst_spatial_clustering:
+    tuning_useful: true
+    notes: "cluster_tool choice (mclust vs leiden) has meaningful impact"
+
+  graphst_deconvolution:
+    tuning_useful: true
+
+  tacco_annotate:
+    tuning_useful: true
+    notes: "method (OT vs nnls) is the primary choice"
+
+  spagft_identify_svg:
+    tuning_useful: true
+
+  prost_index_svg:
+    tuning_useful: true
+
+  run_destvi:
+    tuning_useful: true
+    notes: "GPU-dependent; epochs are the main tunable"
+
+  # --- LOW-VALUE TUNING TARGETS (mostly fixed or data-dependent) ---
+
+  run_miso:
+    tuning_useful: false
+    skip_conditions:
+      - "Only n_clusters is tunable and it is dataset-dependent"
+    notes: "MISO has minimal tunable hyperparameters"
+
+  run_sedr:
+    tuning_useful: false
+    notes: "SEDR has n_clusters (dataset-dependent), using_dec (keep true) and hvg_flavor (keep 'seurat'; 'seurat_v3' needs scikit-misc, absent from sedr_env, and stops the run)"
+
+  stride_deconvolution:
+    tuning_useful: false
+    notes: "STRIDE has minimal tunable parameters"
+
+  bsp_identify_svg:
+    tuning_useful: false
+    notes: "Only top_k_genes is tunable"
+
+  # --- SKIP TUNING (pure I/O or domain-specific) ---
+
+  convert_h5ad_to_seurat_rds:
+    tuning_useful: false
+    skip_conditions: ["Data conversion tool - no meaningful hyperparameters"]
+
+  convert_seurat_rds_to_h5ad:
+    tuning_useful: false
+    skip_conditions: ["Data conversion tool"]
+
+  convert_h5ad_to_csv:
+    tuning_useful: false
+    skip_conditions: ["Data conversion tool"]
+
+  convert_csv_to_h5ad:
+    tuning_useful: false
+    skip_conditions: ["Data conversion tool"]
+
+  # --- NOT DRIVABLE BY THE TUNER'S DIRECT-CLI TRIALS ---
+  # A trial runs the worker directly, without the portal. These portals do something with their
+  # input that a trial cannot reproduce, so every trial would be refused; say so up front instead of
+  # advertising them as tunable (hunt 2026-09-30, u32-tuning-14).
+
+  svgbit_run:
+    tuning_useful: false
+    skip_conditions: ["svgbit_worker.py takes a single --json payload the portal builds; a tuning trial cannot drive it"]
+
+  starfysh_deconvolution:
+    tuning_useful: false
+    skip_conditions: ["starfysh_worker.py takes a single --json payload the portal builds; a tuning trial cannot drive it"]
+
+  spiral_integrate:
+    tuning_useful: false
+    skip_conditions: ["SPIRAL integrates two or more slices; a tuning trial carries one dataset"]
+
+  seurat_qc_cluster:
+    tuning_useful: false
+    skip_conditions: ["the portal stages its input into a counts directory for seurat_worker.R; a tuning trial cannot drive it"]
+
+  # The CSV-input portals. Each takes counts/coordinates tables that a caller converts from the h5ad
+  # first (convert_h5ad_to_csv); a trial hands the worker one .h5ad, so build_tool_command refuses
+  # every one of them ("declares no .h5ad input parameter"). They were still listed tunable, three of
+  # them as moderate-value targets, so each search ran its whole budget into that refusal
+  # (hunt 2026-09-30, u32-tuning-14 follow-up).
+
+  run_card:
+    tuning_useful: false
+    skip_conditions: ["run_card takes spatial/reference counts CSVs converted from the h5ad first; a tuning trial carries one .h5ad and cannot drive it"]
+
+  spacexr_rctd_deconvolution:
+    tuning_useful: false
+    skip_conditions: ["spacexr_rctd_deconvolution takes spatial/reference counts CSVs converted from the h5ad first; a tuning trial carries one .h5ad and cannot drive it"]
+    notes: "mode (doublet vs full vs multi) is the primary choice, once a trial can drive it"
+
+  run_spotlight:
+    tuning_useful: false
+    skip_conditions: ["run_spotlight takes spatial/reference counts CSVs converted from the h5ad first; a tuning trial carries one .h5ad and cannot drive it"]
+
+  run_stdeconvolve:
+    tuning_useful: false
+    skip_conditions: ["run_stdeconvolve takes a spatial counts CSV converted from the h5ad first; a tuning trial carries one .h5ad and cannot drive it"]
+
+  spark_svg_detection:
+    tuning_useful: false
+    skip_conditions: ["spark_svg_detection takes counts and coordinates CSVs converted from the h5ad first; a tuning trial carries one .h5ad and cannot drive it"]
+
+  spvc_svg_detection:
+    tuning_useful: false
+    skip_conditions: ["spvc_svg_detection takes counts and coordinates CSVs converted from the h5ad first; a tuning trial carries one .h5ad and cannot drive it"]
+
+  run_bass:
+    tuning_useful: false
+    skip_conditions: ["run_bass takes counts and coordinates CSVs converted from the h5ad first; a tuning trial carries one .h5ad and cannot drive it"]
+
+  precast_spatial_clustering:
+    tuning_useful: false
+    skip_conditions: ["precast_spatial_clustering takes per-slice counts and coordinates CSVs converted from the h5ad first; a tuning trial carries one .h5ad and cannot drive it"]
+    notes: "K is dataset-dependent; gene_number has limited impact"

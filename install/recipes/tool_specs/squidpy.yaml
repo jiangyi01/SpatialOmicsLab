@@ -1,0 +1,29 @@
+server_key: squidpy
+worker_kind: python
+env_prefix: SQUIDPY
+override_vars:
+  SQUIDPY_PYTHON: /opt/conda/envs/moscot/bin/python
+worker_var: SQUIDPY_WORKER
+worker_file: squidpy_worker.py
+server_file: squidpy_mcp_server.py
+source_env: moscot
+import_check: squidpy
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/squidpy.env.yaml
+gpu: false
+shared_env: true
+est_gb: null
+service_keys: []
+functions:
+- name: squidpy_spatial_neighbors
+  category: spatial_analysis
+- name: squidpy_nhood_enrichment
+  category: spatial_analysis
+- name: squidpy_co_occurrence
+  category: spatial_analysis
+- name: squidpy_spatial_autocorr
+  category: spatial_analysis
+- name: squidpy_ripley
+  category: spatial_analysis
+- name: squidpy_centrality_scores
+  category: spatial_analysis

@@ -1,0 +1,19 @@
+server_key: stlearn
+worker_kind: python
+env_prefix: STLEARN
+override_vars:
+  STLEARN_PYTHON: /opt/conda/envs/stlearn/bin/python
+worker_var: STLEARN_WORKER
+worker_file: stlearn_worker.py
+server_file: stlearn_mcp_server.py
+source_env: stlearn
+import_check: stlearn
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/stlearn.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: stlearn_spatial_clustering
+  category: spatial_clustering

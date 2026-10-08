@@ -1,0 +1,33 @@
+server_key: seurat
+worker_kind: rscript
+env_prefix: SEURAT
+override_vars:
+  SEURAT_RSCRIPT: /opt/conda/envs/seurat_env/bin/Rscript
+worker_var: SEURAT_WORKER
+worker_file: seurat_worker.R
+server_file: seurat_mcp_server.py
+source_env: seurat_env
+import_check: Seurat
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/seurat.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: seurat_qc_cluster
+  category: spatial_analysis
+- name: seurat_integrate_qc_cluster
+  category: spatial_analysis
+- name: seurat_find_markers
+  category: spatial_analysis
+- name: seurat_dimplot
+  category: spatial_analysis
+- name: seurat_spatial_qc_cluster
+  category: spatial_analysis
+- name: seurat_spatial_feature_plot
+  category: spatial_analysis
+- name: seurat_spatial_dimplot
+  category: spatial_analysis
+- name: seurat_spatial_variable_features
+  category: spatial_analysis

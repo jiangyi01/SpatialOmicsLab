@@ -1,0 +1,19 @@
+server_key: spaceflow
+worker_kind: python
+env_prefix: SPACEFLOW
+override_vars:
+  SPACEFLOW_PYTHON: /opt/conda/envs/spaceflow_env/bin/python
+worker_var: SPACEFLOW_WORKER
+worker_file: spaceflow_worker.py
+server_file: spaceflow_mcp_server.py
+source_env: spaceflow_env
+import_check: SpaceFlow
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spaceflow.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: spaceflow_spatial_domains
+  category: spatial_clustering

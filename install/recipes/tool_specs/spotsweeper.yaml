@@ -1,0 +1,19 @@
+server_key: spotsweeper
+worker_kind: rscript
+env_prefix: SPOTSWEEPER
+override_vars:
+  SPOTSWEEPER_PYTHON: /opt/conda/envs/spotsweeper_env2/bin/Rscript
+worker_var: SPOTSWEEPER_WORKER
+worker_file: spotsweeper_worker.R
+server_file: spotsweeper_mcp_server.py
+source_env: spotsweeper_env2
+import_check: SpotSweeper
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spotsweeper.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_spotsweeper
+  category: spatial_analysis

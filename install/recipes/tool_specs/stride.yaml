@@ -1,0 +1,19 @@
+server_key: stride
+worker_kind: python
+env_prefix: STRIDE
+override_vars:
+  STRIDE_PYTHON: /opt/conda/envs/stride/bin/python
+worker_var: STRIDE_WORKER
+worker_file: stride_worker.py
+server_file: stride_mcp_server.py
+source_env: stride
+import_check: STRIDE
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/stride.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: stride_deconvolution
+  category: deconvolution

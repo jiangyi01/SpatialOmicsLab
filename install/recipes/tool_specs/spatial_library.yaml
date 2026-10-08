@@ -1,0 +1,23 @@
+server_key: spatial_library
+worker_kind: python
+env_prefix: SPATIAL_LIBRARY
+override_vars:
+  SPATIAL_LIBRARY_PYTHON: /opt/conda/bin/python
+worker_var: SPATIAL_LIBRARY_WORKER
+worker_file: spatial_library_worker.py
+server_file: spatial_library_mcp_server.py
+source_env: null
+import_check: spatial_library
+# Base-env server: the worker runs under base python (see override_vars above), so there is
+# nothing to build or clone. `none` makes classify() return ToolStatus.NONE (provision.py) and
+# validate() skip the build-only checks (specs.py) — the eval-server contract. Previously
+# `conda_export` with recipe: null, which hard-fails every fresh clone ("conda_export has no recipe").
+build_strategy: none
+recipe: null
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: search_spatial_datasets
+  category: spatial_analysis

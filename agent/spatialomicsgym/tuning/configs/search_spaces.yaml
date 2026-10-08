@@ -1,0 +1,837 @@
+# Search space definitions for hyperparameter tuning.
+#
+# For each tool, defines tunable parameters with:
+#   name, type, default, min, max, choices, step
+#   tunable: true/false
+#   risk_level: safe | moderate | dangerous
+#   output_cap: true for a knob that caps how many results the tool reports. A proxy objective that
+#     counts results cannot rank it, so adaptive (proxy-scored) searches leave it out; the benchmark
+#     modes, scored against ground truth, keep it (hunt 2026-09-30, u32-tuning-19).
+#   inert_when_fixed: fixed parameters (TuningConfig.fixed_params) that, set to anything but 0/empty,
+#     leave this one without effect; a search then neither varies nor reports it.
+#
+# Parameters ordered by tuning impact (most impactful first).
+
+tools:
+  # ============================================================
+  # SPATIAL CLUSTERING TOOLS
+  # ============================================================
+
+  run_scanpy_spatial_domain:
+    task_type: spatial_clustering
+    parameters:
+      - name: resolution
+        type: float
+        default: 0.6
+        min: 0.1
+        max: 2.0
+        step: 0.1
+        tunable: true
+        risk_level: safe
+        description: "Leiden clustering resolution"
+        # With target_n_clusters fixed (a benchmark dataset's cluster count) the worker binary-searches
+        # the resolution itself and ignores this one (hunt 2026-09-30, u32-tuning-5 follow-up).
+        inert_when_fixed: [target_n_clusters]
+      - name: n_neighbors
+        type: int
+        default: 15
+        min: 5
+        max: 50
+        step: 5
+        tunable: true
+        risk_level: safe
+        description: "KNN graph neighbors"
+      - name: n_pcs
+        type: int
+        default: 30
+        min: 10
+        max: 100
+        step: 10
+        tunable: true
+        risk_level: safe
+        description: "PCA components for neighbor graph"
+      - name: min_counts
+        type: int
+        default: 0
+        min: 0
+        max: 100
+        tunable: false
+        risk_level: moderate
+        description: "Gene filtering threshold"
+
+  graphst_spatial_clustering:
+    task_type: spatial_clustering
+    parameters:
+      - name: cluster_tool
+        type: categorical
+        default: "mclust"
+        choices: ["mclust", "leiden", "louvain"]
+        tunable: true
+        risk_level: safe
+        description: "Clustering backend"
+      - name: radius
+        type: int
+        default: 50
+        min: 10
+        max: 200
+        step: 20
+        tunable: true
+        risk_level: safe
+        description: "Nearest spots voting in the mclust refinement step (no effect with leiden/louvain)"
+
+  stagate_spatial_domains:
+    task_type: spatial_clustering
+    parameters:
+      - name: rad_cutoff
+        type: float
+        default: 0.0
+        min: 50.0
+        max: 500.0
+        step: 50.0
+        tunable: true
+        risk_level: safe
+        description: "Spatial network radius cutoff, in obsm[spatial_key] units. Default 0 (portal default since 2026-09-29) derives the radius from the spot spacing; min/max are absolute radii whose meaning depends on the slide's coordinate units, and the worker refuses a candidate radius that leaves more than half the spots isolated"
+      - name: n_epochs
+        type: int
+        default: 200
+        min: 50
+        max: 2000
+        step: 100
+        tunable: true
+        risk_level: safe
+        description: "Training epochs"
+      - name: n_clusters
+        type: int
+        default: 6
+        min: 2
+        max: 30
+        tunable: false
+        risk_level: moderate
+        description: "Number of clusters (dataset-dependent)"
+
+  deepst_identify_domains:
+    task_type: spatial_clustering
+    parameters:
+      - name: pre_epochs
+        type: int
+        default: 500
+        min: 100
+        max: 1500
+        step: 200
+        tunable: true
+        risk_level: safe
+        description: "Pre-training epochs"
+      - name: epochs
+        type: int
+        default: 500
+        min: 100
+        max: 1500
+        step: 200
+        tunable: true
+        risk_level: safe
+        description: "Training epochs"
+      - name: pca_n_comps
+        type: int
+        default: 200
+        min: 50
+        max: 500
+        step: 50
+        tunable: true
+        risk_level: safe
+        description: "PCA components"
+      - name: n_domains
+        type: int
+        default: 7
+        min: 2
+        max: 30
+        tunable: false
+        risk_level: moderate
+
+  stlearn_spatial_clustering:
+    task_type: spatial_clustering
+    parameters:
+      - name: resolution
+        type: float
+        default: 1.0
+        min: 0.1
+        max: 2.0
+        step: 0.1
+        tunable: true
+        risk_level: safe
+      - name: n_neighbors
+        type: int
+        default: 25
+        min: 5
+        max: 50
+        step: 5
+        tunable: true
+        risk_level: safe
+      - name: n_pcs
+        type: int
+        default: 50
+        min: 10
+        max: 100
+        step: 10
+        tunable: true
+        risk_level: safe
+      - name: radius
+        type: int
+        default: 50
+        min: 10
+        max: 200
+        tunable: true
+        risk_level: safe
+      - name: crop_size
+        type: int
+        default: 40
+        min: 20
+        max: 100
+        tunable: true
+        risk_level: moderate
+
+  prost_pnn_domains:
+    task_type: spatial_clustering
+    parameters:
+      - name: n_neighbors
+        type: int
+        default: 20
+        min: 5
+        max: 50
+        step: 5
+        tunable: true
+        risk_level: safe
+      - name: n_eigs
+        type: int
+        default: 30
+        min: 10
+        max: 100
+        step: 10
+        tunable: true
+        risk_level: safe
+      - name: n_domains
+        type: int
+        default: 6
+        min: 2
+        max: 30
+        tunable: false
+        risk_level: moderate
+
+  cellcharter_cluster_spatial_domains:
+    task_type: spatial_clustering
+    parameters:
+      - name: n_layers
+        type: int
+        default: 3
+        min: 1
+        max: 5
+        tunable: true
+        risk_level: safe
+      # The two bounds of ClusterAutoK's K search are drawn independently, so their ranges must not
+      # overlap: with min in [2,10] and max in [5,30] the grid proposed (10, 5), which the worker
+      # refuses before any compute (hunt 2026-09-30, u32-tuning-17).
+      - name: n_clusters_min
+        type: int
+        default: 3
+        min: 2
+        max: 6
+        tunable: true
+        risk_level: safe
+      - name: n_clusters_max
+        type: int
+        default: 12
+        min: 8
+        max: 30
+        tunable: true
+        risk_level: safe
+      - name: max_runs
+        type: int
+        default: 5
+        min: 2
+        max: 20
+        tunable: true
+        risk_level: safe
+      - name: convergence_tol
+        type: float
+        default: 0.001
+        min: 0.0001
+        max: 0.01
+        tunable: true
+        risk_level: moderate
+
+  precast_spatial_clustering:
+    task_type: spatial_clustering
+    parameters:
+      - name: K
+        type: int
+        default: 7
+        min: 2
+        max: 30
+        tunable: false
+        risk_level: moderate
+        description: "Number of clusters (dataset-dependent)"
+      - name: gene_number
+        type: int
+        default: 2000
+        min: 500
+        max: 5000
+        step: 500
+        tunable: true
+        risk_level: safe
+
+  run_sedr:
+    task_type: spatial_clustering
+    parameters:
+      - name: n_clusters
+        type: int
+        default: 7
+        min: 2
+        max: 30
+        tunable: false
+        risk_level: moderate
+      - name: using_dec
+        type: bool
+        default: true
+        tunable: true
+        risk_level: safe
+
+  run_bass:
+    task_type: spatial_clustering
+    parameters:
+      - name: n_clusters
+        type: int
+        default: 7
+        min: 2
+        max: 30
+        tunable: false
+        risk_level: moderate
+      - name: burn_in
+        type: int
+        default: 2000
+        min: 500
+        max: 5000
+        step: 500
+        tunable: true
+        risk_level: safe
+      - name: n_samples
+        type: int
+        default: 5000
+        min: 1000
+        max: 10000
+        step: 1000
+        tunable: true
+        risk_level: safe
+
+  seurat_qc_cluster:
+    task_type: spatial_clustering
+    parameters:
+      - name: resolution
+        type: float
+        default: 0.8
+        min: 0.1
+        max: 2.0
+        step: 0.1
+        tunable: true
+        risk_level: safe
+      - name: n_hvgs
+        type: int
+        default: 2000
+        min: 500
+        max: 5000
+        step: 500
+        tunable: true
+        risk_level: safe
+      - name: n_pcs
+        type: int
+        default: 30
+        min: 10
+        max: 100
+        step: 10
+        tunable: true
+        risk_level: safe
+
+  spiral_integrate:
+    task_type: spatial_clustering
+    parameters:
+      - name: n_epochs
+        type: int
+        default: 300
+        min: 100
+        max: 1000
+        step: 100
+        tunable: true
+        risk_level: safe
+      - name: hidden_dim
+        type: int
+        default: 32
+        choices: [16, 32, 64]
+        tunable: true
+        risk_level: safe
+      - name: latent_dim
+        type: int
+        default: 32
+        choices: [16, 32, 64]
+        tunable: true
+        risk_level: safe
+      - name: knn
+        type: int
+        default: 10
+        min: 5
+        max: 30
+        tunable: true
+        risk_level: safe
+      - name: n_clusters
+        type: int
+        default: 7
+        min: 2
+        max: 30
+        tunable: false
+        risk_level: moderate
+
+  # ============================================================
+  # SVG DETECTION TOOLS
+  # ============================================================
+
+  hotspot_spatial_modules:
+    task_type: svg_detection
+    parameters:
+      - name: n_neighbors
+        type: int
+        default: 30
+        min: 5
+        max: 100
+        step: 10
+        tunable: true
+        risk_level: safe
+      - name: model
+        type: categorical
+        default: "danb"
+        choices: ["danb", "bernoulli", "normal", "none"]
+        tunable: true
+        risk_level: safe
+      - name: autocorr_fdr
+        type: float
+        default: 0.05
+        min: 0.001
+        max: 0.1
+        tunable: true
+        risk_level: moderate
+      - name: min_gene_threshold
+        type: int
+        default: 30
+        min: 5
+        max: 100
+        tunable: true
+        risk_level: safe
+
+  spagft_identify_svg:
+    task_type: svg_detection
+    parameters:
+      - name: n_neighbors
+        type: int
+        default: 20
+        min: 5
+        max: 50
+        step: 5
+        tunable: false
+        risk_level: safe
+        description: "Substitute-only (allow_gft_fallback); SpaGFT.detect_svg sets its own KNN size and the worker lists n_neighbors in params.ignored, so a trial varying it reruns the same analysis"
+      - name: n_eigs
+        type: int
+        default: 50
+        min: 10
+        max: 200
+        step: 20
+        tunable: false
+        risk_level: safe
+        description: "Substitute-only; SpaGFT.detect_svg uses ceil(sqrt(n_spots)) low- and high-frequency modes and the worker lists n_eigs in params.ignored"
+      - name: low_freq_fraction
+        type: float
+        default: 0.1
+        min: 0.01
+        max: 0.5
+        tunable: false
+        risk_level: safe
+        description: "Substitute-only; SpaGFT.detect_svg never reads it (params.ignored)"
+      - name: n_top_genes
+        type: int
+        default: 200
+        min: 50
+        max: 1000
+        step: 50
+        tunable: true
+        risk_level: safe
+        output_cap: true
+
+  prost_index_svg:
+    task_type: svg_detection
+    parameters:
+      - name: n_neighbors
+        type: int
+        default: 20
+        min: 5
+        max: 50
+        step: 5
+        tunable: true
+        risk_level: safe
+      - name: n_eigs
+        type: int
+        default: 50
+        min: 10
+        max: 200
+        step: 20
+        tunable: true
+        risk_level: safe
+      - name: n_top_genes
+        type: int
+        default: 200
+        min: 50
+        max: 1000
+        step: 50
+        tunable: true
+        risk_level: safe
+        output_cap: true
+
+  spark_svg_detection:
+    task_type: svg_detection
+    parameters:
+      - name: pval_cutoff
+        type: float
+        default: 0.05
+        min: 0.001
+        max: 0.1
+        tunable: true
+        risk_level: safe
+      - name: n_top
+        type: int
+        default: 100
+        min: 50
+        max: 1000
+        tunable: true
+        risk_level: safe
+        output_cap: true
+
+  spvc_svg_detection:
+    task_type: svg_detection
+    parameters:
+      - name: pval_cutoff
+        type: float
+        default: 0.05
+        min: 0.001
+        max: 0.1
+        tunable: true
+        risk_level: safe
+      - name: n_top
+        type: int
+        default: 100
+        min: 50
+        max: 1000
+        tunable: true
+        risk_level: safe
+        output_cap: true
+
+  svgbit_run:
+    task_type: svg_detection
+    parameters:
+      # Defaults are svgbit.run's and the portal's (6 / 1000); 10 / 200 were an old local choice
+      # (hunt 2026-09-30, u32-tuning-13).
+      - name: k
+        type: int
+        default: 6
+        min: 5
+        max: 30
+        tunable: true
+        risk_level: safe
+      - name: n_svgs
+        type: int
+        default: 1000
+        min: 50
+        max: 1000
+        tunable: true
+        risk_level: safe
+        output_cap: true
+
+  bsp_identify_svg:
+    task_type: svg_detection
+    parameters:
+      - name: top_k_genes
+        type: int
+        default: 200
+        min: 50
+        max: 1000
+        tunable: true
+        risk_level: safe
+        output_cap: true
+
+  # ============================================================
+  # DECONVOLUTION TOOLS
+  # ============================================================
+
+  run_cell2location:
+    task_type: deconvolution
+    parameters:
+      - name: n_cells_per_location
+        type: int
+        default: 30
+        min: 1
+        max: 100
+        step: 5
+        tunable: true
+        risk_level: safe
+        description: "Expected cells per spot"
+      - name: detection_alpha
+        type: float
+        default: 20.0
+        min: 1.0
+        max: 200.0
+        step: 10.0
+        tunable: true
+        risk_level: safe
+        description: "Detection over-dispersion prior"
+      # The portal and worker have defaulted to 250 / 30000 (the tutorials' values) since
+      # 2026-09-29; the ranges still ended at 500 / 10000, so no candidate could train as long as an
+      # ordinary call, and narrowing around a winning 30000 baseline raised ValueError
+      # (hunt 2026-09-30, u32-tuning-15).
+      - name: max_epochs_ref
+        type: int
+        default: 250
+        min: 10
+        max: 500
+        step: 50
+        tunable: true
+        risk_level: safe
+      - name: max_epochs_map
+        type: int
+        default: 30000
+        min: 5000
+        max: 40000
+        step: 5000
+        tunable: true
+        risk_level: safe
+      - name: leiden_resolution
+        type: float
+        default: 1.1
+        min: 0.1
+        max: 2.0
+        step: 0.1
+        tunable: true
+        risk_level: safe
+      - name: cell_count_cutoff
+        type: int
+        default: 5
+        min: 1
+        max: 20
+        tunable: true
+        risk_level: moderate
+      - name: cell_percentage_cutoff2
+        type: float
+        default: 0.03
+        min: 0.01
+        max: 0.1
+        tunable: true
+        risk_level: moderate
+      - name: nonz_mean_cutoff
+        type: float
+        default: 1.12
+        min: 0.5
+        max: 2.0
+        tunable: true
+        risk_level: moderate
+
+  tangram_map_sc_to_spatial:
+    task_type: deconvolution
+    parameters:
+      - name: num_epochs
+        type: int
+        default: 500
+        min: 100
+        max: 2000
+        step: 100
+        tunable: true
+        risk_level: safe
+      - name: n_markers_per_class
+        type: int
+        default: 100
+        min: 20
+        max: 500
+        step: 20
+        tunable: true
+        risk_level: safe
+      - name: density_prior
+        type: categorical
+        default: "rna_count_based"
+        choices: ["rna_count_based", "uniform"]
+        tunable: true
+        risk_level: safe
+      - name: mode
+        type: categorical
+        default: "cells"
+        choices: ["cells", "clusters"]
+        tunable: true
+        risk_level: moderate
+
+  graphst_deconvolution:
+    task_type: deconvolution
+    parameters:
+      - name: epochs
+        type: int
+        default: 1200
+        min: 200
+        max: 3000
+        step: 200
+        tunable: true
+        risk_level: safe
+      - name: retain_percent
+        type: float
+        default: 0.15
+        min: 0.05
+        max: 0.5
+        step: 0.05
+        tunable: true
+        risk_level: safe
+
+  tacco_annotate:
+    task_type: deconvolution
+    parameters:
+      - name: method
+        type: categorical
+        default: "OT"
+        choices: ["OT", "nnls", "projection"]
+        tunable: true
+        risk_level: safe
+      - name: multi_center
+        type: int
+        default: 3
+        min: 0
+        max: 10
+        tunable: true
+        risk_level: safe
+      - name: lamb
+        type: float
+        default: 0.001
+        min: 0.0001
+        max: 0.1
+        tunable: true
+        risk_level: safe
+
+  spacexr_rctd_deconvolution:
+    task_type: deconvolution
+    parameters:
+      - name: mode
+        type: categorical
+        default: "doublet"
+        choices: ["doublet", "full", "multi"]
+        tunable: true
+        risk_level: safe
+
+  run_card:
+    task_type: deconvolution
+    parameters:
+      - name: min_count_gene
+        type: int
+        default: 100
+        min: 10
+        max: 500
+        tunable: true
+        risk_level: safe
+      - name: min_count_spot
+        type: int
+        default: 5
+        min: 1
+        max: 20
+        tunable: true
+        risk_level: safe
+
+  run_destvi:
+    task_type: deconvolution
+    parameters:
+      # Defaults are the portal's (100 / 2000); 500 / 2500 matched neither the portal nor scvi-tools
+      # (CondSCVI.train 300, DestVI.train 2000) (hunt 2026-09-30, u32-tuning-13).
+      - name: max_epochs_sc
+        type: int
+        default: 100
+        min: 100
+        max: 2000
+        step: 100
+        tunable: true
+        risk_level: safe
+      - name: max_epochs_st
+        type: int
+        default: 2000
+        min: 500
+        max: 5000
+        step: 500
+        tunable: true
+        risk_level: safe
+      - name: n_top_genes
+        type: int
+        default: 2000
+        min: 500
+        max: 5000
+        step: 500
+        tunable: true
+        risk_level: safe
+
+  run_spotlight:
+    task_type: deconvolution
+    parameters:
+      - name: n_top
+        type: int
+        default: 3000
+        min: 500
+        max: 5000
+        tunable: true
+        risk_level: safe
+      - name: min_cont
+        type: float
+        default: 0.09
+        min: 0.01
+        max: 0.3
+        tunable: true
+        risk_level: safe
+
+  run_stdeconvolve:
+    task_type: deconvolution
+    parameters:
+      - name: n_topics
+        type: int
+        default: 15
+        min: 3
+        max: 30
+        tunable: true
+        risk_level: safe
+      - name: n_top_genes
+        type: int
+        default: 2000
+        min: 500
+        max: 5000
+        tunable: true
+        risk_level: safe
+
+  starfysh_deconvolution:
+    task_type: deconvolution
+    parameters:
+      - name: n_genes
+        type: int
+        default: 2000
+        min: 500
+        max: 5000
+        step: 500
+        tunable: true
+        risk_level: safe
+      # Defaults are the portal's (200 / 1e-3); run_starfysh's own are 100 / 1e-4
+      # (hunt 2026-09-30, u32-tuning-13).
+      - name: epochs
+        type: int
+        default: 200
+        min: 50
+        max: 1000
+        step: 50
+        tunable: true
+        risk_level: safe
+      - name: lr
+        type: float
+        default: 0.001
+        min: 0.0001
+        max: 0.01
+        tunable: true
+        risk_level: moderate

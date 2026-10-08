@@ -1,0 +1,19 @@
+server_key: spatial_miso
+worker_kind: python
+env_prefix: MISO
+override_vars:
+  MISO_PYTHON: /opt/conda/envs/miso/bin/python
+worker_var: MISO_WORKER
+worker_file: miso_worker.py
+server_file: miso_mcp_server.py
+source_env: miso
+import_check: miso
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spatial_miso.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_miso
+  category: spatial_clustering

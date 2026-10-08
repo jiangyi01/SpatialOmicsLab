@@ -1,0 +1,19 @@
+server_key: hotspot
+worker_kind: python
+env_prefix: HOTSPOT
+override_vars:
+  HOTSPOT_PYTHON: /opt/conda/envs/hotspot/bin/python
+worker_var: HOTSPOT_WORKER
+worker_file: hotspot_worker.py
+server_file: hotspot_mcp_server.py
+source_env: hotspot
+import_check: hotspot
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/hotspot.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: hotspot_spatial_modules
+  category: svg_detection

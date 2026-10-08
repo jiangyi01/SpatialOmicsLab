@@ -1,0 +1,19 @@
+server_key: deepst
+worker_kind: python
+env_prefix: DEEPST
+override_vars:
+  DEEPST_PYTHON: /opt/conda/envs/deepst-env/bin/python
+worker_var: DEEPST_WORKER
+worker_file: deepst_worker.py
+server_file: deepst_mcp_server.py
+source_env: deepst-env
+import_check: deepstkit
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/deepst.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: deepst_identify_domains
+  category: spatial_clustering

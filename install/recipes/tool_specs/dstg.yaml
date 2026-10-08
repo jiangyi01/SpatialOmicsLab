@@ -1,0 +1,19 @@
+server_key: dstg
+worker_kind: python
+env_prefix: DSTG
+override_vars:
+  DSTG_PYTHON: /opt/conda/envs/dstg_env/bin/python
+worker_var: DSTG_WORKER
+worker_file: dstg_worker.py
+server_file: dstg_mcp_server.py
+source_env: dstg_env
+import_check: __future__
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/dstg.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_dstg
+  category: deconvolution

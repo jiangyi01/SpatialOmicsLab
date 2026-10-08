@@ -1,0 +1,19 @@
+server_key: tangram
+worker_kind: python
+env_prefix: TANGRAM
+override_vars:
+  TANGRAM_PYTHON: /opt/conda/envs/tangram-env/bin/python
+worker_var: TANGRAM_WORKER
+worker_file: tangram_worker.py
+server_file: tangram_mcp_server.py
+source_env: tangram-env
+import_check: tangram
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/tangram.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: tangram_map_sc_to_spatial
+  category: deconvolution

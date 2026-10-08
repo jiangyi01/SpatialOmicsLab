@@ -1,0 +1,19 @@
+server_key: stplus
+worker_kind: python
+env_prefix: STPLUS
+override_vars:
+  STPLUS_PYTHON: /opt/conda/envs/stplus_env/bin/python
+worker_var: STPLUS_WORKER
+worker_file: stplus_worker.py
+server_file: stplus_mcp_server.py
+source_env: stplus_env
+import_check: stPlus
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/stplus.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_stplus
+  category: spatial_analysis

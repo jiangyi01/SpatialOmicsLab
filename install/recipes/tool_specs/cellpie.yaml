@@ -1,0 +1,19 @@
+server_key: cellpie
+worker_kind: python
+env_prefix: CELLPIE
+override_vars:
+  CELLPIE_PYTHON: /opt/conda/envs/cellpie_env/bin/python3.9
+worker_var: CELLPIE_WORKER
+worker_file: cellpie_worker.py
+server_file: cellpie_mcp_server.py
+source_env: cellpie_env
+import_check: __future__
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/cellpie.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_cellpie
+  category: deconvolution

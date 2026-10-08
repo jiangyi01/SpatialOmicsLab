@@ -1,0 +1,19 @@
+server_key: spatialpca
+worker_kind: rscript
+env_prefix: SPATIALPCA
+override_vars:
+  SPATIALPCA_PYTHON: /opt/conda/envs/spatialpca_env/bin/Rscript
+worker_var: SPATIALPCA_WORKER
+worker_file: spatialpca_worker.R
+server_file: spatialpca_mcp_server.py
+source_env: spatialpca_env
+import_check: SpatialPCA
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spatialpca.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_spatialpca
+  category: spatial_analysis

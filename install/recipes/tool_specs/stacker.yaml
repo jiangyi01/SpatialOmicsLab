@@ -1,0 +1,19 @@
+server_key: stacker
+worker_kind: python
+env_prefix: STACKER
+override_vars:
+  STACKER_PYTHON: /opt/conda/envs/stacker/bin/python
+worker_var: STACKER_WORKER
+worker_file: stacker_worker.py
+server_file: stacker_mcp_server.py
+source_env: stacker
+import_check: ants
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/stacker.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: stacker_register
+  category: spatial_alignment

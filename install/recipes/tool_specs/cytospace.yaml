@@ -1,0 +1,19 @@
+server_key: cytospace
+worker_kind: python
+env_prefix: CYTOSPACE
+override_vars:
+  CYTOSPACE_PYTHON: /opt/conda/envs/cytospace_env/bin/python3.9
+worker_var: CYTOSPACE_WORKER
+worker_file: cytospace_worker.py
+server_file: cytospace_mcp_server.py
+source_env: cytospace_env
+import_check: cytospace
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/cytospace.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_cytospace
+  category: deconvolution

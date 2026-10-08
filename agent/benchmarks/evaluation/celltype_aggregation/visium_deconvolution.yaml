@@ -1,0 +1,93 @@
+# Cell-type aggregation table — visium_deconvolution
+#
+# Dataset: 10x Genomics V1_Human_Lymph_Node Visium dataset
+# GT: spatial.h5ad obs['CellType'] — 4 histological zone labels
+#   • B follicle, Germinal Center, T-cell, Mixed
+# SC reference: King-2020 / Park-2020 / James-2020 lymphoid atlas
+#   sc.obs['CellType'] — 44 fine lineage labels at the cluster level
+#
+# Tools either:
+#   (a) predict directly at the 4-class level (run_card, run_cell2location,
+#       run_destvi, run_spatialscope, tangram, tacco, ...) → no aggregation
+#       (this file's mapping is identity for those 4 keys);
+#   (b) predict at the 44-class sc-reference level (spacexr_rctd) → must
+#       aggregate fine labels into the 4 GT zones via the rules below.
+#
+# Mapping rationale (lineage-based; spatial proximity is secondary):
+#   • Germinal Center: any GC-resident B clone (DZ/LZ/cycling/prePB)
+#   • B follicle    : mature non-GC B cells (memory, naive, plasma, preGC)
+#   • T-cell        : all αβ/γδ T cells AND TfH (TfH is a T lineage even
+#                     though it homes to GC/follicle borders)
+#   • Mixed         : myeloid, NK/NKT/ILC, endothelial, stromal, unknown.
+#                     The histological "Mixed" GT label is exactly the
+#                     interfollicular fall-through — it has no single
+#                     dominant lineage, so non-B/non-T sc clusters fall here.
+#
+# Name-normalization for matching prediction-column names (which different
+# tools sanitize differently): lowercase + collapse [_-\s/] to single space.
+# Tools' columns do not need to match the canonical name string — the
+# evaluator normalizes both sides before lookup.
+#
+# Coverage check: 44 fine labels mapped + 4 GT identity entries = 48 keys.
+
+dataset: visium_deconvolution
+gt_classes: ["B follicle", "Germinal Center", "T-cell", "Mixed"]
+
+mapping:
+  # ── Germinal Center (GC reaction zone) ─────────────────────────────
+  B_GC_1:             "Germinal Center"
+  B_GC_2:             "Germinal Center"
+  B_GC_3:             "Germinal Center"
+  B_GC_4:             "Germinal Center"
+  B_GC_prePB:         "Germinal Center"
+  B_DZGC_1:           "Germinal Center"
+  B_DZGC_2:           "Germinal Center"
+  B_LZGC:             "Germinal Center"
+  B_Cycling:          "Germinal Center"
+
+  # ── B follicle (mature non-GC B cells) ─────────────────────────────
+  B_naive_1:          "B follicle"
+  B_naive_2:          "B follicle"
+  B_naive_activated:  "B follicle"
+  B_mem_1:            "B follicle"
+  B_mem_2:            "B follicle"
+  B_mem_3:            "B follicle"
+  B_mem_4:            "B follicle"
+  B_mem_FCRL4+:       "B follicle"
+  B_activated_preGC:  "B follicle"
+  B_plasma:           "B follicle"
+
+  # ── T-cell (all T lineages, including TfH) ─────────────────────────
+  T_CD4+_1:           "T-cell"
+  T_CD4+_2:           "T-cell"
+  T_CD4+_3:           "T-cell"
+  T_CD8+_1:           "T-cell"
+  T_CD8+_2:           "T-cell"
+  T_CD8+_3:           "T-cell"
+  T_Cycling:          "T-cell"
+  "T TIM3+ DN":       "T-cell"
+  TfH_1:              "T-cell"
+  TfH_2:              "T-cell"
+  TfH_3:              "T-cell"
+  Treg:               "T-cell"
+  "Treg/Tfr":         "T-cell"
+
+  # ── Mixed (myeloid / innate / stromal / endothelial / unknown) ─────
+  DC_1:               "Mixed"
+  pDC:                "Mixed"
+  Endo_1:             "Mixed"
+  Endo_2:             "Mixed"
+  "Lymph/Endo":       "Mixed"
+  ILC:                "Mixed"
+  Macrophages:        "Mixed"
+  Monocytes:          "Mixed"
+  NK_1:               "Mixed"
+  NK_2:               "Mixed"
+  NKT:                "Mixed"
+  "unknown/VSMC/FDC": "Mixed"
+
+  # ── Identity (4-class tools that already predict GT classes) ───────
+  "B follicle":       "B follicle"
+  "Germinal Center":  "Germinal Center"
+  "T-cell":           "T-cell"
+  "Mixed":            "Mixed"

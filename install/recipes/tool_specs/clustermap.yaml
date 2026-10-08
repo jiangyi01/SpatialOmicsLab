@@ -1,0 +1,23 @@
+server_key: clustermap
+worker_kind: python
+env_prefix: CLUSTERMAP
+override_vars:
+  CLUSTERMAP_PYTHON: /opt/conda/envs/clustermap_env/bin/python
+worker_var: CLUSTERMAP_WORKER
+worker_file: clustermap_worker.py
+server_file: clustermap_mcp_server.py
+source_env: clustermap_env
+# Worker-bound, like dstg and spicemix: the worker imports ClusterMap from the checkout CLUSTERMAP_SRC
+# names (docs/EXTERNAL_DEPENDENCIES.md). Upstream's setup.py declares packages=[''], so the recipe's
+# git install ships no module and `import ClusterMap` failed on every recipe-built env, even with
+# CLUSTERMAP_SRC set, since the probe does not read it (hunt 2026-09-30, u38b-specs-a-6).
+import_check: __future__
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/clustermap.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_clustermap
+  category: cell_segmentation

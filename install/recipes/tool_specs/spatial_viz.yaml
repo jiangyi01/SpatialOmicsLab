@@ -1,0 +1,62 @@
+server_key: spatial_viz
+worker_kind: python
+env_prefix: SPATIAL_VIZ
+override_vars:
+  SPATIAL_VIZ_PYTHON: /opt/conda/envs/spatialomicsgym_env/bin/python
+worker_var: SPATIAL_VIZ_WORKER
+worker_file: spatial_viz_worker.py
+server_file: spatial_viz_mcp_server.py
+source_env: null
+import_check: spatialomicsgym.viz
+# Agent-core server, same contract as `viz_inspector` above: matplotlib, scanpy and anndata are
+# already in the agent environment, so there is nothing to build. Verified by rendering on this
+# box — spatial scatters, histology overlays, QC panels, marker dot plots and SVG export all work
+# there with no new dependency.
+#
+# The heavier families — segmentation boundaries, SpatialData scenes, very large point clouds —
+# are deliberately NOT here, and no other portal or recipe serves them: they are declared in the
+# capability matrix and refused (D-061). The function list below is every @mcp.tool the server
+# registers (hunt 2026-09-30, u38d-specs-c-10).
+build_strategy: none
+recipe: null
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: plot_spatial_expression
+  category: spatial_analysis
+- name: plot_spatial_annotation
+  category: spatial_analysis
+- name: plot_embedding
+  category: spatial_analysis
+- name: generate_qc_report
+  category: spatial_analysis
+- name: plot_marker_expression
+  category: spatial_analysis
+- name: plot_differential_expression
+  category: spatial_analysis
+- name: plot_deconvolution
+  category: spatial_analysis
+- name: plot_pathway_results
+  category: spatial_analysis
+- name: plot_spatial_statistics
+  category: spatial_analysis
+- name: plot_trajectory
+  category: spatial_analysis
+- name: plot_cell_communication
+  category: spatial_analysis
+- name: compose_figure
+  category: spatial_analysis
+- name: export_visualization
+  category: spatial_analysis
+- name: run_visualization_pipeline
+  category: spatial_analysis
+- name: update_visualization
+  category: spatial_analysis
+- name: plot_spatial_3d
+  category: spatial_analysis
+- name: plot_section_grid
+  category: spatial_analysis
+- name: plot_alignment_qc
+  category: spatial_analysis

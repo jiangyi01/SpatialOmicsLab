@@ -1,0 +1,21 @@
+server_key: spatialprompt
+worker_kind: python
+env_prefix: SPATIALPROMPT
+override_vars:
+  SPATIALPROMPT_PYTHON: /opt/conda/envs/spatialpromptENV/bin/python
+worker_var: SPATIALPROMPT_WORKER
+worker_file: spatialprompt_worker.py
+server_file: spatialprompt_mcp_server.py
+source_env: spatialpromptENV
+import_check: spatialprompt
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spatialprompt.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: spatialprompt_deconvolution
+  category: deconvolution
+- name: spatialprompt_cluster
+  category: spatial_analysis

@@ -1,0 +1,19 @@
+server_key: stdgcn
+worker_kind: python
+env_prefix: STDGCN
+override_vars:
+  STDGCN_PYTHON: /opt/conda/envs/stdgcn_env/bin/python
+worker_var: STDGCN_WORKER
+worker_file: stdgcn_worker.py
+server_file: stdgcn_mcp_server.py
+source_env: stdgcn_env
+import_check: __future__
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/stdgcn.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_stdgcn
+  category: deconvolution

@@ -1,0 +1,294 @@
+# setuptools>=64 = PEP 660 editable-install support (the repo installs itself with ``pip install -e .``).
+# NOT >=77: that floor was only needed for the PEP 639 SPDX-string ``license`` field, which we no longer
+# use (see ``[project].license`` below) precisely so the wheel builds on older/offline toolchains too.
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spatialomicsgym"
+dynamic = ["version"]
+# No portal count here (hunt 2026-09-30, u38a-packaging-17): it said 88 while mcp_config.yaml wired 95,
+# and a number frozen into every wheel's METADATA cannot follow the config it describes.
+description = "ST-Coscientist: a self-driving spatial-transcriptomics analysis agent (ReAct loop over MCP tool portals, per-tool conda environments, terminal chat and Python API)"
+readme = "README.md"
+# Classic table form + trove classifier, NOT the PEP 639 SPDX string ``license = "AGPL-3.0-only"``.
+# The SPDX-string form is a HARD build error on setuptools < 77 (very common in conda base envs, and on
+# every ``pip install --no-build-isolation`` / offline deploy). The table form below is accepted from
+# setuptools 61 through the latest — verified building clean on both 73 and 83 with zero deprecation —
+# so ``pip install .`` succeeds on the widest range of machines. LICENSE ships via [tool.setuptools].
+license = {text = "AGPL-3.0-only"}
+classifiers = [
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+]
+# The address that stood here was upstream Biomni's author, who does not maintain this fork, so every
+# wheel pointed bug reports and AGPL source requests at the wrong person (hunt 2026-09-30,
+# u38a-packaging-17). The project is reached through [project.urls]. The name never credited
+# upstream, so dropping the address removes no attribution.
+authors = [
+    {name = "SpatialOmicsLab Team"}
+]
+requires-python = ">=3.11"
+# The runtime closure of the agent CORE (mirrors the validated minimal-env pip block in
+# agent/spatialomicsgym/spatialomicsgym_env/spatialomicsgym_env.yml — that env runs the full test
+# suite, which is the proof this list is sufficient). Floors, not pins, so a wheel install
+# composes with whatever compatible versions the host already has; the langchain family is
+# capped at the next breaking minor because the ReAct loop touches its private surfaces.
+# Heavy science deps (torch, squidpy, R stacks, ...) are deliberately ABSENT: per-tool conda
+# worker envs own them, and the core suite proves the agent runs without them.
+dependencies = [
+    "pydantic>=2.8",
+    "python-dotenv>=1.0",
+    "pyyaml>=6.0",
+    "langchain>=0.3,<0.4",
+    "langchain-core>=0.3,<0.4",
+    # Imported directly by spatialomicsgym/legacy/env_collection.py. It reached the gate env only transitively, via
+    # langchain 0.3's own dependency, so the declared closure was wrong wherever that transitive
+    # edge does not exist -- including /opt/conda, the env the live portal is served from, where
+    # `import spatialomicsgym.agent.env_collection` raises ModuleNotFoundError and the module's own
+    # test file cannot be collected. A direct import is a direct dependency.
+    "langchain-text-splitters>=0.3,<0.4",
+    "langchain-anthropic>=0.3,<0.4",
+    "langchain-openai>=0.3,<0.4",
+    "langgraph>=0.3,<0.5",
+    "requests>=2.31",
+    "httpx>=0.27",
+    "tenacity>=8.2",
+    "rich>=13.0",
+    "tqdm>=4.66",
+    "tiktoken>=0.7",
+    "numpy>=1.26",
+    "pandas>=2.0",
+    "scipy>=1.11",
+    "scikit-learn>=1.4",
+    "pyarrow>=15.0",
+    "h5py>=3.10",
+    # Not below 0.12.10: 0.12.6 with scipy 1.17 (scipy is uncapped here) has no `_validate_indices` on
+    # its backed sparse matrices, so every X slice of a backed AnnData raises AttributeError -- the
+    # crash f9633f7 fixed in the env recipe and left admitted here (hunt 2026-09-30, u38a-packaging-2).
+    "anndata>=0.12.10",
+    "scanpy>=1.10",
+    # scanpy's clustering/integration backends. Core, not per-tool, because the know-how corpus
+    # reaches every prompt and tells the agent to run `sc.tl.leiden` and harmony inline in the
+    # REPL -- so without these the instruction is one the install cannot carry out. Measured in a
+    # fresh wheel venv: `sc.tl.leiden(flavor="igraph")` raised ImportError. harmonypy is capped
+    # because 2.x breaks scanpy's harmony_integrate orientation.
+    "python-igraph>=0.11",
+    "leidenalg>=0.10",
+    "harmonypy>=0.0.9,<0.1",
+    # The in-process bio tools (spatialomicsgym/tool/*). The catalogue advertises them and they run
+    # in the agent's own interpreter; the env recipe gained them in f9633f7 because 32 of the 41 tools
+    # in five modules failed on import or on call without them (user decision: add the dependencies
+    # rather than hide the tools); rdkit and fcsparser followed for pharmacology's and cell_biology's
+    # tools. A wheel install is the same interpreter with the same catalogue (hunt 2026-09-30,
+    # u38a-packaging-2).
+    "biopython>=1.81",
+    "beautifulsoup4>=4.12",
+    "scikit-image>=0.22",
+    "opencv-python-headless>=4.8",
+    "trackpy>=0.6",
+    "rdkit>=2023.9.1",
+    "fcsparser>=0.2.4",
+    "mcp>=1.16",
+    "fastmcp>=3.0,<4",
+    "nest-asyncio>=1.6",
+]
+
+[project.urls]
+Homepage = "https://github.com/jiangyi01/SpatialOmicsLab"
+Repository = "https://github.com/jiangyi01/SpatialOmicsLab"
+
+[project.scripts]
+# Fresh-clone setup wizard. Stdlib + pyyaml only, so it runs before any env exists.
+sog-setup = "sog_install.cli:main"
+# Terminal chat with the ST-Coscientist agent (interactive REPL,
+# or one-shot when given a question / piped stdin). ``sog-chat`` is an alias.
+stcoscientist = "spatialomicsgym.chat_cli:main"
+sog-chat = "spatialomicsgym.chat_cli:main"
+
+[project.optional-dependencies]
+# No ``gradio`` extra: its one consumer, the legacy ``launch_gradio_demo`` front door, is retired
+# (user decision 2026-09-30). The env recipes still carry gradio -- fastapi and uvicorn reach
+# spatialomicsgym_env through it -- and the wheel declares those itself, under ``webui``.
+tuning = ["optuna>=3.0,<5.0"]
+# Contributor loop: the versions the gate env validates (spatialomicsgym_env.yml pins them).
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[tool.setuptools]
+include-package-data = true
+# setuptools-native key — works on old AND new setuptools. The PEP 639 ``[project].license-files``
+# equivalent is a hard error on setuptools < 77, so license-file globbing stays tool-side here.
+#
+# The second pattern carries the licences of code VENDORED into our tree (copied in and adapted, not
+# installed as a dependency) — currently ToolUniverse's Apache-2.0. Apache-2.0 §4(a) obliges us to give
+# recipients of a derivative work a copy of the licence, and a wheel is a recipient. ``_expand_patterns``
+# globs these relative to the project root and keeps only regular files, so the directory's own
+# ``README.md`` ships alongside them, which is what explains to a recipient why an Apache file sits in an
+# AGPL repository. See THIRD_PARTY_LICENSES/README.md.
+license-files = ["LICENSE", "THIRD_PARTY_LICENSES/*"]
+
+[tool.setuptools.package-data]
+# The egress policy travels with the code that enforces it. `envdoctor` reads it during setup,
+# before any state dir exists, so it cannot live only in the state dir.
+"spatialomicsgym.policy" = ["*.yaml"]
+# NOTE on the rest of the wheel payload:
+#   * The agent's runtime DATA (know_how corpus, tool/protocols, tuning configs, data/*.json) ships via
+#     ``recursive-include`` in MANIFEST.in + ``include-package-data = true`` above — without those the
+#     non-editable wheel installs but the agent loses its know-how/protocols. See MANIFEST.in.
+#   * The ``agent/benchmarks/{manuscript,results,benchmark_data,creation_deletion}`` research artifacts are kept
+#     OUT of the wheel by the ``packages.find`` ``exclude`` below (NOT by MANIFEST — a stale
+#     ``*.egg-info/SOURCES.txt`` will otherwise reintroduce them; delete it before a release build).
+
+[tool.setuptools.dynamic]
+version = {attr = "spatialomicsgym.version.__version__"}
+
+[tool.setuptools.packages.find]
+# namespaces=true is REQUIRED: several shipped runtime dirs are implicit-namespace packages with no
+# __init__.py — notably spatialomicsgym/tool/schema_db (the *.pkl schema DBs), tool/tool_description
+# (dynamic tool schemas), tool/protocols, and know_how/resource. Turning namespaces off silently drops
+# them from the wheel and breaks the agent at runtime.
+namespaces = true
+# Two source roots, one per tier of the checkout: agent/ (spatialomicsgym, skills, benchmarks) and
+# install/ (sog_install, the setup wizard). Package names
+# are relative to their root, so the include/exclude patterns below name ``benchmarks.*``, not
+# ``agent.benchmarks.*``. Everything else under those roots stays out by not matching ``include``:
+# agent/tools, agent/tools_user and agent/MCP_server ship through ``setup.py``'s ``_platform/``
+# payload, install/recipes is build input.
+where = ["agent", "install"]
+include = ["spatialomicsgym*", "skills*", "benchmarks*", "sog_install*"]
+# The benchmarks.{manuscript,results,benchmark_data,creation_deletion} subtrees are NOT importable code —
+# they are research artifacts, benchmark datasets (GBs of h5ad), and one-off scripts. With namespace
+# discovery on, ``benchmarks*`` would otherwise sweep 1700+ spurious "packages" (every data subdir) into
+# the wheel AND hard-crash build_py on a dangling scratch symlink left under manuscript/ by a benchmark
+# run. Only the real code packages (config, data, evaluation, reporting, runners, strategies, workflows)
+# ship; the optional ``tuning`` extra needs just benchmarks.evaluation. ``dev_test``/``system_tests`` are
+# machine-local QA trees, both gitignored (`dev_test/`, `agent/benchmarks/system_tests/`) and never shipped — excluding them here
+# keeps a build from a dirty working tree from sweeping them into the wheel anyway.
+exclude = [
+    "test*",
+    "tutorials*",
+    "extensions*",
+    "benchmarks.manuscript*",
+    "benchmarks.results*",
+    "benchmarks.benchmark_data*",
+    "benchmarks.creation_deletion*",
+    "benchmarks.dev_test*",
+    "benchmarks.system_tests*",
+]
+
+[tool.pytest.ini_options]
+# `test/manual/` is not a test suite. It holds 37 ad-hoc debug drivers named `test_*.py` whose
+# module body calls `subprocess.run([...], timeout=600)` to launch a per-tool worker in its own
+# conda env. pytest imports every module it collects, so without this ignore a bare `pytest` from
+# the repo root *runs the tool suite during collection* and hangs -- even under `--collect-only`.
+# Keep them for manual debugging (`python test/manual/test_destvi_only.py`), out of collection.
+# `test/test_repo_hygiene.py::TestCollectedTestModulesDoNoWorkAtImport` pins this.
+#
+# `test/installation/` is not a test suite either: it is the setup wizard's per-run artifact
+# directory (sog_install's ARTIFACT_DIRNAME), rewritten and emptied by every `sog-setup` run, so
+# nothing in it may be collected.
+#
+# test/ has no `__init__.py` on purpose -- `test` is a standard-library package and a package of
+# that name would shadow it -- so its helpers import as top-level modules (`from conftest import X`,
+# `from smoke import registry`) under pytest's default prepend import mode.
+# `agent/` on sys.path: before the re-layout `tools`, `tools_user` and `skills` sat at the repo root, which
+# `python -m pytest` from the root put on sys.path; they now live under agent/ (running code appends it the
+# same way: sog_install.constants.ensure_repo_importable).
+pythonpath = ["agent"]
+testpaths = ["test"]
+addopts = "--ignore=test/manual --ignore=test/installation"
+
+[tool.ruff]
+src = ["agent", "install"]
+line-length = 120
+# Same rationale as the pytest ignore above: `test/manual/` is hand-run debug drivers, not
+# maintained source. pre-commit runs ruff-check with `--fix --unsafe-fixes`, so without this the
+# next commit that touches the directory would silently rewrite ~40 findings across scripts that
+# nobody re-runs to check the rewrite was sound.
+#
+# `agent/benchmarks/manuscript/code/` is the same shape, and the packages-find `exclude` above already
+# says so in its own words: those subtrees are "NOT importable code -- they are research
+# artifacts, benchmark datasets ... and one-off scripts". Measured on the three scripts this
+# branch modifies: 64 findings, of which ruff fixes 13 safely and 18 more only under
+# `--unsafe-fixes`; the remaining 33 are 28 E701/E702 one-liners that only `ruff format` rewrites
+# and 8 `zip()` calls whose `strict=` value is a judgement about already-published figures. So the
+# hook would rewrite the files *and still fail the commit*. The specific reason not to let it
+# rewrite them: three collected tests (five name it) load
+# `aggregation/07_build_comprehensive_tables.py` by path and read it as source text rather than
+# importing it, so an unsafe fix here surfaces as a suite failure with no visible connection to
+# the edit that caused it. Stated cost, because it is real: the newer Fig-7 scripts in this
+# directory are ruff-clean today and stop being checked.
+extend-exclude = ["test/manual", "agent/benchmarks/manuscript/code"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = [
+    "F",      # Errors detected by Pyflakes
+    "E",      # Error detected by Pycodestyle
+    "W",      # Warning detected by Pycodestyle
+    "I",      # isort
+    #"D",      # pydocstyle
+    "B",      # flake8-bugbear
+    "TID",    # flake8-tidy-imports
+    "C4",     # flake8-comprehensions
+    "BLE",    # flake8-blind-except
+    "UP",     # pyupgrade
+    "RUF100", # Report unused noqa directives
+    "TCH",    # Typing imports
+    #"NPY",    # Numpy specific rules
+    #"PTH",    # Use pathlib
+    #"PL"      # pylint
+]
+ignore = [
+    # line too long -> we accept long comment lines; black gets rid of long code lines
+    "E501",
+    # Do not assign a lambda expression, use a def -> lambda expression assignments are convenient
+    "E731",
+    # allow I, O, l as variable names -> I is the identity matrix
+    "E741",
+    # Missing docstring in public package
+    "D104",
+    # Missing docstring in public module
+    "D100",
+    # Missing docstring in __init__
+    "D107",
+    # Errors from function calls in argument defaults. These are fine when the result is immutable.
+    "B008",
+    # __magic__ methods are are often self-explanatory, allow missing docstrings
+    "D105",
+    # first line should end with a period [Bug: doesn't work with single-line docstrings]
+    "D400",
+    # First line should be in imperative mood; try rephrasing
+    "D401",
+    ## Disable one in each pair of mutually incompatible rules
+    # We don’t want a blank line before a class docstring
+    "D203",
+    # We want docstrings to start immediately after the opening triple quote
+    "D213",
+    # camcelcase imported as lowercase
+    "N813",
+    # module import not at top level of file
+    "E402",
+    # Too many arguments in function definition
+    "PLR0913",
+    # Too many branches
+    "PLR0912",
+    # magic value used in comparison
+    "PLR2004",
+    # Too many statements
+    "PLR0915",
+    # Extracting value from dictionary without calling `.items()` - clashes with sim
+    "PLC0206",
+    # import should be at top of file
+    "PLC0415",
+    # do not catch blind exception
+    "BLE001",
+    # strip with multi characters
+    "B005"
+]

@@ -1,0 +1,24 @@
+server_key: paste
+worker_kind: python
+env_prefix: PASTE
+override_vars:
+  PASTE_PYTHON: /opt/conda/envs/paste_env/bin/python
+worker_var: PASTE_WORKER
+worker_file: paste_worker.py
+server_file: paste_mcp_server.py
+source_env: paste_env
+# NOT `paste`. PyPI's unrelated WSGI toolkit `Paste` also installs a top-level `paste`, so that probe
+# passed with the wrong package in the env; paste.PASTE is the module only paste-bio ships, and the
+# one the worker calls (hunt 2026-09-30, u38c-specs-b-11).
+import_check: paste.PASTE
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/paste.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: paste_pairwise_align
+  category: spatial_alignment
+- name: paste_center_align
+  category: spatial_alignment

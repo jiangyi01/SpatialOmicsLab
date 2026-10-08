@@ -1,0 +1,19 @@
+server_key: destvi
+worker_kind: python
+env_prefix: DESTVI
+override_vars:
+  DESTVI_PYTHON: /opt/conda/envs/destvi_env/bin/python
+worker_var: DESTVI_WORKER
+worker_file: destvi_worker.py
+server_file: destvi_mcp_server.py
+source_env: destvi_env
+import_check: scvi
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/destvi.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_destvi
+  category: deconvolution

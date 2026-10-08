@@ -1,0 +1,34 @@
+server_key: viz_inspector
+worker_kind: python
+env_prefix: VIZ_INSPECTOR
+override_vars:
+  VIZ_INSPECTOR_PYTHON: /opt/conda/envs/spatialomicsgym_env/bin/python
+worker_var: VIZ_INSPECTOR_WORKER
+worker_file: viz_inspector_worker.py
+server_file: viz_inspector_mcp_server.py
+source_env: null
+import_check: spatialomicsgym.viz
+# Agent-core server: the worker runs under the agent environment's own interpreter, where anndata,
+# numpy and pandas already are, so there is nothing to build or clone. `none` makes classify()
+# return ToolStatus.NONE (provision.py) and validate() skip the build-only checks (specs.py) — the
+# same contract `spatial_library` uses. A `conda_clone` with no recipe would hard-fail every fresh
+# clone; a recipe would build a second copy of an environment the portal is already running in.
+#
+# These four functions are pure reads: no output directory, no file written, no directory created.
+# That is what makes the portal safe to call while planning, and it is why it is split from
+# `spatial_viz` rather than folded into it.
+build_strategy: none
+recipe: null
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: inspect_dataset
+  category: spatial_analysis
+- name: list_visualization_capabilities
+  category: spatial_analysis
+- name: recommend_visualizations
+  category: spatial_analysis
+- name: validate_plot_request
+  category: spatial_analysis

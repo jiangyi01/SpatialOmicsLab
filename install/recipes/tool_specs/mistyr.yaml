@@ -1,0 +1,19 @@
+server_key: mistyr
+worker_kind: rscript
+env_prefix: MISTYR
+override_vars:
+  MISTYR_PYTHON: /opt/conda/envs/mistyr/bin/Rscript
+worker_var: MISTYR_WORKER
+worker_file: mistyr_worker.R
+server_file: mistyr_mcp_server.py
+source_env: mistyr
+import_check: mistyR
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/mistyr.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: mistyr_spatial_modeling
+  category: spatial_communication

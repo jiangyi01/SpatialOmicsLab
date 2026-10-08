@@ -1,0 +1,407 @@
+# The egress policy: every destination this platform may reach, and why.
+#
+# Seeded from a scan of the shipped tree and maintained by hand since: no command regenerates it
+# (`sog-web egress inventory`, named here before, never existed). Every host below is one some
+# shipped code actually names; a module that starts reaching a new host must add it here.
+#
+# READ-ONLY TO EVERY AGENT AND EVERY TOOL. Changing it is an operator action on the shell.
+# Nothing in `spatialomicsgym/` writes this file, and a lens fails the suite if anything starts
+# to. The portal runs as root so DAC cannot stop it; what stops it is that no writer exists, and
+# the sha256 of the bytes actually loaded is recorded at every boot.
+#
+# SCOPE tells you which boundary enforces an entry:
+#   tool   - an in-process research module in the portal (http_client's allowlist)
+#   worker - reachable from the sog-agent REPL worker or an MCP tool worker (the proxy)
+#   setup  - package installation (the broker and the recipe lens)
+#
+# A `paths:` block makes an entry PATH-GRANULAR: being on the host is not enough. That is
+# enforced at the broker and over the recipes. It CANNOT be enforced at the proxy, which sees
+# only `CONNECT github.com:443` -- see SECURITY.md, 'What this does not stop'.
+
+version: 1
+
+defaults:
+  max_redirects: 4              # R5.2: re-check every hop, cap the chain
+  max_response_bytes: 8388608   # R5.4: charge the DECOMPRESSED size
+  deadline_grace_seconds: 60    # wall clock beyond the caller's timeout
+  refuse_private_ranges: true   # R5.3: no private/link-local/loopback/CGNAT
+
+hosts:
+  - host: alphafold.ebi.ac.uk
+    scope: [tool]
+    reason: "AlphaFold structures"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: api.altmetric.com
+    scope: [tool, worker]
+    reason: "Altmetric attention scores; needs ALTMETRIC_API_KEY"
+    owner: [spatialomicsgym/tool/omics_scripts/impact_assessment.py]
+  - host: api.biorxiv.org
+    scope: [tool, worker]
+    reason: "bioRxiv preprint search"
+    owner: [spatialomicsgym/tool/omics_scripts/biorxiv_search.py]
+  - host: api.brain-map.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/spatial_atlases.py]
+  - host: api.crossref.org
+    scope: [tool]
+    reason: "citation metadata"
+    owner: [spatialomicsgym/tool/scholarly_literature.py, spatialomicsgym/tool/omics_scripts/crossref_validator.py]
+  - host: api.fda.gov
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py, spatialomicsgym/tool/pharmacology.py]
+  - host: api.genome.ucsc.edu
+    scope: [tool]
+    reason: "UCSC genome browser API"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: api.monarchinitiative.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: api.openalex.org
+    scope: [tool]
+    reason: "citation metadata"
+    owner: [spatialomicsgym/tool/scholarly_literature.py, spatialomicsgym/tool/omics_scripts/impact_assessment.py]
+  - host: api.platform.opentargets.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: api.togoid.dbcls.jp
+    scope: [tool]
+    reason: "identifier conversion"
+    owner: [spatialomicsgym/tool/gene_identifiers.py]
+  - host: apiv3.iucnredlist.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: bayestme.readthedocs.io
+    scope: [worker]
+    reason: "BayesTME example data referenced by its worker"
+    owner: [tools/bayestme_worker.py]
+  - host: clinicaltrials.gov
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: dailymed.nlm.nih.gov
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: data.rcsb.org
+    scope: [tool]
+    reason: "PDB structures"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: deepcell-data.s3-us-west-1.amazonaws.com
+    scope: [worker]
+    reason: "DeepCell segmentation model weights"
+    owner: [tools/deepcell_worker.py]
+  - host: doi.org
+    scope: [tool]
+    reason: "DOI resolution"
+    owner: [spatialomicsgym/tool/literature.py, spatialomicsgym/tool/scholarly_literature.py]
+  - host: dx.doi.org
+    scope: [tool]
+    reason: "DOI resolution (legacy)"
+    owner: [spatialomicsgym/tool/scholarly_literature.py]
+  - host: entity.api.hubmapconsortium.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/spatial_atlases.py]
+  - host: eutils.ncbi.nlm.nih.gov
+    scope: [tool]
+    reason: "NCBI E-utilities"
+    owner: [spatialomicsgym/tool/database.py, spatialomicsgym/tool/scholarly_literature.py]
+  - host: export.arxiv.org
+    scope: [tool, worker]
+    reason: "arXiv preprint search"
+    owner: [spatialomicsgym/tool/omics_scripts/arxiv_search.py]
+  - host: files.rcsb.org
+    scope: [tool]
+    reason: "PDB files"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: github.com
+    scope: [setup, tool, worker]
+    reason: "pinned upstreams for tool environments and runtime clones"
+    owner: [spatialomicsgym/tool/expression_atlases.py, spatialomicsgym/tool/gene_identifiers.py, spatialomicsgym/tool/genomics.py, spatialomicsgym/tool/glycoengineering.py, ...]
+    # PATH-GRANULAR. 22 pinned recipe upstreams + 4 repos cloned at runtime by a worker.
+    paths:
+      - path: /DongqingSun96/STRIDE
+        owner: setup/tool_specs/env/stride.env.yaml
+      - path: /JEFworks-Lab/STalign
+        owner: setup/tool_specs/env/stalign.env.yaml
+      - path: /JinmiaoChenLab/SEDR
+        owner: setup/tool_specs/env/sedr.env.yaml
+      - path: /QIFEIDKN/STAGATE_pyG
+        owner: setup/tool_specs/env/stagate.env.yaml
+      - path: /STOmics/ST-GEARS
+        owner: setup/tool_specs/env/st_gears.env.yaml
+      - path: /Tang-Lab-super/PROST
+        owner: setup/tool_specs/env/prost.env.yaml
+      - path: /YangLabHKUST/SpatialScope
+        owner: setup/tool_specs/env/spatialscope.env.yaml
+      - path: /ZJUFanLab/SpaTrio
+        owner: setup/tool_specs/env/spatrio.env.yaml
+      - path: /ZJUFanLab/bulk2space
+        owner: setup/tool_specs/env/bulk2space.env.yaml
+      - path: /anucvml/ddn
+        owner: setup/tool_specs/env/scdot.env.yaml
+      - path: /chenhcs/scResolve
+        owner: setup/tool_specs/env/scresolve.env.yaml
+      - path: /digitalcytometry/cytospace
+        owner: setup/tool_specs/env/cytospace.env.yaml
+      - path: /guott15/SPIRAL
+        owner: setup/tool_specs/env/spiral.env.yaml
+      - path: /illuminate6060/SpotGF
+        owner: setup/tool_specs/env/spotgf.env.yaml
+      - path: /kpcoleman/miso
+        owner: setup/tool_specs/env/spatial_miso.env.yaml
+      - path: /ludvb/xfuse
+        owner: setup/tool_specs/env/xfuse.env.yaml
+      - path: /mexchy1000/CellDART
+        owner: setup/tool_specs/env/celldart.env.yaml
+      - path: /tansey-lab/bayestme
+        owner: setup/tool_specs/env/bayestme.env.yaml
+      - path: /wanglab-broad/CAST
+        owner: setup/tool_specs/env/cast.env.yaml
+      - path: /wanglab-broad/ClusterMap
+        owner: setup/tool_specs/env/clustermap.env.yaml
+      - path: /zcang/SpaOTsc
+        owner: setup/tool_specs/env/spaotsc.env.yaml
+      - path: /zhanglabtools/STAGE
+        owner: setup/tool_specs/env/stage.env.yaml
+      - path: /ManchesterBioinference/CellPie
+        owner: tools/cellpie_worker.py
+        note: cloned at RUN time by that worker, not installed from a recipe
+      - path: /daviddaiweizhang/istar
+        owner: tools/istar_worker.py
+        note: cloned at RUN time by that worker, not installed from a recipe
+      - path: /szczurek-lab/Celloscope
+        owner: tools/celloscope_worker.py
+        note: cloned at RUN time by that worker, not installed from a recipe
+  - host: gitlab.mpcdf.mpg.de
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/glycoengineering.py]
+  - host: gnomad.broadinstitute.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: gtexportal.org
+    scope: [tool]
+    reason: "GTEx bulk expression"
+    owner: [spatialomicsgym/tool/expression_atlases.py]
+  - host: huggingface.co
+    scope: [tool]
+    reason: "model and dataset weights for spatial tools"
+    owner: [spatialomicsgym/tool/genomics.py]
+  - host: iupred2a.elte.hu
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/biophysics.py]
+  - host: jaspar.elixir.no
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: jaspar.genereg.net
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/genetics.py]
+  - host: jats.nlm.nih.gov
+    scope: [tool]
+    reason: "JATS article schema"
+    owner: [spatialomicsgym/tool/scholarly_literature.py]
+  - host: lakehouse-1.jgi.lbl.gov
+    scope: [tool, worker]
+    reason: "JGI Lakehouse (Dremio) SQL on :9047; needs DREMIO_PAT"
+    owner: [spatialomicsgym/tool/omics_scripts/jgi_lakehouse.py]
+  - host: mychem.info
+    scope: [tool]
+    reason: "BioThings chemical annotation"
+    owner: [spatialomicsgym/tool/gene_identifiers.py]
+  - host: mygene.info
+    scope: [tool]
+    reason: "BioThings gene annotation"
+    owner: [spatialomicsgym/tool/gene_identifiers.py]
+  - host: myvariant.info
+    scope: [tool]
+    reason: "BioThings variant annotation"
+    owner: [spatialomicsgym/tool/gene_identifiers.py]
+  - host: ontology.api.hubmapconsortium.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/spatial_atlases.py]
+  - host: openalex.org
+    scope: [tool]
+    reason: "citation metadata"
+    owner: [spatialomicsgym/tool/scholarly_literature.py]
+  - host: paleobiodb.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: phenome.jax.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: phenomedoc.jax.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: pmc.ncbi.nlm.nih.gov
+    scope: [tool]
+    reason: "PubMed Central full text"
+    owner: [spatialomicsgym/tool/scholarly_literature.py]
+  - host: pubchem.ncbi.nlm.nih.gov
+    scope: [tool]
+    reason: "PubChem compounds"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: purl.obolibrary.org
+    scope: [tool]
+    reason: "OBO ontology terms"
+    owner: [spatialomicsgym/tool/ontology.py]
+  - host: pypi.org
+    scope: [tool]
+    reason: "package metadata lookup"
+    owner: [spatialomicsgym/tool/genomics.py]
+  - host: reactome.org
+    scope: [tool]
+    reason: "pathway definitions"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: regulomedb.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: remap.univ-amu.fr
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: repo-prod.prod.sagebase.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: rest.ensembl.org
+    scope: [tool]
+    reason: "Ensembl REST: genes, transcripts, coordinates"
+    owner: [spatialomicsgym/tool/database.py, spatialomicsgym/tool/genomics.py]
+  - host: rest.genenames.org
+    scope: [tool]
+    reason: "HGNC gene symbols"
+    owner: [spatialomicsgym/tool/gene_identifiers.py]
+  - host: rest.kegg.jp
+    scope: [tool]
+    reason: "KEGG pathways"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: rest.uniprot.org
+    scope: [tool]
+    reason: "protein records"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: screen-beta-api.wenglab.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: search.api.hubmapconsortium.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/spatial_atlases.py]
+  - host: search.rcsb.org
+    scope: [tool]
+    reason: "PDB search"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: services.healthtech.dtu.dk
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/glycoengineering.py]
+  - host: spatialomicsgym.stanford.edu
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/pharmacology.py]
+  - host: string-db.org
+    scope: [tool]
+    reason: "protein interaction networks"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: ucdeconvolve.org
+    scope: [worker]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [tools/ucd_token.py]
+  - host: version-12-0.string-db.org
+    scope: [tool]
+    reason: "pinned STRING release"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: webservice.bridgedb.org
+    scope: [tool]
+    reason: "identifier mapping"
+    owner: [spatialomicsgym/tool/gene_identifiers.py]
+  - host: www.10xgenomics.com
+    scope: [worker]
+    reason: "reference Visium datasets"
+    owner: [tools/bayestme_worker.py]
+  - host: www.addgene.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/molecular_biology.py]
+  - host: www.alliancegenome.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/model_organisms.py]
+  - host: www.cbioportal.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: www.ebi.ac.uk
+    scope: [tool]
+    reason: "EBI: Expression Atlas, ontologies, proteins"
+    owner: [spatialomicsgym/tool/database.py, spatialomicsgym/tool/expression_atlases.py, spatialomicsgym/tool/ontology.py, spatialomicsgym/tool/scholarly_literature.py, ...]
+  - host: www.encodeproject.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: www.ensembl.org
+    scope: [tool]
+    reason: "Ensembl web endpoints"
+    owner: [spatialomicsgym/tool/genomics.py]
+  - host: www.guidetopharmacology.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: www.marinespecies.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/database.py]
+  - host: www.ncbi.nlm.nih.gov
+    scope: [tool]
+    reason: "NCBI record pages"
+    owner: [spatialomicsgym/tool/scholarly_literature.py]
+  - host: www.proteinatlas.org
+    scope: [tool]
+    reason: "Human Protein Atlas expression"
+    owner: [spatialomicsgym/tool/expression_atlases.py]
+  - host: www.protocols.io
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/protocols.py]
+  - host: zenodo.org
+    scope: [tool]
+    reason: "reached by the module named in owner; review this entry"
+    owner: [spatialomicsgym/tool/bioimaging.py]
+
+package_indexes:
+  - host: pypi.org
+    reason: "the default index"
+  - host: files.pythonhosted.org
+    reason: "where pypi serves the files"
+  - host: download.pytorch.org
+    reason: "torch cpu/cu wheels; 14 recipes"
+  - host: data.pyg.org
+    reason: "PyG find-links; 4 recipes"
+
+conda_channels:
+  - name: conda-forge
+    reason: "every one of the 90 recipes"
+  - name: bioconda
+    reason: "9 recipes"
+  - name: pytorch
+    reason: "1 recipe"
+  - name: nvidia
+    reason: "GPU builds; kept from the pre-existing trust list"
+  - name: defaults
+    reason: "MEASURED in 1 recipe and absent from the old TRUSTED_CONDA_CHANNELS -- see SECURITY.md"
+

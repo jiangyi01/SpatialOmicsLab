@@ -1,0 +1,19 @@
+server_key: stdeconvolve
+worker_kind: rscript
+env_prefix: STDECONVOLVE
+override_vars:
+  STDECONVOLVE_PYTHON: /opt/conda/envs/stdeconvolve_env/bin/Rscript
+worker_var: STDECONVOLVE_WORKER
+worker_file: stdeconvolve_worker.R
+server_file: stdeconvolve_mcp_server.py
+source_env: stdeconvolve_env
+import_check: STdeconvolve
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/stdeconvolve.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_stdeconvolve
+  category: deconvolution

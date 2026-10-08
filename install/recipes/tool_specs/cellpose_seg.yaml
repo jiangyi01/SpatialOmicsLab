@@ -1,0 +1,19 @@
+server_key: cellpose_seg
+worker_kind: python
+env_prefix: CELLPOSE
+override_vars:
+  CELLPOSE_PYTHON: /opt/conda/envs/cellpose_env/bin/python
+worker_var: CELLPOSE_WORKER
+worker_file: cellpose_worker.py
+server_file: cellpose_mcp_server.py
+source_env: cellpose_env
+import_check: cellpose
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/cellpose_seg.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_cellpose_segmentation
+  category: cell_segmentation

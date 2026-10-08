@@ -1,0 +1,19 @@
+server_key: slat
+worker_kind: python
+env_prefix: SLAT
+override_vars:
+  SLAT_PYTHON: /opt/conda/envs/slat/bin/python
+worker_var: SLAT_WORKER
+worker_file: slat_worker.py
+server_file: slat_mcp_server.py
+source_env: slat
+import_check: scSLAT
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/slat.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: slat_align_slices
+  category: spatial_alignment

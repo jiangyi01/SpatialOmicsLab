@@ -1,0 +1,19 @@
+server_key: celltrek
+worker_kind: rscript
+env_prefix: CELLTREK
+override_vars:
+  CELLTREK_PYTHON: /opt/conda/envs/celltrek/bin/Rscript
+worker_var: CELLTREK_WORKER
+worker_file: celltrek_worker.R
+server_file: celltrek_mcp_server.py
+source_env: celltrek
+import_check: CellTrek
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/celltrek.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: celltrek_spatial_mapping
+  category: deconvolution

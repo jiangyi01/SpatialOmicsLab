@@ -1,0 +1,19 @@
+server_key: st_gears
+worker_kind: python
+env_prefix: ST_GEARS
+override_vars:
+  ST_GEARS_PYTHON: /opt/conda/envs/st_gears/bin/python
+worker_var: ST_GEARS_WORKER
+worker_file: st_gears_worker.py
+server_file: st_gears_mcp_server.py
+source_env: st_gears
+import_check: st_gears
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/st_gears.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: st_gears_reconstruct_3d
+  category: spatial_alignment

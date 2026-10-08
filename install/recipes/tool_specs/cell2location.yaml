@@ -1,0 +1,19 @@
+server_key: cell2location
+worker_kind: python
+env_prefix: CELL2LOCATION
+override_vars:
+  CELL2LOCATION_PYTHON: /opt/conda/envs/cell2loc_env/bin/python
+worker_var: CELL2LOCATION_WORKER
+worker_file: cell2location_worker.py
+server_file: cell2location_mcp_server.py
+source_env: cell2loc_env
+import_check: cell2location
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/cell2location.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_cell2location
+  category: deconvolution

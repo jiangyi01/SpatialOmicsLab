@@ -1,0 +1,21 @@
+server_key: somde
+worker_kind: python
+env_prefix: SOMDE
+override_vars:
+  SOMDE_PYTHON: /opt/conda/envs/somde/bin/python
+worker_var: SOMDE_WORKER
+worker_file: somde_worker.py
+server_file: somde_mcp_server.py
+source_env: somde
+import_check: somde
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/somde.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: somde_identify_svg
+  category: svg_detection
+- name: somde_run
+  category: svg_detection

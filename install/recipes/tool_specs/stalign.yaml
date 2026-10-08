@@ -1,0 +1,21 @@
+server_key: stalign
+worker_kind: python
+env_prefix: STALIGN
+override_vars:
+  STALIGN_PYTHON: /opt/conda/envs/stalign/bin/python
+worker_var: STALIGN_WORKER
+worker_file: stalign_worker.py
+server_file: stalign_mcp_server.py
+source_env: stalign
+import_check: STalign
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/stalign.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: stalign_align_points
+  category: spatial_alignment
+- name: stalign_align_to_image
+  category: spatial_alignment

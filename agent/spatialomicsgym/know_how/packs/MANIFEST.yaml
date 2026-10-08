@@ -1,0 +1,1718 @@
+# The tier-2 know-how packs: what was merged, from where, under which licence, with which edits.
+#
+# This file drives spatialomicsgym/know_how/merge_packs.py. Nothing under packs/ is edited by hand;
+# a change is made here, the script is re-run against clones pinned at the commits below, and the
+# recorded digest (RECORDED_PACK_DIGEST in the corpus lens, KNOW_HOW_PACKS_HASH in BASELINE.md) is
+# re-recorded in the same commit. The two intakes under docs/audit/wave_a/ are the evidence for
+# every admission and every refusal named here; DECISIONS.md D-045/D-046/D-056 (and the D-056
+# addendum of 2026-09-20, which removed four documents after an audit and a live measurement) are
+# the decisions.
+#
+# Deliberately absent from this file: the strings of the eighteen excluded identifiers. They live
+# in merge_packs.EXCLUDED_IDENTIFIERS (outside packs/) and are recorded with their evidence in
+# CHINA_EXCLUSION_REPO.md section 19. Everything under packs/ -- this manifest included -- is
+# scanned for them, so this record names what it excludes by intake row, not by name.
+schema: 1
+
+packs:
+  sciagent:
+    display_name: SciAgent-Skills
+    upstream: https://github.com/jaechang-hits/SciAgent-Skills
+    clone_dir: sciagent
+    commit: fe505cae14d20b6c33be2e49666425be98f005bb
+    commit_date: "2026-08-29T09:42:20+09:00"
+    licence: CC BY 4.0
+    licence_file: LICENSE
+    licence_sha256: 513891915dfd73a3fd4d74b57053760e736b4f7af62f7aff813f1c7559b0f908
+    licence_copy: THIRD_PARTY_LICENSES/SciAgent-Skills-CC-BY-4.0.txt
+    licence_line: >-
+      CC BY 4.0, Copyright (c) 2024 jaechang-hits (THIRD_PARTY_LICENSES/SciAgent-Skills-CC-BY-4.0.txt).
+      Upstream inherits K-Dense-AI/claude-scientific-skills (MIT) and snap-stanford/Biomni (Apache-2.0);
+      those notices travel with this text. Changes were made -- see Modifications.
+    attribution: jaechang-hits/SciAgent-Skills, 203 registry skills, 12 admitted (intake section 6, gget struck in verification, anndata-data-structure measured out 2026-09-20)
+    intake: docs/audit/wave_a/intake-sciagent.md
+    # Every SciAgent skill ends with a "Related Skills" list routing the reader to sibling skills --
+    # most of them never merged (omics-plotting, harmony-batch-correction), some refused or measured
+    # out below (scanpy-scrna-seq, anndata-data-structure). A merged document cannot reach another by
+    # naming it, and naming an absent one steers the agent toward a capability that is not here
+    # (hunt 2026-09-30, u13k2-packs-14). Dropped by name, recorded in every Modifications line.
+    drop_sections:
+      - Related Skills
+    skills:
+      - name: scvi-tools-single-cell
+        source: skills/genomics-bioinformatics/single-cell/scvi-tools-single-cell/SKILL.md
+        dest: sciagent/scvi-tools-single-cell.md
+        # The live measurement of 2026-09-20 (D-056 addendum) picked this document on 2 of 10 control
+        # prompts (deconvolution, integration): the upstream description sells the library to every
+        # batch-correction task. Scoped so pass 2 picks it only when the task names scvi-tools.
+        # Kept under 240 characters on purpose: get_pack_summaries clips there, and the scoping
+        # clause is the last sentence.
+        short_description: >-
+          Direct use of the scvi-tools single-cell API (scVI, scANVI, totalVI, scArches). Not needed for
+          the platform's own deconvolution, integration or annotation tools, which wrap these; pick only
+          when the task names scvi-tools or a model.
+        # hunt 2026-09-30, u13k2-packs-2/-7/-9/-14: no install or subsample advice, SOLO labels need
+        #   soft=False, DestVI genes must match, and no routing to skills that are not here
+        excise:
+          - '- Use **harmony-batch-correction** instead when you need fast linear batch correction (seconds vs minutes) without deep learning overhead'
+          - '- For **standard clustering and visualization** without batch effects or probabilistic DE, use **scanpy-scrna-seq**'
+        replace:
+          - old: |-
+              doublet_preds = solo.predict()   # DataFrame: {"singlet": prob, "doublet": prob}
+              adata.obs["doublet_score"] = doublet_preds["doublet"].values
+              adata.obs["is_doublet"] = doublet_preds["prediction"].values
+            new: |-
+              doublet_probs = solo.predict()             # DataFrame: "singlet" / "doublet" probabilities
+              doublet_labels = solo.predict(soft=False)  # Series of "singlet"/"doublet"; soft=True has no label column
+              adata.obs["doublet_score"] = doublet_probs["doublet"].values
+              adata.obs["is_doublet"] = doublet_labels.values
+          - old: Install `scvi-tools[cuda12]`; pass `accelerator="gpu"` to `train()`; or subsample to 50k cells for prototyping
+            new: Pass `accelerator="gpu"` to `train()` when a CUDA build of PyTorch imports here (nothing is installed from this document); otherwise expect a long CPU run -- train on every cell and raise the time limit, never subsample
+          - old: |
+              # Step 1: Train CondSCVI on reference single-cell data
+            new: |
+              # Both objects need raw counts in layers["counts"] and the same genes in the same order -- DestVI.from_rna_model
+              # reuses the reference decoder: genes = sc_adata.var_names.intersection(st_adata.var_names), subset both first.
+              # Step 1: Train CondSCVI on reference single-cell data
+      - name: cellxgene-census
+        source: skills/genomics-bioinformatics/single-cell/cellxgene-census/SKILL.md
+        dest: sciagent/cellxgene-census.md
+        # hunt 2026-09-30, u13k2-packs-13/-14: the twin's TileDB-SOMA-ML loader, checked against cellxgene-
+        #   census 1.17.0 (the heavy tool env) and the TileDB-SOMA-ML source; the Short Description no longer routes to
+        #   scanpy/anndata skills
+        replace:
+          - old: ' For your own data use scanpy; for annotated data use anndata.'
+            new: ''
+          - old: |-
+              Train models directly on Census data using the experimental dataloader.
+
+              ```python
+              from cellxgene_census.experimental.ml import experiment_dataloader
+              import cellxgene_census
+
+              with cellxgene_census.open_soma() as census:
+                  dataloader = experiment_dataloader(
+                      census["census_data"]["homo_sapiens"],
+                      measurement_name="RNA",
+                      X_name="raw",
+                      obs_value_filter="tissue_general == 'liver' and is_primary_data == True",
+                      obs_column_names=["cell_type"],
+                      batch_size=128,
+                      shuffle=True,
+                  )
+
+                  for batch in dataloader:
+                      X = batch["X"]           # Gene expression tensor
+                      labels = batch["obs"]    # Cell metadata
+                      print(f"Batch X shape: {X.shape}, labels: {list(labels.columns)}")
+                      break  # Show first batch only
+              ```
+            new: |-
+              Train models on Census data with TileDB-SOMA-ML. The `cellxgene_census.experimental.ml` loaders are deprecated: cellxgene-census 1.17.0 warns on use, and its `experiment_dataloader` takes an `ExperimentDataPipe`, not the arguments this example used to pass.
+
+              ```python
+              import cellxgene_census
+              import tiledbsoma as soma
+              from tiledbsoma_ml import ExperimentDataset, experiment_dataloader
+
+              with cellxgene_census.open_soma() as census:
+                  experiment = census["census_data"]["homo_sapiens"]
+                  with experiment.axis_query(
+                      measurement_name="RNA",
+                      obs_query=soma.AxisQuery(value_filter="tissue_general == 'liver' and is_primary_data == True"),
+                  ) as query:
+                      dataset = ExperimentDataset(
+                          query=query,
+                          layer_name="raw",
+                          obs_column_names=["cell_type"],
+                          batch_size=128,
+                          shuffle=True,
+                      )
+                      dataloader = experiment_dataloader(dataset)
+
+                      for X, obs in dataloader:
+                          print(f"Batch X shape: {X.shape}, labels: {list(obs.columns)}")
+                          break  # Show first batch only
+              ```
+      - name: gseapy-gene-enrichment
+        source: skills/genomics-bioinformatics/rnaseq/gseapy-gene-enrichment/SKILL.md
+        dest: sciagent/gseapy-gene-enrichment.md
+        # hunt 2026-09-30, u13k2-packs-5/-9/-13/-14: rank GSEA by the Wald stat (as the pathway-enrichment
+        #   twin says), look the term up by name, draw the dot plot here instead of in a skill that is not
+        #   merged
+        excise:
+          - '- Use **omics-plotting** SKILL after DE and for publication-quality plots of gsea results'
+        replace:
+          - old: '- Performing GSEA prerank analysis on a log2-fold-change-ranked gene list without an expression matrix'
+            new: '- Performing GSEA prerank analysis on a ranked gene list (DESeq2 Wald `stat`, or sign(log2FC) × -log10(p)) without an expression matrix'
+          - old: Run GSEA on a log2 fold-change ranked gene list from differential expression.
+            new: 'Run GSEA on a ranked gene list from differential expression. Rank by the DESeq2 Wald `stat` (or sign(log2FC) × -log10(p)), not by log2 fold change alone: low-count genes carry large, unstable fold changes.'
+          - old: '# ranked = deseq_results["log2FoldChange"].dropna().sort_values(ascending=False)'
+            new: '# ranked = deseq_results["stat"].dropna().sort_values(ascending=False)   # Wald statistic'
+          - old: |-
+              # Example ranked gene list (gene → log2FC)
+              np.random.seed(42)
+              gene_names = [f"GENE_{i}" for i in range(1000)]
+              log2fc = np.random.normal(0, 2, 1000)
+              ranked = pd.Series(log2fc, index=gene_names)
+            new: |-
+              # Example ranked gene list (gene → score); synthetic values, for illustration only
+              np.random.seed(42)
+              gene_names = [f"GENE_{i}" for i in range(1000)]
+              score = np.random.normal(0, 2, 1000)
+              ranked = pd.Series(score, index=gene_names)
+          - old: (omics-plotting covers the GSEA bar/dot summary plots instead, see Step 5.)
+            new: (Step 5 draws the dot summary plot.)
+          - old: |
+              from gseapy import gseaplot
+
+              # pre_res: prerank result from Step 3
+              top_term = pre_res.res2d.sort_values("NES", ascending=False).index[0]
+            new: |
+              import os
+
+              from gseapy import gseaplot
+
+              # pre_res: prerank result from Step 3. pre_res.results is keyed by term NAME;
+              # res2d's index is a row number, so take the name from its Term column
+              top_term = pre_res.res2d.sort_values("NES", ascending=False)["Term"].iloc[0]
+              os.makedirs("figures", exist_ok=True)
+          - old: Run ORA, then **read (upstream skill, not merged here) and follow its "GSEA dot plot" recipe** on the exported table (→ `figures/enrichment_dotplot.png`). Map GSEApy's `Overlap` column to the recipe's `GeneRatio`.
+            new: Run ORA, then draw the dot plot from the exported table (→ `figures/enrichment_dotplot.png`). No plotting skill is merged here, so the plot is drawn directly with matplotlib; GSEApy's `Overlap` column ("k/n") gives the gene ratio.
+          - old: |-
+              print(f"ORA terms: {len(enr.results)} -> enrichment.csv")
+              # (upstream skill, not merged here)
+              ```
+            new: |-
+              print(f"ORA terms: {len(enr.results)} -> enrichment.csv")
+
+              import os
+
+              import matplotlib.pyplot as plt
+              import numpy as np
+
+              # Dot plot of the 15 strongest terms; "Overlap" is "k/n" -- k list genes in an n-gene set
+              top = enr.results.sort_values("Adjusted P-value").head(15).copy()
+              k_n = top["Overlap"].str.split("/", expand=True).astype(int)
+              top["GeneRatio"] = k_n[0] / k_n[1]
+              neg_log_padj = -np.log10(top["Adjusted P-value"].clip(lower=np.finfo(float).tiny))
+
+              os.makedirs("figures", exist_ok=True)
+              fig, ax = plt.subplots(figsize=(7, max(3, 0.35 * len(top))))
+              points = ax.scatter(top["GeneRatio"], top["Term"], s=k_n[0] * 20, c=neg_log_padj, cmap="viridis")
+              fig.colorbar(points, ax=ax, label="-log10(adjusted p-value)")
+              ax.invert_yaxis()
+              ax.set_xlabel("GeneRatio (overlap / gene-set size); dot size = overlap count")
+              plt.tight_layout()
+              plt.savefig("figures/enrichment_dotplot.png", dpi=300)
+              print(f"Dot plot of {len(top)} terms -> figures/enrichment_dotplot.png")
+              ```
+          - old: '# deseq_df = deseq_df.dropna(subset=["log2FoldChange", "padj"])'
+            new: '# deseq_df = deseq_df.dropna(subset=["log2FoldChange", "padj", "stat"])'
+          - old: |2
+                  "log2FoldChange": np.random.normal(0, 1.5, n),
+                  "padj": np.random.uniform(0, 1, n),
+            new: |2
+                  "log2FoldChange": np.random.normal(0, 1.5, n),
+                  "stat": np.random.normal(0, 3, n),
+                  "padj": np.random.uniform(0, 1, n),
+          - old: |-
+              # Preranked GSEA on full ranked list
+              ranked = deseq_df["log2FoldChange"].sort_values(ascending=False)
+            new: |-
+              # Preranked GSEA on the full list, ranked by the Wald statistic (not log2FC alone)
+              ranked = deseq_df["stat"].sort_values(ascending=False)
+          - old: sorted descending (log2FC recommended)
+            new: sorted descending (DESeq2 Wald `stat` recommended; log2FC alone is unstable for low-count genes)
+          - old: '    # ranked = df["log2FoldChange"].dropna().sort_values(ascending=False)'
+            new: '    # ranked = df["stat"].dropna().sort_values(ascending=False)   # Wald statistic'
+      - name: pydeseq2-differential-expression
+        source: skills/genomics-bioinformatics/rnaseq/pydeseq2-differential-expression/SKILL.md
+        dest: sciagent/pydeseq2-differential-expression.md
+        # hunt 2026-09-30, u13k2-packs-5/-13/-14: the PyDESeq2 >= 0.5.2 API the kdense twin states (checked
+        #   against the v0.5.4 source; pydeseq2 is not installed in any env here), and volcano/MA plots drawn
+        #   here
+        excise:
+          - '- Use `omics-plotting` SKILL after DE for publication-quality plots of differential expression results'
+        replace:
+          - old: '`pydeseq2>=0.4`, '
+            new: '`pydeseq2>=0.5.2`, '
+          - old: '- **Data requirements**: Raw (unnormalized)'
+            new: |-
+              - **API version**: PyDESeq2 API as checked against the v0.5.4 source: since 0.5.2 size factors are `dds.obs["size_factors"]` and dispersions `dds.var["dispersions"]` (0.5.1 and earlier kept them in `obsm`/`varm`); since 0.5.0 `DeseqStats` requires `contrast` and `lfc_shrink(coeff=...)` requires the design-column name (e.g. `"condition[T.treated]"`); `DeseqDataSet(n_cpus=...)` and `inference=DefaultInference(n_cpus=...)` are both accepted.
+              - **Data requirements**: Raw (unnormalized)
+          - old: dds.obsm['size_factors']
+            new: dds.obs['size_factors']
+          - old: |
+              ds.lfc_shrink()
+            new: |
+              ds.lfc_shrink(coeff="condition[T.treated]")  # a design-matrix column; required since 0.5.0
+          - old: '| `lfc_shrink()` | off | call after `summary()` | apeGLM shrinkage; reduces noisy LFC estimates |'
+            new: '| `lfc_shrink(coeff=...)` | off | call after `summary()` | apeGLM shrinkage of one design column, e.g. `"condition[T.treated]"` |'
+          - old: '| `contrast` | `None` | `[var, test, ref]` | Which comparison to test; `None` uses last coefficient |'
+            new: '| `contrast` | (required) | `[var, test, ref]` | Which comparison to test; `DeseqStats` requires it |'
+          - old: '| Shrinkage produces unexpected LFCs | Calling `lfc_shrink()` before `summary()` | Always call `ds.summary()` first, then `ds.lfc_shrink()` |'
+            new: '| Shrinkage produces unexpected LFCs | Calling `lfc_shrink()` before `summary()` | Always call `ds.summary()` first, then `ds.lfc_shrink(coeff=...)` |'
+          - old: |-
+              np.log10(dds.varm["_normed_means"] + 1),
+                  np.log10(dds.varm["dispersions"]),
+            new: |-
+              np.log10(dds.var["_normed_means"] + 1),
+                  np.log10(dds.var["dispersions"]),
+          - old: |-
+              Prepare the DEG table, then **read (upstream skill, not merged here) and follow its "Volcano" recipe** on the exported CSV (→ `figures/volcano_plot.png`).
+
+              ```python
+              # Volcano input = log2FoldChange vs padj; saved in Step 6 as deseq2_all_results.csv
+              volcano_input = results[["log2FoldChange", "padj"]].dropna()
+              print(f"Volcano input: {len(volcano_input)} genes -> deseq2_all_results.csv")
+              # (upstream skill, not merged here)
+              ```
+            new: |-
+              Plot every tested gene from the Step 6 table (→ `figures/volcano_plot.png`). No plotting skill is merged here, so the plot is drawn directly with matplotlib.
+
+              ```python
+              import os
+
+              import matplotlib.pyplot as plt
+              import numpy as np
+
+              volcano = results[["log2FoldChange", "padj"]].dropna()
+              sig = (volcano.padj < 0.05) & (volcano.log2FoldChange.abs() > 1.0)
+              neg_log_padj = -np.log10(volcano.padj.clip(lower=np.finfo(float).tiny))  # padj can be exactly 0
+
+              os.makedirs("figures", exist_ok=True)
+              plt.figure(figsize=(8, 6))
+              plt.scatter(volcano.log2FoldChange[~sig], neg_log_padj[~sig], s=8, c="lightgray", label="not significant")
+              plt.scatter(volcano.log2FoldChange[sig], neg_log_padj[sig], s=8, c="crimson", label="padj < 0.05, |log2FC| > 1")
+              plt.axhline(-np.log10(0.05), color="gray", linestyle="--", linewidth=0.8)
+              for x in (-1.0, 1.0):
+                  plt.axvline(x, color="gray", linestyle="--", linewidth=0.8)
+              plt.xlabel("log2 fold change")
+              plt.ylabel("-log10(adjusted p-value)")
+              plt.legend()
+              plt.savefig("figures/volcano_plot.png", dpi=300, bbox_inches="tight")
+              print(f"Volcano: {len(volcano)} genes, {int(sig.sum())} significant -> figures/volcano_plot.png")
+              ```
+          - old: |-
+              Prepare the DEG table, then **read (upstream skill, not merged here) and follow its "MA plot" recipe** on the exported CSV (→ `figures/ma_plot.png`).
+
+              ```python
+              # MA input = log2FoldChange vs mean normalized count (baseMean); from deseq2_all_results.csv
+              ma_input = results[["baseMean", "log2FoldChange", "padj"]].dropna(subset=["padj"])
+              print(f"MA input: {len(ma_input)} genes -> deseq2_all_results.csv")
+              # (upstream skill, not merged here)
+              ```
+            new: |-
+              Plot every gene with a tested p-value (→ `figures/ma_plot.png`); run after Step 7, which imports matplotlib and numpy.
+
+              ```python
+              ma = results[["baseMean", "log2FoldChange", "padj"]].dropna(subset=["padj"])
+              sig = ma.padj < 0.05
+
+              plt.figure(figsize=(8, 6))
+              plt.scatter(np.log10(ma.baseMean[~sig] + 1), ma.log2FoldChange[~sig], s=8, c="lightgray", label="padj >= 0.05")
+              plt.scatter(np.log10(ma.baseMean[sig] + 1), ma.log2FoldChange[sig], s=8, c="crimson", label="padj < 0.05")
+              plt.axhline(0, color="gray", linestyle="--", linewidth=0.8)
+              plt.xlabel("log10(mean normalized count + 1)")
+              plt.ylabel("log2 fold change")
+              plt.legend()
+              plt.savefig("figures/ma_plot.png", dpi=300, bbox_inches="tight")
+              print(f"MA: {len(ma)} genes -> figures/ma_plot.png")
+              ```
+      - name: depmap-crispr-essentiality
+        source: skills/genomics-bioinformatics/databases/depmap-crispr-essentiality/SKILL.md
+        dest: sciagent/depmap-crispr-essentiality.md
+      - name: muon-multiomics-singlecell
+        source: skills/systems-biology-multiomics/muon-multiomics-singlecell/SKILL.md
+        dest: sciagent/muon-multiomics-singlecell.md
+        # hunt 2026-09-30, u13k2-packs-14: no routing to the scanpy-scrna-seq or omics-plotting skills
+        replace:
+          - old: Use scanpy-scrna-seq for single-modality RNA; use muon when combining 2+ omics from the same cells.
+            new: Use muon when combining 2+ omics from the same cells; a single RNA modality needs only scanpy.
+          - old: '- Use **omics-plotting** SKILL for generic result-table figures; joint embeddings use scanpy/muon `sc.pl.*` / `mu.pl.*`'
+            new: '- Joint embeddings plot with scanpy/muon `sc.pl.*` / `mu.pl.*`'
+          - old: '- Use **scanpy-scrna-seq** instead when analyzing'
+            new: '- Use plain scanpy instead when analyzing'
+      - name: mofaplus-multi-omics
+        source: skills/systems-biology-multiomics/mofaplus-multi-omics/SKILL.md
+        dest: sciagent/mofaplus-multi-omics.md
+        # hunt 2026-09-30, u13k2-packs-2/-5/-14: no install-separately comment; the factor scatter and loading
+        #   heatmap drawn here
+        excise:
+          - '- Use **omics-plotting** SKILL after training for publication-quality factor scatter and loading heatmaps'
+        replace:
+          - old: '# Example: run ORA with gseapy (install separately)'
+            new: '# Example: ORA with gseapy, if it imports in this environment (nothing is installed from here)'
+          - old: Extract the feature weights (loadings) per factor here, then **read (upstream skill, not merged here) and follow its recipes**
+            new: Extract the feature weights (loadings) per factor here, then draw the figures directly with matplotlib/seaborn (no plotting skill is merged here)
+          - old: |-
+              # (upstream skill, not merged here)
+              #   factors_meta -> "factor scatter"  -> figures/mofa_factor_scatter.png
+              #   weights_rna  -> loading heatmap   -> figures/mofa_rna_weights_heatmap.png
+              ```
+            new: |-
+              import os
+
+              os.makedirs("figures", exist_ok=True)
+
+              # Factor scatter: Factor1 against Factor2 and Factor3, coloured by condition
+              others = [fc for fc in ("Factor2", "Factor3") if fc in factors_meta.columns]
+              fig, axes = plt.subplots(1, len(others), figsize=(5.5 * len(others), 4.5), squeeze=False)
+              for ax, other in zip(axes[0], others):
+                  for cond, sub in factors_meta.groupby("condition", observed=True):
+                      ax.scatter(sub["Factor1"], sub[other], s=10, label=str(cond))
+                  ax.set_xlabel("Factor1")
+                  ax.set_ylabel(other)
+              axes[0][0].legend(title="condition", fontsize=8)
+              plt.tight_layout()
+              plt.savefig("figures/mofa_factor_scatter.png", dpi=200)
+
+              # Loading heatmap: the 10 most positive and 10 most negative RNA features of the first 5 factors
+              factors = list(weights_rna.columns[:5])
+              top = []
+              for fc in factors:
+                  top += weights_rna[fc].nlargest(10).index.tolist() + weights_rna[fc].nsmallest(10).index.tolist()
+              top = list(dict.fromkeys(top))  # keep the order, drop repeats
+              fig, ax = plt.subplots(figsize=(6, max(6, 0.18 * len(top))))
+              sns.heatmap(weights_rna.loc[top, factors], cmap="RdBu_r", center=0, ax=ax)
+              ax.set_title("Top RNA loadings, first 5 factors")
+              plt.tight_layout()
+              plt.savefig("figures/mofa_rna_weights_heatmap.png", dpi=200)
+              print("Saved figures/mofa_factor_scatter.png and figures/mofa_rna_weights_heatmap.png")
+              ```
+          - old: ; via omics-plotting |
+            new: ; drawn in Step 7 |
+      - name: lamindb-data-management
+        source: skills/systems-biology-multiomics/lamindb-data-management/SKILL.md
+        dest: sciagent/lamindb-data-management.md
+        # hunt 2026-09-30, u13k2-packs-14: the Short Description no longer routes to the measured-out scanpy
+        #   skill
+        replace:
+          - old: For scRNA-seq use scanpy; for ontology lookups use bionty.
+            new: For ontology lookups use bionty.
+      - name: histolab-wsi-processing
+        source: skills/medical-imaging/histolab-wsi-processing/SKILL.md
+        dest: sciagent/histolab-wsi-processing.md
+        references:
+          - skills/medical-imaging/histolab-wsi-processing/references/filters_preprocessing.md
+          - skills/medical-imaging/histolab-wsi-processing/references/tile_extraction.md
+          - skills/medical-imaging/histolab-wsi-processing/references/visualization_slides.md
+        # hunt 2026-09-30, u13k2-packs-2: no install instruction in the troubleshooting table
+        replace:
+          - old: '| Install OpenSlide system library; verify format with `openslide-show-properties` |'
+            new: '| OpenSlide is not installed from this document: if `import openslide` fails, say so; verify the format with `openslide-show-properties` |'
+      - name: pathml
+        source: skills/medical-imaging/pathml/SKILL.md
+        dest: sciagent/pathml.md
+        # hunt 2026-09-30, u13k2-packs-13/-15: the PathML 3.0.5 API the kdense twin states (checked against
+        #   the v3.0.5 tag; pathml is not installed in any env here) -- HEStainNormalization,
+        #   NuclearSegmentation and SlideData.read do not exist
+        wrapped_tool_licence: GPL-2.0 (PathML, per its source tag and the kdense pathml document)
+        commercial_use: 'This text is CC BY 4.0 and may be used commercially. The wrapped library, PathML, is GPL-2.0: that licence governs redistribution of the library itself, not of this description, and nothing from the library is vendored here.'
+        replace:
+          - old: '- **Environment**: Python 3.8+, CUDA-compatible GPU for deep learning preprocessing'
+            new: '- **Environment**: Python 3.10-3.12 (PathML 3.0.5); the code below is checked against the PathML v3.0.5 source: `HESlide`/`SlideData.run()`, `StainNormalizationHE`, `NucleusDetectionHE`, and `.h5path` files read back with `SlideData(path)`'
+          - old: |-
+              ```python
+              from pathml.core import SlideData
+              from pathml.preprocessing import Pipeline
+              from pathml.preprocessing.transforms import BoxBlur, TissueDetectionHE
+
+              # Load → build pipeline → tile → preprocess
+              slide = SlideData("tumor.svs", name="demo")
+              pipeline = Pipeline([BoxBlur(kernel_size=3), TissueDetectionHE(mask_name="tissue")])
+              slide.run(pipeline, tile_size=256, tile_stride=256)
+
+              # Inspect tiles
+              from pathml.core import Tile
+              tiles = [t for t in slide.tiles if t.masks["tissue"].any()]
+              print(f"Tissue tiles: {len(tiles)} of {len(slide.tiles)}")
+              ```
+            new: |-
+              ```python
+              from pathml.core import HESlide
+              from pathml.preprocessing import BoxBlur, Pipeline, TissueDetectionHE
+
+              # Load → build pipeline → tile and preprocess in one call (SlideData.run() tiles the slide)
+              slide = HESlide("tumor.svs", name="demo", backend="openslide")
+              pipeline = Pipeline([BoxBlur(kernel_size=3), TissueDetectionHE(mask_name="tissue")])
+              slide.run(pipeline, distributed=False, tile_size=256, tile_stride=256, level=0)
+
+              # Inspect tiles
+              tiles = [t for t in slide.tiles if t.masks["tissue"].any()]
+              print(f"Tissue tiles: {len(tiles)} of {len(slide.tiles)}")
+              ```
+          - old: |-
+              ```python
+              from pathml.core import SlideData
+
+              # Load an H&E whole-slide image
+              slide = SlideData("path/to/slide.svs", name="tumor_slide_001")
+              print(f"Slide name: {slide.name}")
+              print(f"Slide shape: {slide.slide.shape}")
+              print(f"Slide properties: {slide.slide.properties}")
+              ```
+            new: |-
+              ```python
+              from pathml.core import HESlide
+
+              # Load an H&E whole-slide image (HESlide is SlideData with the H&E slide type)
+              slide = HESlide("path/to/slide.svs", name="tumor_slide_001", backend="openslide")
+              print(f"Slide name: {slide.name}")
+              print(f"Slide shape: {slide.shape}")
+              print(f"Pyramid levels: {slide.slide.level_count}")
+              ```
+          - old: |-
+              ```python
+              from pathml.preprocessing import Pipeline
+              from pathml.preprocessing.transforms import (
+                  BoxBlur,
+                  TissueDetectionHE,
+                  HEStainNormalization,
+              )
+
+              # Build a preprocessing pipeline for H&E slides
+              pipeline = Pipeline([
+                  BoxBlur(kernel_size=5),                       # smooth image
+                  TissueDetectionHE(mask_name="tissue"),         # detect tissue regions
+                  HEStainNormalization(target="normalize"),       # normalize H&E staining
+              ])
+              print(f"Pipeline steps: {len(pipeline.transforms)}")
+              ```
+            new: |-
+              ```python
+              from pathml.preprocessing import BoxBlur, Pipeline, StainNormalizationHE, TissueDetectionHE
+
+              # Build a preprocessing pipeline for H&E slides
+              pipeline = Pipeline([
+                  BoxBlur(kernel_size=5),                         # smooth image
+                  TissueDetectionHE(mask_name="tissue"),          # detect tissue regions
+                  StainNormalizationHE(target="normalize", stain_estimation_method="macenko"),  # normalize H&E staining
+              ])
+              print(f"Pipeline steps: {len(pipeline)}")
+              ```
+          - old: |-
+              ### Step 3: Create a TileDataset
+
+              ```python
+              from pathml.core import TileDataset
+
+              # Tile the slide into 256x256 patches at 20x magnification
+              slide.generate_tiles(
+                  shape=(256, 256),
+                  stride=(256, 256),
+                  pad=False,
+                  level=0,           # pyramid level 0 = highest resolution
+                  coords_format="fractional",
+              )
+              print(f"Total tiles generated: {len(slide.tiles)}")
+              ```
+            new: |-
+              ### Step 3: Preview Tiles
+
+              ```python
+              from itertools import islice
+
+              # SlideData.run() (Step 4) tiles the slide itself. To look at a few tiles first, iterate the
+              # generate_tiles() generator -- it does not add anything to slide.tiles.
+              for tile in islice(slide.generate_tiles(shape=256, stride=256, level=0), 4):
+                  print(tile.coords, tile.image.shape)
+              ```
+          - old: |-
+              ```python
+              # Apply preprocessing pipeline to all tiles
+              slide.run(pipeline, distributed=False, tile_pad=False)
+              print("Pipeline complete — tiles preprocessed")
+
+              # Inspect a single tile
+              tile = slide.tiles[0]
+              print(f"Tile shape: {tile.image.shape}")      # (256, 256, 3)
+              print(f"Tile masks: {list(tile.masks.keys())}")
+              ```
+            new: |-
+              ```python
+              # Tile the slide and apply the pipeline to every tile (distributed=False: no Dask cluster needed)
+              slide.run(pipeline, distributed=False, tile_size=256, tile_stride=256, level=0, tile_pad=False)
+              print(f"Pipeline complete: {len(slide.tiles)} tiles")
+
+              # Inspect a single tile
+              tile = slide.tiles[0]
+              print(f"Tile shape: {tile.image.shape}")      # (256, 256, 3)
+              print(f"Tile masks: {list(tile.masks.keys())}")
+              ```
+          - old: |-
+              ```python
+              from pathml.preprocessing.transforms import NuclearSegmentation
+
+              # Run Hematoxylin-channel nuclear segmentation
+              seg_pipeline = Pipeline([
+                  TissueDetectionHE(mask_name="tissue"),
+                  NuclearSegmentation(mask_name="nuclei"),
+              ])
+
+              slide.run(seg_pipeline, distributed=False)
+
+              # Count nuclei per tile
+              for tile in list(slide.tiles)[:5]:
+                  n_nuclei = tile.masks["nuclei"].max()
+                  print(f"Tile {tile.coords}: {n_nuclei} nuclei detected")
+              ```
+            new: |-
+              ```python
+              from pathml.preprocessing import NucleusDetectionHE
+              from skimage.measure import label
+
+              # PathML 3.0.5 has no NuclearSegmentation transform. NucleusDetectionHE writes a binary nucleus
+              # mask (hematoxylin channel + superpixels + Otsu), so nuclei are counted as connected components.
+              seg_pipeline = Pipeline([
+                  TissueDetectionHE(mask_name="tissue"),
+                  NucleusDetectionHE(mask_name="nuclei"),
+              ])
+
+              slide.run(seg_pipeline, distributed=False, tile_size=256, tile_stride=256, overwrite_existing_tiles=True)
+
+              # Count nuclei in the first tiles
+              for i in range(min(5, len(slide.tiles))):
+                  tile = slide.tiles[i]
+                  n_nuclei = label(tile.masks["nuclei"] > 0).max()
+                  print(f"Tile {tile.coords}: {n_nuclei} nuclei detected")
+              ```
+          - old: |
+              import numpy as np
+              from pathml.core import SlideDataset
+            new: |
+              import numpy as np
+              from skimage.measure import label
+          - old: '"n_nuclei":  int(tile.masks["nuclei"].max()) if "nuclei" in tile.masks else 0,'
+            new: '"n_nuclei":  int(label(tile.masks["nuclei"] > 0).max()) if "nuclei" in tile.masks else 0,'
+          - old: |-
+              ```python
+              import h5py
+
+              # Save slide data (tiles + masks) to HDF5
+              slide.write("processed_slide.h5")
+              print("Slide saved to processed_slide.h5")
+
+              # Reload for downstream use
+              from pathml.core import SlideData
+              slide_loaded = SlideData.read("processed_slide.h5")
+              print(f"Reloaded: {len(slide_loaded.tiles)} tiles")
+              ```
+            new: |-
+              ```python
+              # Save slide data (tiles + masks) in PathML's h5path format
+              slide.write("processed_slide.h5path")
+              print("Slide saved to processed_slide.h5path")
+
+              # Reload: SlideData reads an .h5path file directly (there is no SlideData.read)
+              from pathml.core import SlideData
+              slide_loaded = SlideData("processed_slide.h5path")
+              print(f"Reloaded: {len(slide_loaded.tiles)} tiles")
+              ```
+          - old: '| `shape` | `(256, 256)` | `(64,64)` – `(1024,1024)` | Tile dimensions in pixels |'
+            new: '| `tile_size` | `256` | `64` – `1024` | Tile edge in pixels (`SlideData.run`) |'
+          - old: '| `stride` | equals `shape` | any tuple ≤ `shape` | Step between tile centers; `stride < shape` gives overlapping tiles |'
+            new: '| `tile_stride` | equals `tile_size` | any value ≤ `tile_size` | Step between tiles; smaller than `tile_size` gives overlapping tiles |'
+          - old: '| `distributed` | `False` | `True`, `False` | Enable Dask distributed processing for large slides |'
+            new: '| `distributed` | `True` | `True`, `False` | Dask distributed processing (needs a Dask client); pass `False` to run locally |'
+          - old: '| `pad` | `False` | `True`, `False` | Pad edge tiles to full `shape` size |'
+            new: '| `tile_pad` | `False` | `True`, `False` | Pad edge tiles to the full tile size |'
+          - old: '| `KeyError: ''nuclei''` in tile.masks | Segmentation pipeline not yet run | Run the `NuclearSegmentation` pipeline with `slide.run()` before accessing masks |'
+            new: '| `KeyError: ''nuclei''` in tile.masks | Nucleus detection not yet run | Run a pipeline with `NucleusDetectionHE(mask_name="nuclei")` via `slide.run()` before accessing masks |'
+          - old: '| `slide.tiles` is empty after generate_tiles | Level index out of range or all tiles filtered | Use `level=0`; check slide pyramid with `slide.slide.level_count` |'
+            new: '| `slide.tiles` is empty | `generate_tiles()` is a generator and never fills `slide.tiles`, or the level is out of range | Tile with `slide.run(...)`; check `slide.slide.level_count` |'
+          - old: '| `AttributeError: SlideData has no attribute ''write''` | Old PathML version | (not installed from this document: if the import fails, the library is not available here -- say so, do not install it) to get HDF5 save/load support |'
+            new: '| `AttributeError: SlideData has no attribute ''write''` | A PathML far older than 3.0.5 | This document targets PathML 3.0.5; with an older version, say the h5path API is not available here |'
+          - old: Reduce tile `shape` to `(128, 128)` or run with `distributed=False` on CPU
+            new: Reduce `tile_size` to 128, or run with `distributed=False` on CPU
+          - old: '- `processed_slide.h5` — HDF5 file with tiles, masks, and metadata for downstream use'
+            new: '- `processed_slide.h5path` — PathML h5path file with tiles, masks, and metadata; reload with `SlideData("processed_slide.h5path")`'
+          - old: |
+              from pathml.core import SlideData
+              from pathml.preprocessing import Pipeline
+              from pathml.preprocessing.transforms import TissueDetectionHE, HEStainNormalization
+            new: |
+              from pathml.core import HESlide
+              from pathml.preprocessing import Pipeline, StainNormalizationHE, TissueDetectionHE
+          - old: |2-
+                  HEStainNormalization(target="normalize"),
+              ])
+
+              wsi_dir
+            new: |2-
+                  StainNormalizationHE(target="normalize", stain_estimation_method="macenko"),
+              ])
+
+              wsi_dir
+          - old: |2-
+                  slide = SlideData(str(wsi_path), name=wsi_path.stem)
+                  slide.generate_tiles(shape=(256, 256), stride=(256, 256), level=0)
+                  slide.run(pipeline, distributed=False)
+                  slide.write(f"processed/{wsi_path.stem}.h5")
+            new: |2-
+                  slide = HESlide(str(wsi_path), name=wsi_path.stem, backend="openslide")
+                  slide.run(pipeline, distributed=False, tile_size=256, tile_stride=256, level=0)
+                  slide.write(f"processed/{wsi_path.stem}.h5path")
+      - name: nan-safe-correlation
+        source: skills/scientific-computing/nan-safe-correlation/SKILL.md
+        dest: sciagent/nan-safe-correlation.md
+        # hunt 2026-09-30, u13k2-packs-13: a constant feature is nunique <= 1, as degenerate-input-filtering
+        #   says; nunique < 3 also dropped every binary feature, which Spearman handles
+        # hunt 2026-09-30, u13k2-packs-14: no routing to the never-merged statistical-analysis or shap-model-
+        #   explainability skills
+        replace:
+          - old: '   - Remove constant features (nunique < 3)'
+            new: '   - Remove constant features (nunique <= 1; a binary feature has two values and is kept)'
+          - old: 'def filter_degenerate(df, min_unique=3, min_nonnan_frac=0.5):'
+            new: 'def filter_degenerate(df, min_unique=2, min_nonnan_frac=0.5):'
+          - old: '        min_unique: Minimum number of unique non-NaN values required'
+            new: '        min_unique: Minimum number of unique non-NaN values required (2 drops constants only)'
+          - old: ' Use statistical-analysis for test choice; shap-model-explainability for interpretability.'
+            new: ''
+      - name: degenerate-input-filtering
+        source: skills/scientific-computing/degenerate-input-filtering/SKILL.md
+        dest: sciagent/degenerate-input-filtering.md
+        # hunt 2026-09-30, u13k2-packs-8: count removed features out of the features (columns), and report
+        #   all-NaN and constant columns separately -- the old code divided removed genes by the sample count
+        # hunt 2026-09-30, u13k2-packs-14: no routing to the never-merged statistical-analysis skill
+        replace:
+          - old: |-
+              import pandas as pd
+              import numpy as np
+
+              def filter_degenerate(data, context="features"):
+                  """Filter degenerate data points and report what was removed.
+
+                  Always call this BEFORE statistical analysis.
+                  """
+                  n_before = len(data)
+
+                  # Filter based on data type
+                  if isinstance(data, pd.DataFrame):
+                      # Remove constant columns (zero variance)
+                      non_constant = data.loc[:, data.nunique() > 1]
+                      # Remove all-NaN columns
+                      non_nan = non_constant.dropna(axis=1, how='all')
+                      filtered = non_nan
+                  elif isinstance(data, list):
+                      # Remove None, empty, and zero-length items
+                      filtered = [x for x in data if x is not None and len(x) > 0]
+                  else:
+                      filtered = data
+
+                  n_after = len(filtered) if not isinstance(filtered, pd.DataFrame) else filtered.shape[1]
+                  n_removed = n_before if not isinstance(data, pd.DataFrame) else data.shape[1]
+                  n_removed = n_removed - n_after
+
+                  # MANDATORY: Print the count
+                  print(f"Degenerate {context} filtered: {n_removed} / {n_before} removed")
+                  print(f"Remaining {context}: {n_after}")
+
+                  return filtered
+            new: |-
+              import pandas as pd
+              import numpy as np
+
+              def filter_degenerate(data, context="features"):
+                  """Filter degenerate data points and report what was removed.
+
+                  Always call this BEFORE statistical analysis. For a DataFrame the features are
+                  the columns (samples x features), so every count below is a count of columns.
+                  """
+                  if isinstance(data, pd.DataFrame):
+                      n_before = data.shape[1]
+                      n_unique = data.nunique()                 # NaN is not counted as a value
+                      all_nan = data.columns[n_unique == 0]     # every value NaN
+                      constant = data.columns[n_unique == 1]    # one distinct non-NaN value
+                      filtered = data.drop(columns=all_nan.union(constant))
+                      n_after = filtered.shape[1]
+                      print(f"All-NaN {context} removed: {len(all_nan)} / {n_before}")
+                      print(f"Constant {context} removed: {len(constant)} / {n_before}")
+                  elif isinstance(data, list):
+                      # Remove None, empty, and zero-length items
+                      n_before = len(data)
+                      filtered = [x for x in data if x is not None and len(x) > 0]
+                      n_after = len(filtered)
+                  else:
+                      n_before = n_after = len(data)
+                      filtered = data
+
+                  n_removed = n_before - n_after
+
+                  # MANDATORY: Print the count
+                  print(f"Degenerate {context} filtered: {n_removed} / {n_before} removed")
+                  print(f"Remaining {context}: {n_after}")
+
+                  return filtered
+          - old: See nan-safe-correlation for NaN-aware correlation; statistical-analysis for test guidance.
+            new: See nan-safe-correlation for NaN-aware correlation.
+
+  kdense:
+    display_name: scientific-agent-skills
+    upstream: https://github.com/k-dense-ai/scientific-agent-skills
+    clone_dir: kdense
+    commit: 330c8e764435a731eff571e3efdda70b363d0792
+    commit_date: "2026-09-14T09:27:37+00:00"
+    licence: MIT
+    licence_file: LICENSE.md
+    licence_sha256: 09b02a3c9df3053c55531d503357a9c7cde275970e6c3ceaa1ddf5f0e90b40c1
+    licence_copy: THIRD_PARTY_LICENSES/scientific-agent-skills-MIT.txt
+    licence_line: >-
+      MIT, Copyright (c) 2025 K-Dense Inc. (THIRD_PARTY_LICENSES/scientific-agent-skills-MIT.txt).
+      Changes were made -- see Modifications.
+    attribution: k-dense-ai/scientific-agent-skills, 166 skills, 40 admitted (intake sections 7.1 and 7.2; anndata, scanpy and database-lookup removed 2026-09-20)
+    intake: docs/audit/wave_a/intake-kdense.md
+    # Every K-Dense skill ends with an instruction to add the pack's arXiv paper to the user's
+    # manuscript and to fetch arxiv.org before writing the reference. That is an instruction to the
+    # agent about the user's paper, not knowledge about a library; MIT asks for the notice, which the
+    # header carries, not for a citation. Dropped by name, recorded in every Modifications line.
+    drop_sections:
+      - Citing Scientific Agent Skills
+      # The K-Dense counterpart of SciAgent's "Related Skills": it routes to database-lookup (refused
+      # in audit), literature-review (refused for safety), scientific-writing and statistical-analysis
+      # (never merged) -- see the sciagent entry above (hunt 2026-09-30, u13k2-packs-14).
+      - Integration with Other Skills
+    skills:
+      # ---- section 7.1: highest value, lowest risk (12 in the intake; 9 after 2026-09-20 -- see excluded.refused.kdense)
+      - name: scvi-tools
+        source: skills/scvi-tools/SKILL.md
+        dest: kdense/scvi-tools.md
+        references:
+          - skills/scvi-tools/references/models-spatial.md
+        # Picked on 2 of 10 control prompts in the 2026-09-20 measurement (deconvolution, integration);
+        # the twin in sciagent/ says the same thing. Scoped the same way, worded distinctly.
+        # Kept under 240 characters on purpose: get_pack_summaries clips there, and the scoping
+        # clause is the last sentence.
+        short_description: >-
+          Direct use of scvi-tools models (scVI, scANVI, DestVI, totalVI, MultiVI, spatial). Not needed
+          for the platform's own deconvolution, integration or annotation tools, which wrap these; pick
+          only when the task names scvi-tools or a model.
+        # hunt 2026-09-30, u13k2-packs-9: the DestVI workflow ran into KeyError (no counts layer after
+        #   read_visium), a gene mismatch (HVGs flagged, never subset or intersected) and InvalidIndexError
+        #   (DataFrame[:, i]); checked against scvi-tools 1.4.0 in the heavy tool env
+        replace:
+          - old: |-
+              # ===== Part 1: Prepare single-cell reference =====
+              # Load and process scRNA-seq reference
+              sc_adata = sc.read_h5ad("reference_scrna.h5ad")
+
+              # QC and filtering
+              sc.pp.filter_genes(sc_adata, min_cells=10)
+              sc.pp.highly_variable_genes(sc_adata, n_top_genes=4000)
+
+              # Train the CondSCVI reference model (labels_key carries cell types)
+              from scvi.model import CondSCVI, DestVI
+
+              CondSCVI.setup_anndata(
+                  sc_adata,
+                  layer="counts",
+                  labels_key="cell_type",
+              )
+
+              sc_model = CondSCVI(sc_adata, weight_obs=False)
+              sc_model.train(max_epochs=300)
+
+              # ===== Part 2: Load spatial data =====
+              spatial_adata = sc.read_visium("path/to/visium")
+              spatial_adata.var_names_make_unique()
+
+              # QC spatial data
+              sc.pp.filter_genes(spatial_adata, min_cells=10)
+
+              # ===== Part 3: Run DestVI =====
+              DestVI.setup_anndata(
+                  spatial_adata,
+                  layer="counts"
+              )
+
+              destvi_model = DestVI.from_rna_model(
+                  spatial_adata,
+                  sc_model,
+              )
+
+              destvi_model.train(max_epochs=2500)
+
+              # ===== Part 4: Extract results =====
+              # Get proportions
+              proportions = destvi_model.get_proportions()
+              spatial_adata.obsm["proportions"] = proportions
+
+              # Add proportions to .obs for easy plotting
+              for i, ct in enumerate(sc_model.adata.obs["cell_type"].cat.categories):
+                  spatial_adata.obs[f"prop_{ct}"] = proportions[:, i]
+            new: |-
+              # ===== Part 1: Load both datasets; both models read raw counts =====
+              sc_adata = sc.read_h5ad("reference_scrna.h5ad")
+              sc_adata.layers["counts"] = sc_adata.X.copy()  # X must hold raw counts here
+              spatial_adata = sc.read_visium("path/to/visium")
+              spatial_adata.var_names_make_unique()
+              spatial_adata.layers["counts"] = spatial_adata.X.copy()  # read_visium creates no layers
+
+              # QC and filtering (seurat_v3 selects HVGs on raw counts; it needs scikit-misc)
+              sc.pp.filter_genes(sc_adata, min_cells=10)
+              sc.pp.filter_genes(spatial_adata, min_cells=10)
+              sc.pp.highly_variable_genes(sc_adata, n_top_genes=4000, flavor="seurat_v3", layer="counts", subset=True)
+
+              # DestVI.from_rna_model reuses the reference decoder, so both objects need the same genes in
+              # the same order: keep the reference HVGs that the spatial data also measured
+              genes = sc_adata.var_names.intersection(spatial_adata.var_names)
+              sc_adata = sc_adata[:, genes].copy()
+              spatial_adata = spatial_adata[:, genes].copy()
+
+              # ===== Part 2: Train the CondSCVI reference model (labels_key carries cell types) =====
+              from scvi.model import CondSCVI, DestVI
+
+              CondSCVI.setup_anndata(
+                  sc_adata,
+                  layer="counts",
+                  labels_key="cell_type",
+              )
+
+              sc_model = CondSCVI(sc_adata, weight_obs=False)
+              sc_model.train(max_epochs=300)
+
+              # ===== Part 3: Run DestVI =====
+              DestVI.setup_anndata(
+                  spatial_adata,
+                  layer="counts"
+              )
+
+              destvi_model = DestVI.from_rna_model(
+                  spatial_adata,
+                  sc_model,
+              )
+
+              destvi_model.train(max_epochs=2500)
+
+              # ===== Part 4: Extract results =====
+              # get_proportions() returns a DataFrame: one column per cell type, indexed like spatial_adata.obs
+              proportions = destvi_model.get_proportions()
+              spatial_adata.obsm["proportions"] = proportions
+
+              # Add proportions to .obs for easy plotting
+              for ct in proportions.columns:
+                  spatial_adata.obs[f"prop_{ct}"] = proportions[ct].values
+      - name: cellxgene-census
+        source: skills/cellxgene-census/SKILL.md
+        dest: kdense/cellxgene-census.md
+        # hunt 2026-09-30, u13k2-packs-14: the Short Description no longer routes to the measured-out scanpy
+        #   and anndata skills (the line pass 2 ranks on)
+        replace:
+          - old: ' For analyzing your own local single-cell data use scanpy, anndata, or scvi-tools.'
+            new: ''
+      - name: scvelo
+        source: skills/scvelo/SKILL.md
+        dest: kdense/scvelo.md
+      - name: pydeseq2
+        source: skills/pydeseq2/SKILL.md
+        dest: kdense/pydeseq2.md
+        # hunt 2026-09-30, u13k2-packs-13: the same version-scoped API sentence its sciagent twin carries
+        replace:
+          - old: |
+              - PyDESeq2 0.5.4
+            new: |
+              - PyDESeq2 0.5.4 -- PyDESeq2 API as checked against the v0.5.4 source: since 0.5.2 size factors are `dds.obs["size_factors"]` and dispersions `dds.var["dispersions"]` (0.5.1 and earlier kept them in `obsm`/`varm`); since 0.5.0 `DeseqStats` requires `contrast` and `lfc_shrink(coeff=...)` requires the design-column name (e.g. `"condition[T.treated]"`); `DeseqDataSet(n_cpus=...)` and `inference=DefaultInference(n_cpus=...)` are both accepted.
+      - name: pathway-enrichment
+        source: skills/pathway-enrichment/SKILL.md
+        dest: kdense/pathway-enrichment.md
+        # hunt 2026-09-30, u13k2-packs-12/-14: no routing to the refused database-lookup skill; the helper
+        #   script is upstream's
+        replace:
+          - old: ; for raw pathway/interaction APIs (Reactome, KEGG, STRING) see the `database-lookup` skill.
+            new: .
+          - old: |
+              ## Helper Script
+            new: |
+              ## Upstream helper script (not vendored)
+        excise:
+          - Run (upstream helper script, not vendored) for all options (background file, FDR cutoff, min/max set size, permutations).
+      - name: ontology-term-resolution
+        source: skills/ontology-term-resolution/SKILL.md
+        dest: kdense/ontology-term-resolution.md
+        # hunt 2026-09-30, u13k2-packs-12: the scripts are not here; a direct service call has to handle every
+        #   trap below
+        replace:
+          - old: |-
+              These are verified against the live service and are the reason this skill ships scripts rather
+              than a recipe.
+            new: |-
+              These are verified against the live service. Upstream ships scripts that handle them; none is
+              vendored here, so a direct OLS or ZOOMA call must handle each one itself.
+      - name: genomic-coordinates
+        source: skills/genomic-coordinates/SKILL.md
+        dest: kdense/genomic-coordinates.md
+      - name: lamindb
+        source: skills/lamindb/SKILL.md
+        dest: kdense/lamindb.md
+        # hunt 2026-09-30, u13k2-packs-2: no install step in the checklist
+        replace:
+          - old: '   - Install pinned LaminDB and required extras'
+            new: '   - Confirm `import lamindb` works and record its version (nothing is installed from this document)'
+      - name: histolab
+        source: skills/histolab/SKILL.md
+        dest: kdense/histolab.md
+      # ---- section 7.2: useful, needs a decision (31)
+        # hunt 2026-09-30, u13k2-packs-7: a sample of tiles is not the slide -- no RandomTiler or fewer tiles
+        #   to save time
+        replace:
+          - old: |-
+              - Extract at lower pyramid level (level=1 or 2)
+              - Reduce `n_tiles` for RandomTiler/ScoreTiler
+              - Use RandomTiler instead of GridTiler for sampling
+              - Use BiggestTissueBoxMask instead of TissueMask
+            new: |-
+              - Extract at a lower pyramid level (level=1 or 2) with GridTiler, so the whole tissue is still covered; report the level used
+              - Do not switch to RandomTiler or lower `n_tiles` to save time: a sample of tiles is not the slide, and if a subset is ever analysed, report what fraction of the tissue it covers
+              - Use BiggestTissueBoxMask instead of TissueMask only when the slide holds a single tissue piece
+      - name: biopython
+        source: skills/biopython/SKILL.md
+        dest: kdense/biopython.md
+        may_name_api_keys: [NCBI_API_KEY]   # Bio.Entrez.api_key, read from os.environ in the text
+        # hunt 2026-09-30, u13k2-packs-2/-12: the reference files are not here, and no upgrade advice
+        replace:
+          - old: 2. **Read the appropriate reference file** using the Read tool
+            new: 2. **Check the module's own documentation** with `help()` -- the upstream reference files are not included here
+          - old: |-
+              1. **Always read relevant reference documentation** before writing code
+              2. **Use grep to search reference files** for specific functions or examples
+            new: |-
+              1. **Check the module's docstrings** (`help(Bio.SeqIO)`) before writing code; the upstream reference files are not included here
+              2. **Inspect objects interactively** (`dir()`, a small test record) for specific functions or examples
+          - old: 8. **Keep Biopython updated** to get latest features and bug fixes
+            new: 8. **Record the Biopython version** (`Bio.__version__`) with the results; nothing is upgraded from this document
+      - name: pysam
+        source: skills/pysam/SKILL.md
+        dest: kdense/pysam.md
+      - name: polars-bio
+        source: skills/polars-bio/SKILL.md
+        dest: kdense/polars-bio.md
+      - name: gtars
+        source: skills/gtars/SKILL.md
+        dest: kdense/gtars.md
+        # hunt 2026-09-30, u13k2-packs-12 / -15: the six references are not here; the tool licence is what
+        #   this document's body says
+        wrapped_tool_licence: MIT per the published gtars crates; the GitHub repository root displays BSD-2-Clause -- verify the exact artifact (per this document's body)
+        replace:
+          - old: |-
+              ## Bundled references
+
+              These are the only six bundled references; all links are local and present:
+            new: |-
+              ## Upstream references (not included)
+
+              Upstream ships six reference files with this skill; none is included here:
+      - name: geniml
+        source: skills/geniml/SKILL.md
+        dest: kdense/geniml.md
+        # hunt 2026-09-30, u13k2-packs-15 / -2: geniml is BSD-2-Clause per this document's body (the MIT
+        #   frontmatter is the skill text's); untrusted artifacts are handled as untrusted code, not by
+        #   building an environment
+        wrapped_tool_licence: BSD-2-Clause (geniml, per this document's body; this skill's own text is MIT)
+        replace:
+          - old: and checksum artifacts before loading; use an isolated environment and never
+            new: and checksum artifacts before loading; treat them as untrusted code and never
+      - name: deeptools
+        source: skills/deeptools/SKILL.md
+        dest: kdense/deeptools.md
+        # hunt 2026-09-30, u13k2-packs-12: the workflow generator and validator are upstream scripts; the
+        #   fence ran a file never generated
+        replace:
+          - old: |-
+              For standard analyses, use the workflow generator to create customized scripts:
+
+              ```bash
+              # List available workflows
+              # (upstream helper script, not vendored)
+
+              # Generate ChIP-seq QC workflow
+              # (upstream helper script, not vendored)
+
+              # Make executable and run
+              chmod +x qc_workflow.sh
+              ./qc_workflow.sh
+              ```
+            new: Upstream generates workflow scripts with a helper that is not vendored here (upstream helper script, not vendored); write the deepTools commands directly -- the common ones are below.
+          - old: '**Always validate files first** using (upstream helper script, not vendored) to check:'
+            new: '**Always validate files first** (upstream''s validator script is not vendored here; check these directly):'
+      - name: bulk-rnaseq
+        source: skills/bulk-rnaseq/SKILL.md
+        dest: kdense/bulk-rnaseq.md
+        # The read trimmer this skill pairs with Trim Galore is intake-sciagent section 2.2 row E3
+        # (an excluded origin); the intake's one-liner list did not notice it here. Every mention is
+        # rewritten to name Trim Galore alone, by line address and line digest (this file is scanned
+        # for the identifier, so it cannot quote it); the Setup fence that installs it goes with the
+        # fence rule. A line that has moved refuses the file, so this cannot rot silently.
+        # hunt 2026-09-30, u13k2-packs-14: the description (line 3) no longer routes to the scientific-visualization or
+        #   scanpy skills, neither of which is merged.
+        line_edits:
+          - line: 3
+            sha256: 8a013834aa1fe2b4dc20e7e8c2ad0f1b188124f0ccea6cbf7691d854e1431bee
+            new: 'description: End-to-end bulk RNA-seq orchestrator — takes raw FASTQ reads through QC and trimming (FastQC, Trim Galore), alignment and quantification (STAR, Salmon, featureCounts), assembles a gene-level counts matrix, then hands off to differential expression (pydeseq2), pathway/GSEA enrichment (pathway-enrichment), and publication figures (matplotlib). Use whenever the user has bulk RNA-seq reads or quant output and wants a complete, reproducible differential-expression workflow — e.g. "analyze my RNA-seq", "FASTQ to DESeq2", "run nf-core/rnaseq", "STAR/Salmon quantification", "build a counts matrix for DESeq2", or "go from reads to differentially expressed genes and enriched pathways". Routes between an nf-core/rnaseq (Nextflow) path and a standalone STAR/Salmon path, and covers experimental design, strandedness, and QC gates.'
+          - line: 39
+            sha256: 52753748ef76aa369096cca449694dd4fe2c20c80238dbc4cb2f2f781e051d4a
+            new: '    qc --> trim["Trim: Trim Galore"]'
+          - line: 115
+            sha256: a3d39e768809bd8b0002683754764f17f42243b85588fff4f11de7898a679924
+            new: 'trim_galore --paired -o trimmed/ s1_R1.fq.gz s1_R2.fq.gz   # 2. Trim adapters/low-quality'
+          - line: 116
+            sha256: 234bf287cd250787e751330ab071c4937a350b40df6b9a63a3dd3978ceb6ae0a
+            new: null
+          - line: 117
+            sha256: 54663d3777ce07db86875689127e9de9f27514fb7e99931eafad6459bace06ce
+            new: null
+          - line: 123
+            sha256: d27a9f6510b7fd3617206b7e34fc3587fc3dd77ba81b05e2dea57fe2be6370d6
+            new: 'Full recipes (FastQC, Trim Galore, STAR index+align+`--quantMode GeneCounts`, Salmon decoy-aware index, featureCounts, strandedness): `references/upstream-manual.md`.'
+          - line: 144
+            sha256: 5edc178d68e85d4a509d7074097a5f05d34f01266942c1f2b473d97333fc5623
+            new: '3. **Trimming.** Remove adapters and low-quality tails (via `Trim Galore`). Re-run FastQC to confirm. Recipes: `references/upstream-manual.md` (Path A does this for you).'
+          - line: 189
+            sha256: 9d9122d42f70e79f462ec58fd172593e4e0e5b4b7629a85de75c0989283b9ab8
+            new: '- `references/upstream-manual.md` — Path B: FastQC, Trim Galore, STAR genome index + alignment + `--quantMode GeneCounts`, Salmon decoy-aware index + `quant`, featureCounts, and how to determine strandedness.'
+          - line: 196
+            sha256: c2f38d9b946d879aac8fb0cd2a6b1c5f535e0f76e2e4e9035ebe35433096b864
+            new: '- Trim Galore: https://github.com/FelixKrueger/TrimGalore · MultiQC: https://multiqc.info'
+        # hunt 2026-09-30, u13k2-packs-14: no routing to the scientific-visualization or scanpy skills
+        #   (neither is merged)
+        replace:
+          - old: vizskill["scientific-visualization skill"] -.-> fig
+            new: vizskill["matplotlib figures"] -.-> fig
+          - old: 8. **Figures → `scientific-visualization` skill.** Volcano,
+            new: 8. **Figures.** Volcano,
+      - name: scikit-bio
+        source: skills/scikit-bio/SKILL.md
+        dest: kdense/scikit-bio.md
+      - name: etetoolkit
+        source: skills/etetoolkit/SKILL.md
+        dest: kdense/etetoolkit.md
+        wrapped_tool_licence: GPL-3.0-or-later (ete4)
+        commercial_use: >-
+          This text is MIT and may be used commercially. The wrapped library, ete4, is GPL-3.0-or-later:
+          that licence governs redistribution of the library itself, not of this description, and nothing
+          from the library is vendored here.
+        # hunt 2026-09-30, u13k2-packs-3: the runtime check is a plain import; `uv run --with` would provision
+        #   an environment
+        line_edits:
+          - line: 75
+            sha256: 6a860aa885489cae06934ca94675305c03ae137fa393fd0d9d00ce00befc50e5
+            new: python -c "import ete4; print(ete4.__version__)"
+      - name: phylogenetics
+        source: skills/phylogenetics/SKILL.md
+        dest: kdense/phylogenetics.md
+        # hunt 2026-09-30, u13k2-packs-7/-10/-13: ETE 4 (the API the etetoolkit document targets, checked
+        #   against the ete 4.4.0 tag; ete is not installed in any env here), statistics over every leaf
+        #   instead of the first 50, and a real internal-node count (len() of a tree counts leaves)
+        replace:
+          - old: Visualize with ETE3 or FigTree.
+            new: Visualize with ETE 4 or FigTree.
+          - old: 4. **ETE3** — Python library for tree manipulation and visualization
+            new: 4. **ETE 4** (`ete4` 4.4.0) — Python library for tree manipulation and visualization. The code below is ETE 4; ETE 3's `ete3` API differs (`format=` became `parser=`, `is_leaf()` the `is_leaf` property)
+          - old: '### 5. Tree Analysis and Visualization with ETE3'
+            new: '### 5. Tree Analysis and Visualization with ETE 4'
+          - old: |-
+              from ete3 import Tree, TreeStyle, NodeStyle, TextFace, PhyloTree
+              import matplotlib.pyplot as plt
+
+              def load_tree(tree_file: str) -> Tree:
+                  """Load a Newick tree file."""
+                  t = Tree(tree_file)
+                  print(f"Tree: {len(t)} leaves, {len(list(t.traverse()))} nodes")
+                  return t
+
+              def basic_tree_stats(t: Tree) -> dict:
+                  """Compute basic tree statistics."""
+                  leaves = t.get_leaves()
+                  distances = [t.get_distance(l1, l2) for l1 in leaves[:min(50, len(leaves))]
+                               for l2 in leaves[:min(50, len(leaves))] if l1 != l2]
+
+                  stats = {
+                      "n_leaves": len(leaves),
+                      "n_internal_nodes": len(t) - len(leaves),
+                      "total_branch_length": sum(n.dist for n in t.traverse()),
+                      "max_leaf_distance": max(distances) if distances else 0,
+                      "mean_leaf_distance": sum(distances)/len(distances) if distances else 0,
+                  }
+                  return stats
+
+              def find_mrca(t: Tree, leaf_names: list) -> Tree:
+                  """Find the most recent common ancestor of a set of leaves."""
+                  return t.get_common_ancestor(*leaf_names)
+
+              def visualize_tree(t: Tree, output_file: str = "tree.png",
+                                  show_branch_support: bool = True,
+                                  color_groups: dict = None,
+                                  width: int = 800) -> None:
+                  """
+                  Render phylogenetic tree to image.
+
+                  Args:
+                      t: ETE3 Tree object
+                      color_groups: Dict mapping leaf_name → color (for coloring taxa)
+                      show_branch_support: Show bootstrap values
+                  """
+                  ts = TreeStyle()
+                  ts.show_leaf_name = True
+                  ts.show_branch_support = show_branch_support
+                  ts.mode = "r"  # 'r' = rectangular, 'c' = circular
+
+                  if color_groups:
+                      for node in t.traverse():
+                          if node.is_leaf() and node.name in color_groups:
+                              nstyle = NodeStyle()
+                              nstyle["fgcolor"] = color_groups[node.name]
+                              nstyle["size"] = 8
+                              node.set_style(nstyle)
+
+                  t.render(output_file, tree_style=ts, w=width, units="px")
+                  print(f"Tree saved to: {output_file}")
+
+              def midpoint_root(t: Tree) -> Tree:
+                  """Root tree at midpoint (use when outgroup unknown)."""
+                  t.set_outgroup(t.get_midpoint_outgroup())
+                  return t
+
+              def prune_tree(t: Tree, keep_leaves: list) -> Tree:
+                  """Prune tree to keep only specified leaves."""
+                  t.prune(keep_leaves, preserve_branch_length=True)
+                  return t
+            new: |-
+              from ete4 import Tree
+
+
+              def load_tree(tree_file: str) -> Tree:
+                  """Load a Newick tree file. ETE 4 reads an open file object (or Newick text), not a path."""
+                  with open(tree_file) as handle:
+                      t = Tree(handle)
+                  print(f"Tree: {len(t)} leaves, {sum(1 for _ in t.traverse())} nodes")
+                  return t
+
+              def basic_tree_stats(t: Tree) -> dict:
+                  """Basic tree statistics over ALL leaves -- exact, no leaf subsample."""
+                  nodes = list(t.traverse("postorder"))  # children before their parent
+                  n = sum(1 for node in nodes if node.is_leaf)
+                  below, depth, diameter = {}, {}, 0.0
+                  for node in nodes:
+                      key = id(node)
+                      if node.is_leaf:
+                          below[key], depth[key] = 1, 0.0
+                          continue
+                      below[key] = sum(below[id(c)] for c in node.children)
+                      reach = sorted(((c.dist or 0.0) + depth[id(c)] for c in node.children), reverse=True)
+                      depth[key] = reach[0]
+                      diameter = max(diameter, sum(reach[:2]))  # longest leaf-to-leaf path through this node
+                  # every branch lies on the path of each leaf pair it separates
+                  crossed = sum((node.dist or 0.0) * below[id(node)] * (n - below[id(node)]) for node in nodes if not node.is_root)
+                  n_pairs = n * (n - 1) // 2
+
+                  stats = {
+                      "n_leaves": n,
+                      "n_internal_nodes": len(nodes) - n,
+                      "total_branch_length": sum(node.dist or 0.0 for node in nodes),
+                      "max_leaf_distance": diameter,
+                      "mean_leaf_distance": crossed / n_pairs if n_pairs else 0.0,
+                  }
+                  return stats
+
+              def find_mrca(t: Tree, leaf_names: list) -> Tree:
+                  """Find the most recent common ancestor of a set of leaves."""
+                  return t.common_ancestor(leaf_names)
+
+              def visualize_tree(t: Tree, output_file: str = "tree.png",
+                                  show_branch_support: bool = True,
+                                  color_groups: dict = None,
+                                  width: int = 800) -> None:
+                  """
+                  Render phylogenetic tree to image with ETE 4's optional Qt treeview (ete4[treeview]).
+
+                  Args:
+                      t: ETE 4 Tree object
+                      color_groups: Dict mapping leaf_name → color (for coloring taxa)
+                      show_branch_support: Show bootstrap values
+                  """
+                  from ete4.treeview import NodeStyle, TreeStyle
+
+                  ts = TreeStyle()
+                  ts.show_leaf_name = True
+                  ts.show_branch_support = show_branch_support
+                  ts.mode = "r"  # 'r' = rectangular, 'c' = circular
+
+                  if color_groups:
+                      for node in t.leaves():
+                          if node.name in color_groups:
+                              nstyle = NodeStyle()
+                              nstyle["fgcolor"] = color_groups[node.name]
+                              nstyle["size"] = 8
+                              node.set_style(nstyle)
+
+                  t.render(output_file, tree_style=ts, w=width, units="px")
+                  print(f"Tree saved to: {output_file}")
+
+              def midpoint_root(t: Tree) -> Tree:
+                  """Root tree at midpoint (use when outgroup unknown)."""
+                  t.set_midpoint_outgroup()
+                  return t
+
+              def prune_tree(t: Tree, keep_leaves: list) -> Tree:
+                  """Prune tree to keep only specified leaves."""
+                  t.prune(keep_leaves, preserve_branch_length=True)
+                  return t
+          - old: |
+              import subprocess, os
+              from ete3 import Tree
+            new: |
+              import subprocess, os
+              from ete4 import Tree
+          - old: |2-
+                  t = Tree(tree_file)
+                  t = midpoint_root(t)
+            new: |2-
+                  t = load_tree(tree_file)
+                  t = midpoint_root(t)
+          - old: t.write(format=1, outfile=rooted_tree_file)
+            new: t.write(outfile=rooted_tree_file, parser=1)
+          - old: '- **ETE3**: http://etetoolkit.org/'
+            new: '- **ETE 4**: https://etetoolkit.github.io/ete/ (etetoolkit.org/docs/latest documents ETE 3)'
+      - name: bioservices
+        source: skills/bioservices/SKILL.md
+        dest: kdense/bioservices.md
+        wrapped_tool_licence: GPL-3.0 (bioservices)
+        commercial_use: >-
+          This text is MIT and may be used commercially. The wrapped library, bioservices, is GPL-3.0:
+          that licence governs redistribution of the library itself, not of this description, and nothing
+          from the library is vendored here.
+      - name: gget
+        source: skills/gget/SKILL.md
+        dest: kdense/gget.md
+        # hunt 2026-09-30, u13k2-packs-2: `gget setup` pip-installs module dependencies into the running
+        #   interpreter; said as a fact, not an instruction (line-addressed: the inline-install rule would
+        #   otherwise mangle the spans)
+        # hunt 2026-09-30, u13k2-packs-2: no environment-building advice
+        line_edits:
+          - line: 71
+            sha256: e724e31820c3606b99b899d3854e0fd89450186351fe48ba8c753e11c25ffa0c
+            new: '| 6. Additional tools | `mutate` (mutated sequences), `gpt` (text generation), `setup` (installs module dependencies into the running interpreter; not run from this document) |'
+          - line: 73
+            sha256: 627cacba1f85d9df37820dc25e268f8690e68d69e760f37b3190edd29cd5d6ad
+            new: Several modules depend on packages that upstream's one-time setup step installs, which is not run from this document (`alphafold`, `elm`,
+          - line: 100
+            sha256: 64990ffd4a121a4470ee9ae75fa9c4f276336598914a134b57643073dea2168f
+            new: '- alphafold, cellxgene, elm and gpt need upstream''s setup step first; if one fails for a missing dependency, say it is not available here'
+        excise:
+          - '- Use virtual environments to avoid dependency conflicts'
+      - name: depmap
+        source: skills/depmap/SKILL.md
+        dest: kdense/depmap.md
+      - name: primekg
+        source: skills/primekg/SKILL.md
+        dest: kdense/primekg.md
+        # intake-kdense section 7.4 item 6: the upstream text leaks one contributor's Windows home
+        # directory as the data location. Our own no-absolute-paths rule, arriving from outside.
+        replace:
+          - old: "Data is stored at `C:\\Users\\eamon\\Documents\\Data\\PrimeKG\\kg.csv`."
+            new: "Data is stored wherever the PrimeKG download (`kg.csv`) was placed on this machine; pass that path explicitly."
+          # hunt 2026-09-30, u13k2-packs-5: no `scripts.query_primekg` module or data/PrimeKG default here --
+          #   load kg.csv with pandas
+          - old: |-
+              # (upstream helper script, not vendored)
+
+              # Search for Alzheimer's disease nodes
+              results = search_nodes("Alzheimer", node_type="disease")
+              # Returns: [{"id": "EFO_0000249", "type": "disease", "name": "Alzheimer's disease", ...}]
+            new: |-
+              import pandas as pd
+
+              # No query helper is vendored here: load the PrimeKG edge list yourself. kg.csv is ~1 GB and
+              # ~8 million rows (each edge appears in both directions); load it once, in full.
+              KG_PATH = "/path/to/kg.csv"  # wherever the user's PrimeKG download is; a data lake may list it
+              kg = pd.read_csv(KG_PATH, low_memory=False)
+              # columns: relation, display_relation, x_index, x_id, x_type, x_name, x_source,
+              #          y_index, y_id, y_type, y_name, y_source
+
+              def search_nodes(text, node_type=None):
+                  nodes = kg[["x_index", "x_id", "x_type", "x_name", "x_source"]].drop_duplicates()
+                  hit = nodes["x_name"].str.contains(text, case=False, na=False, regex=False)
+                  if node_type:
+                      hit &= nodes["x_type"] == node_type
+                  return nodes[hit]
+
+              results = search_nodes("Alzheimer", node_type="disease")
+          - old: |-
+              # (upstream helper script, not vendored)
+
+              # Get all neighbors of a specific disease ID
+              neighbors = get_neighbors("EFO_0000249")
+              # Returns: List of neighbors like {"neighbor_name": "APOE", "relation": "disease_gene", ...}
+            new: |-
+              def get_neighbors(x_index, relation_type=None):
+                  """Every edge leaving one node (PrimeKG's ``x_index`` is unique per node; ``x_id`` is not)."""
+                  edges = kg[kg["x_index"] == x_index]
+                  if relation_type:
+                      edges = edges[edges["relation"] == relation_type]
+                  return edges[["relation", "display_relation", "y_type", "y_name", "y_id", "y_source"]]
+
+              neighbors = get_neighbors(results["x_index"].iloc[0])
+          - old: |-
+              # (upstream helper script, not vendored)
+
+              # Comprehensive summary for a disease
+              context = get_disease_context("Alzheimer's disease")
+              # Access: context['associated_genes'], context['associated_drugs'], context['phenotypes']
+            new: |-
+              def get_disease_context(name):
+                  """Genes, drugs and phenotypes linked to a disease, by exact node name."""
+                  edges = kg[(kg["x_type"] == "disease") & (kg["x_name"] == name)]
+                  return {
+                      "associated_genes": sorted(edges.loc[edges["relation"] == "disease_protein", "y_name"].unique()),
+                      "associated_drugs": sorted(edges.loc[edges["y_type"] == "drug", "y_name"].unique()),
+                      "phenotypes": sorted(edges.loc[edges["relation"] == "disease_phenotype_positive", "y_name"].unique()),
+                  }
+
+              context = get_disease_context("Alzheimer disease")
+          - old: '- Point the scripts at it with `export PRIMEKG_DATA=/path/to/kg.csv` (default: `data/PrimeKG/kg.csv`).'
+            new: '- No loader or default location is vendored: pass the path of the user''s `kg.csv` explicitly (as `KG_PATH` above).'
+      - name: alphagenome
+        source: skills/alphagenome/SKILL.md
+        dest: kdense/alphagenome.md
+        may_name_api_keys: [ALPHAGENOME_API_KEY]   # dna_client.create(os.environ[...]) in the text
+        # hunt 2026-09-30, u13k2-packs-14 / -15: no routing to the refused database-lookup or genomic-
+        #   intelligence skills; the client licence is the one this document's body states
+        wrapped_tool_licence: Apache-2.0 (the alphagenome client, per this document's body); model weights and outputs carry their own terms
+        replace:
+          - old: '| `folklore-variant-evidence`, `database-lookup` |'
+            new: '| `folklore-variant-evidence` |'
+        excise:
+          - '| promoter/enhancer/expression predictions without a DeepMind key | `genomic-intelligence` | different provider, keyless demo tier |'
+      - name: folklore-variant-evidence
+        source: skills/folklore-variant-evidence/SKILL.md
+        dest: kdense/folklore-variant-evidence.md
+        # hunt 2026-09-30, u13k2-packs-14 / -15: no routing to the refused database-lookup skill; the adapter
+        #   licence is the body's
+        wrapped_tool_licence: Apache-2.0 (the public folklore-mcp adapter, per this document's body); the hosted service has its own terms
+        replace:
+          - old: |
+              - Use `database-lookup` for broad direct queries across ClinVar, dbSNP, gnomAD,
+                Ensembl VEP, COSMIC, or multiple databases.
+            new: ''
+      - name: pathogen-variant-surveillance
+        source: skills/pathogen-variant-surveillance/SKILL.md
+        dest: kdense/pathogen-variant-surveillance.md
+      - name: imaging-data-commons
+        source: skills/imaging-data-commons/SKILL.md
+        dest: kdense/imaging-data-commons.md
+        # hunt 2026-09-30, u13k2-packs-2 / u13k2-packs-extra-14: no install path -- the prints-an-install-
+        #   command script it pointed at is not vendored, and its command targets the interpreter serving the
+        #   portal
+        replace:
+          - old: |-
+              2. **Otherwise, is `idc-index` installed?** Run (upstream helper script, not vendored). If it passes,
+                 use `idc-index` for everything.
+            new: |-
+              2. **Otherwise, does `idc-index` import?** Try `import idc_index`. If it does, use `idc-index` for
+                 everything.
+          - old: |-
+              script the user re-runs? Install `idc-index`: `check_version.py` exits non-zero and prints
+                 the exact install command for the running interpreter. Prefer a virtual environment, then
+                 restart Python.
+            new: |-
+              script the user re-runs? Those need `idc-index`, which is not installed from this document: say it
+                 is not available here, answer what the REST API can, and name what needs `idc-index`.
+          - old: |2-
+               `check_version.py` never installs anything itself — it also flags a newer
+              `idc-index` or skill release when one exists.
+            new: ''
+          - old: '- **Solution:** If the task is read-only metadata, do not install it — use the REST API instead (*Data Access Options*). Otherwise run (upstream helper script, not vendored) and use the install command it prints, which targets the running interpreter and pins the vetted version. For data analysis also add pandas, numpy, and pydicom (tested with pandas>=1.5, numpy>=1.23, pydicom>=2.3)'
+            new: '- **Solution:** `idc-index` is not installed from this document. If the task is read-only metadata, use the REST API instead (*Data Access Options*); otherwise say `idc-index` is not available here. (Upstream tested it with pandas>=1.5, numpy>=1.23, pydicom>=2.3.)'
+      - name: omero-integration
+        source: skills/omero-integration/SKILL.md
+        dest: kdense/omero-integration.md
+        # The upstream sentence forbids loading a dotenv file -- the right rule, but it names the
+        # file, and DOTENV_RE refuses the name itself. Same rule, without the pointer.
+        replace:
+          - old: "   Never search parent directories or load `.env` files."
+            new: "   Never search parent directories or load dotenv files."
+          # hunt 2026-09-30, u13k2-packs-2/-12/-15: no install instruction, no pointer at a stripped
+          #   frontmatter, and omero-py's own licence (GPL-2.0-or-later, per this document's body) rather than
+          #   the skill text's MIT
+          - old: |-
+              Install the exact IcePy 3.6.5 wheel matching the interpreter, OS, architecture,
+              and wheel tags, then OMERO.py:
+            new: |-
+              OMERO.py needs the exact IcePy 3.6.5 wheel matching the interpreter, OS, architecture,
+              and wheel tags; neither is installed from this document.
+          - old: 2. Read credentials only from the named `OMERO_*` variables in the frontmatter.
+            new: |-
+              2. Read credentials only from `OMERO_*` environment variables the user has set for this session
+                 (upstream's frontmatter listed them; it is not carried into this document).
+        wrapped_tool_licence: GPL-2.0-or-later (omero-py, per this document's body; this skill's own text is MIT)
+        commercial_use: 'This text is MIT and may be used commercially. The wrapped library, omero-py, is GPL-2.0-or-later: that licence governs redistribution of the library itself, not of this description, and nothing from the library is vendored here.'
+      - name: pathml
+        source: skills/pathml/SKILL.md
+        dest: kdense/pathml.md
+        # hunt 2026-09-30, u13k2-packs-12/-15: PathML is GPL-2.0 (this document's own body says so); the CLIs
+        #   are upstream's
+        wrapped_tool_licence: GPL-2.0 (PathML, per this document's body, with upstream commercial licensing options; this skill's own text is MIT)
+        commercial_use: 'This text is MIT and may be used commercially. The wrapped library, PathML, is GPL-2.0 (with upstream commercial licensing options): that licence governs redistribution of the library itself, not of this description, and nothing from the library is vendored here.'
+        replace:
+          - old: |
+              ## Bundled local CLIs
+            new: |
+              ## Upstream local CLIs (not vendored)
+      - name: flowio
+        source: skills/flowio/SKILL.md
+        dest: kdense/flowio.md
+        # hunt 2026-09-30, u13k2-packs-3/-5/-12: the runtime check is a plain import (uv run provisions), and
+        #   no `skills/flowio` path or bundled-inspector instruction
+        line_edits:
+          - line: 44
+            sha256: 383da792b83e2c5d70024b67e4fa4b1707c60e183c2d3009d356af1381cd99b2
+            new: python -c "import flowio; print(flowio.__version__)"
+        replace:
+          - old: |
+              ## Bundled Inspector
+            new: |
+              ## Upstream Inspector (not vendored)
+          - old: |+
+              Set `FLOWIO_SKILL_DIR` to the installed skill directory. From this repository's
+              root, use (upstream skill, not merged here):
+
+            new: ''
+      - name: matchms
+        source: skills/matchms/SKILL.md
+        dest: kdense/matchms.md
+        # hunt 2026-09-30, u13k2-packs-3: the runtime check is a plain import; `uv run` would provision an
+        #   environment
+        line_edits:
+          - line: 47
+            sha256: c7a69c337b9fbefcba07231d8c33b1e42e76fe44da9ed6f9a36afc1d1228d4c8
+            new: python -c "import matchms; print(matchms.__version__)"
+      - name: pyopenms
+        source: skills/pyopenms/SKILL.md
+        dest: kdense/pyopenms.md
+        # hunt 2026-09-30, u13k2-packs-12: no script ships; use the API
+        replace:
+          - old: |-
+              **This skill ships ready-to-run scripts in (upstream helper script, not vendored)** covering the most common
+              high-level workflows. Prefer running a script over writing new code—each is a
+              parameterized CLI tool that handles loading, processing, and export. Drop into the
+              Python API (and the (upstream reference file, not included)) only when no script fits.
+            new: |-
+              Upstream ships ready-to-run workflow scripts with this skill; none is vendored here, so use the
+              Python API below directly.
+      - name: glycoengineering
+        source: skills/glycoengineering/SKILL.md
+        dest: kdense/glycoengineering.md
+        replace:
+          - old: "- **GlycoWorkbench**: https://glycoworkbench.software.informer.com/"
+            new: "- **GlycoWorkbench**: (link removed: upstream pointed at a download-aggregator host, not the project's own site)"
+          # hunt 2026-09-30, u13k2-packs-10 / -2: overlapping sequons (NNST) were skipped by stepping 3;
+          #   GlycoSHIELD is not installed from here
+          - old: |2
+                          i += 3
+                      else:
+                          i += 1
+            new: |2
+                      i += 1  # one residue at a time: sequons overlap (NNST holds NNS and NST)
+          - old: '`gmx` from GROMACS on `PATH`). Install from the checkout:'
+            new: '`gmx` from GROMACS on `PATH`).'
+        line_edits:
+          - line: 234
+            sha256: 5575298f6f3a2000bf4c9cdecbd71c8fc3e11eee2979554ee3a3cc4dc0912382
+            new: GlycoSHIELD is **not on PyPI** and is not installed from this document. It ships as three scripts on top
+      - name: esm
+        source: skills/esm/SKILL.md
+        dest: kdense/esm.md
+        # ESM_API_KEY is how esm.sdk.client() reads its token from os.environ; that is the library's
+        # configuration surface and may be named. The sentence that told the reader to open a dotenv
+        # file for it may not (post-check DOTENV_RE), and a URL-shortener link is not reviewable.
+        may_name_api_keys: [ESM_API_KEY]
+        replace:
+          - old: "2. If not, check a local `.env` for `ESM_API_KEY` only (do not load unrelated secrets)."
+            new: "2. If not, ask the user to set `ESM_API_KEY` in the environment; never open a dotenv file to look for it."
+          - old: "- **Community:** Slack community at https://bit.ly/3FKwcWd"
+            new: "- **Community:** a Slack community (link removed: upstream gave only a URL-shortener address)"
+          # hunt 2026-09-30, u13k2-packs-2: a fact about the package, not an install instruction
+          - old: Install from PyPI ([`esm` on PyPI](https://pypi.org/project/esm/) by EvolutionaryScale).
+            new: The package is [`esm` on PyPI](https://pypi.org/project/esm/) by EvolutionaryScale.
+      - name: waypoint-bio
+        source: skills/waypoint-bio/SKILL.md
+        dest: kdense/waypoint-bio.md
+        # hunt 2026-09-30, u13k2-packs-2 / -15: no `hf auth login` (it writes a token to disk); the artefacts'
+        #   licence is the body's
+        wrapped_tool_licence: Apache-2.0 (Outpost Bio's three released artefacts, per this document's body)
+        line_edits:
+          - line: 68
+            sha256: 54235661837676700dc3773ccbd95eed8b61698d29385d226c80ca4851703eeb
+            new: 2. Authenticate with a read-scoped Hugging Face token the user has already configured (the `HF_TOKEN` environment variable); this document does not log in or store a token.
+          - line: 70
+            sha256: 4511fa32b0387ad3481ee8f02efd2b9621b1c9af8d6e9352a02df625f1da90dd
+            new: null
+          - line: 71
+            sha256: 30046fdb8ffca6f8787b69feca4361f7dd650fcb724ff2365a10833f46bc13eb
+            new: null
+          - line: 72
+            sha256: a6788eef33b6d1dea3e77b9610dc41fa7ce3c8e344933b9932984d11269ff0e3
+            new: null
+          - line: 73
+            sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+            new: null
+      - name: tiledbvcf
+        source: skills/tiledbvcf/SKILL.md
+        dest: kdense/tiledbvcf.md
+        # hunt 2026-09-30, u13k2-packs-2/-16: no install step; a region string is always 1-based inclusive --
+        #   the BED-style example read chr1:999999 as 1-based and silently took one extra base
+        replace:
+          - old: '**2. Install TileDB-Cloud Python Client**'
+            new: '**2. TileDB-Cloud Python client** (`tiledb.cloud`; not installed from this document)'
+          - old: |-
+              # BED-style (0-based, half-open converted internally)
+              regions = ["chr1:999999-2000000"]  # Equivalent to 1-based chr1:1000000-2000000
+            new: |-
+              # A region string is always read as 1-based inclusive -- nothing is converted. From a BED
+              # interval (0-based start, half-open end), add 1 to the start and keep the end:
+              # BED "chr1  999999  2000000"  ->  region "chr1:1000000-2000000"
+              regions = ["chr1:1000000-2000000"]
+      - name: nextflow
+        source: skills/nextflow/SKILL.md
+        dest: kdense/nextflow.md
+        # hunt 2026-09-30, u13k2-packs-2: a container or Conda profile provisions images/environments; not
+        #   instructed from here
+        replace:
+          - old: '- **Always `test` first**: `-profile test,docker` (or `singularity`/`conda`) before real data — fast and catches environment problems.'
+            new: '- **Always `test` first**: run the pipeline''s `test` profile before real data — fast and catches environment problems. Its container or Conda profiles pull images or build per-process environments, which this document does not do: run only where the user has already provisioned the engine.'
+      - name: dnanexus-integration
+        source: skills/dnanexus-integration/SKILL.md
+        dest: kdense/dnanexus-integration.md
+        # hunt 2026-09-30, u13k2-packs-2: the virtual-environment advice is for the remote app execution
+        #   environment, said so
+        replace:
+          - old: |
+              - In Ubuntu 24.04, prefer a virtual environment for Python dependencies even
+            new: |
+              - Inside a Ubuntu 24.04 app execution environment (the remote DNAnexus worker, not
+                this machine), keep an app's Python dependencies in their own virtual environment even
+      - name: latchbio-integration
+        source: skills/latchbio-integration/SKILL.md
+        dest: kdense/latchbio-integration.md
+      - name: arboreto
+        source: skills/arboreto/SKILL.md
+        dest: kdense/arboreto.md
+
+# What is NOT here, and where the reasons are. By pointer: this directory is scanned for the
+# excluded identifiers, so the record of an exclusion must not itself carry the name.
+excluded:
+  identifiers:
+    count: 18
+    defined_in: spatialomicsgym/know_how/merge_packs.py (EXCLUDED_IDENTIFIERS)
+    evidence: CHINA_EXCLUSION_REPO.md section 19; docs/audit/wave_a/intake-sciagent.md section 2.2 and 6.2; intake-kdense.md section 3.2
+    rule: "UNCERTAIN = EXCLUDE (D-046: swept by attribution, not only by host)"
+  refused:
+    sciagent:
+      origin: intake-sciagent.md section 2.2 rows E1-E9 and section 6.2 row E10 -- four whole skills, one legacy file, five model identifiers
+      execution: intake-sciagent.md section 5 rows X1-X6 (workflow on push, a .env walker, and four more)
+      duplicates: intake-sciagent.md section 4.2 -- about 45 skills that duplicate content already in this tree, including a round-trip of know_how/sgRNA_design_guide.md
+      struck_in_verification:
+        - gget-genomic-databases   # section 6.1 F1: we already import gget in spatialomicsgym/tool/genomics.py
+      not_recommended_yet:
+        - scanpy-scrna-seq         # would out-rank know_how/spatial_transcriptomics.md on spatial queries
+        - multiqc-qc-reports       # only useful with a bulk lane
+      # Admitted by the intake, removed 2026-09-20 by the live retrieval measurement (budget 3, real
+      # model; D-056 addendum). The keep-rule was "the ten control prompts -- standard spatial tasks
+      # tier 1 already covers -- pick zero packs"; these were picked anyway.
+      measured_out:
+        anndata-data-structure: >-
+          picked on 3/10 control prompts; duplicates tier-1 coverage of scanpy/anndata usage; costs
+          every spatial turn up to three documents
+      never_copied:
+        - .github/  # a validate workflow on push
+        - pixi.toml
+        - pixi.lock
+        - tests/
+        - scripts/
+        - .claude-plugin/
+        - .claude/
+        - legacy/
+        - blind_test_results.csv
+        - assets/
+    kdense:
+      origin: intake-kdense.md section 3.2 rows B-1 to B-7, section 3.3 (nine UNCERTAIN = EXCLUDE), section 3.4, section 3.5 (rdkit, research-lookup)
+      licence: intake-kdense.md section 7.3 -- cobrapy (GPL-2.0-only, incompatible with AGPL-3.0), deepspot-m (noncommercial), docx/pdf/pptx/xlsx (Anthropic proprietary)
+      safety: intake-kdense.md section 7.3 -- autoskill (reads the screen), paperclip and literature-review (unsigned self-updating pipe-to-shell installers)
+      out_of_domain: all 25 skills of category (c), intake-kdense.md section 4
+      names_that_carry_no_identifier:
+        - pi-agent
+        - generate-image
+        - genomic-intelligence
+        - onekgpd
+        - bgpt-paper-search
+        - paperzilla
+        - geomaster
+        - ncats-arax
+        - consciousness-council
+        - dhdna-profiler
+        - what-if-oracle
+        - deepspot-m
+        - cobrapy
+        - docx
+        - pdf
+        - pptx
+        - xlsx
+        - research-grants
+        - autoskill
+        - paperclip
+        - literature-review
+        - rdkit
+        - research-lookup
+      plus: one whole skill (section 3.2 row B-1) whose directory name is itself an excluded identifier
+      # Admitted by the intake (section 7.1), removed 2026-09-20 by the adversarial audit of the
+      # merged tree. The reason is the document's own text, not its origin.
+      refused_in_audit:
+        database-lookup: >-
+          instructs credential reading -- a step titled "Check [the dotenv file] narrowly", a table of eighteen API-key variable
+          names and a shell fence testing one, in a document a model with a live REPL retrieves from
+          the checkout that loads its keys from that file; out of scope (SEC EDGAR, NASA, NOAA, weather,
+          finance, patents); gutted -- 89 references marked "not included"
+      # Admitted by the intake, removed 2026-09-20 by the live retrieval measurement (budget 3, real
+      # model; D-056 addendum): the ten control prompts must pick zero packs, and these were picked.
+      measured_out:
+        scanpy: >-
+          picked on 7/10 control prompts; duplicates tier-1 coverage of scanpy/anndata usage; costs
+          every spatial turn up to three documents
+        anndata: >-
+          picked on 4/10 control prompts; duplicates tier-1 coverage of scanpy/anndata usage; costs
+          every spatial turn up to three documents
+      never_copied:
+        - scripts/   # 659 scripts, 32 CRITICAL/HIGH findings from the vendor's own scanner
+        - tests/
+        - docs/
+        - plugin.json
+        - pyproject.toml
+      contributor_note: >-
+        commit c2b1682 (a China-linked contributor) touched 68 of 166 SKILL.md files; verified purely
+        cosmetic -- 68 insertions, 68 deletions, all a pair of quote marks around an unchanged
+        description value. Recorded so the next sweep does not rediscover it (D-045).
+  # The three one-line PRC references intake-kdense section 7.4 item 3 asks to excise before merging
+  # OTHERWISE-CLEAN skills. All three files are outside the 43 admitted above, so Phase 1 never
+  # touches them and must not claim to: these entries are DORMANT. Each is identified by the sha256
+  # of the exact line so `--check --src` can report whether it is still where the intake found it,
+  # without this file carrying the string it exists to keep out. A widening that admits one of these
+  # files promotes its entry to that skill's `excise:` list -- and re-verifies the line first.
+  line_excisions:
+    - pack: kdense
+      source: skills/transformers/SKILL.md
+      line: 92
+      line_sha256: ef731c7dbb8a027fc8836984a90d2ff45db17542f6d07420939b07c19a0155c7
+      intake: intake-kdense.md section 3.2 row B-4
+      status: dormant -- the file is not merged
+    - pack: kdense
+      source: skills/arbor/references/arbor-upstream.md
+      line: 33
+      line_sha256: 62fe6cea650ffd548981f9a993bf4acc20a8d8894fb12260c73b17b6201d792b
+      intake: intake-kdense.md section 3.2 row B-5
+      status: dormant -- the file is not merged
+    - pack: kdense
+      source: skills/open-notebook/SKILL.md
+      line: 245
+      line_sha256: d62529a9b4a2a8d16f07063a54aa0712233ab6f1a5a873d071ae056f0dff805c
+      intake: intake-kdense.md section 3.2 row B-6
+      status: dormant -- the file is not merged

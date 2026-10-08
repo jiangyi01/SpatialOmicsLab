@@ -1,0 +1,25 @@
+server_key: data_converter
+worker_kind: python
+env_prefix: DATA_CONVERTER
+override_vars:
+  DATA_CONVERTER_PYTHON: /opt/conda/envs/novosparc/bin/python
+worker_var: DATA_CONVERTER_WORKER
+worker_file: data_converter_worker.py
+server_file: data_converter_mcp_server.py
+source_env: novosparc
+import_check: anndata
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/data_converter.env.yaml
+gpu: false
+shared_env: true
+est_gb: null
+service_keys: []
+functions:
+- name: convert_h5ad_to_seurat_rds
+  category: data_conversion
+- name: convert_seurat_rds_to_h5ad
+  category: data_conversion
+- name: convert_h5ad_to_csv
+  category: data_conversion
+- name: convert_csv_to_h5ad
+  category: data_conversion

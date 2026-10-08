@@ -1,0 +1,21 @@
+server_key: deeplinc
+worker_kind: python
+env_prefix: DEEPLINC
+override_vars:
+  DEEPLINC_PYTHON: /opt/conda/envs/deeplinc/bin/python
+worker_var: DEEPLINC_WORKER
+worker_file: deeplinc_worker.py
+server_file: deeplinc_mcp_server.py
+source_env: deeplinc
+import_check: __future__
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/deeplinc.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: deeplinc_cell_interactions
+  category: spatial_communication
+- name: deeplinc_cell_interactions_csv
+  category: spatial_communication

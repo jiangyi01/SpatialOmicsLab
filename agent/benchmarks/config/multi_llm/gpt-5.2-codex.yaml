@@ -1,0 +1,12 @@
+# Multi-LLM benchmark — gpt-5.2-codex (Azure deployment)
+# OUTPUT IS ISOLATED to benchmarks/results/benchmark_multi_llm/gpt-5.2-codex/.
+
+llm: "azure-gpt-5.2-codex"
+temperature: 1.0
+timeout_seconds: 86400  # 24h — let multi-step deconv tools run to completion (RCTD R, celldart training, SC CSV conversion)
+max_workers: 1
+# project_root: defaults to the checkout this runner lives in (load_benchmark_config); a pinned
+# absolute path sent a worktree's or another box's run to the main tree (hunt 2026-09-30, u33a-bench-runner-27).
+benchmark_data_dir: "benchmarks/benchmark_data"
+output_dir: "benchmarks/results/benchmark_multi_llm/gpt-5.2-codex"
+mcp_config_path: "MCP_server/mcp_config.yaml"

@@ -1,0 +1,19 @@
+server_key: svgbit
+worker_kind: python
+env_prefix: SVGBIT
+override_vars:
+  SVGBIT_PYTHON: /opt/conda/envs/svgbit/bin/python
+worker_var: SVGBIT_WORKER
+worker_file: svgbit_worker.py
+server_file: svgbit_mcp_server.py
+source_env: svgbit
+import_check: svgbit
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/svgbit.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: svgbit_run
+  category: svg_detection

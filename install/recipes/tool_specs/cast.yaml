@@ -1,0 +1,32 @@
+server_key: cast
+worker_kind: python
+env_prefix: CAST
+override_vars:
+  CAST_PYTHON: /opt/conda/envs/cast/bin/python
+worker_var: CAST_WORKER
+worker_file: cast_worker.py
+server_file: cast_mcp_server.py
+source_env: cast
+import_check: CAST
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/cast.env.yaml
+# True, and set by hand because `capture` hardcodes false. CAST is written for CUDA and picks it
+# up automatically; it runs on CPU perfectly well -- 61 s for two sections of 1,415 cells at
+# upstream's 400 epochs, measured on this box -- so the flag is not a claim that CPU is
+# impractical. It is what stops a GPU-shaped failure on a GPU-less box counting as a hard failure.
+gpu: true
+recipe_notes: |
+  Two pins in the recipe are not optional and both were found by the import failing.
+  `dgl==2.1.0` reaches torchdata through dataloading -> distributed -> graphbolt, and
+  torchdata >= 0.10 removed torchdata.datapipes, so torchdata==0.7.1 is pinned. dgl then also
+  needs pyyaml and pydantic, neither of which it declares.
+build_strategy_notes: |
+  CAST is not on PyPI. The pip entry is the git URL at a pinned SHA, like the six other
+  git-installed recipes; `cast==0.4` as `conda env export` writes it would install an unrelated
+  package of that name.
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: cast_align_slices
+  category: spatial_alignment

@@ -1,0 +1,19 @@
+server_key: mist
+worker_kind: python
+env_prefix: MIST
+override_vars:
+  MIST_PYTHON: /opt/conda/envs/ReST/bin/python
+worker_var: MIST_WORKER
+worker_file: mist_worker.py
+server_file: mist_mcp_server.py
+source_env: ReST
+import_check: __future__
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/mist.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: mist_regions_impute
+  category: spatial_analysis

@@ -1,0 +1,19 @@
+server_key: redeconve
+worker_kind: rscript
+env_prefix: REDECONVE
+override_vars:
+  REDECONVE_PYTHON: /opt/conda/envs/redeconve/bin/Rscript
+worker_var: REDECONVE_WORKER
+worker_file: redeconve_worker.R
+server_file: redeconve_mcp_server.py
+source_env: redeconve
+import_check: Redeconve
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/redeconve.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: redeconve_deconvolution
+  category: deconvolution

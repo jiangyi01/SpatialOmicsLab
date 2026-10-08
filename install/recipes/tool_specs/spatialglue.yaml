@@ -1,0 +1,19 @@
+server_key: spatialglue
+worker_kind: python
+env_prefix: SPATIALGLUE
+override_vars:
+  SPATIALGLUE_PYTHON: /opt/conda/envs/spatialglue/bin/python
+worker_var: SPATIALGLUE_WORKER
+worker_file: spatialglue_worker.py
+server_file: spatialglue_mcp_server.py
+source_env: spatialglue
+import_check: SpatialGlue
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spatialglue.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: spatialglue_integrate
+  category: spatial_analysis

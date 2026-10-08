@@ -1,0 +1,11 @@
+# SpatialOmicsLab-driven MCP smoke test configuration
+llm: "gpt-5"
+temperature: 1.0
+timeout_seconds: 1800
+max_workers: 3
+mode: "direct"
+data_dir: "test/test_data"
+output_dir: "agent/benchmarks/results/benchmark_smoke_test"
+mcp_config_path: "agent/MCP_server/mcp_config.yaml"
+# Relative paths here are read from the repository root (the launch directory).
+project_root: "."

@@ -1,0 +1,19 @@
+server_key: moscot
+worker_kind: python
+env_prefix: MOSCOT
+override_vars:
+  MOSCOT_PYTHON: /opt/conda/envs/moscot/bin/python
+worker_var: MOSCOT_WORKER
+worker_file: moscot_worker.py
+server_file: moscot_mcp_server.py
+source_env: moscot
+import_check: moscot
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/moscot.env.yaml
+gpu: false
+shared_env: true
+est_gb: null
+service_keys: []
+functions:
+- name: moscot_run
+  category: spatial_analysis

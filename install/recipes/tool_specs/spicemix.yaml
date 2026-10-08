@@ -1,0 +1,19 @@
+server_key: spicemix
+worker_kind: python
+env_prefix: SPICEMIX
+override_vars:
+  SPICEMIX_PYTHON: /opt/conda/envs/spicemix_env/bin/python
+worker_var: SPICEMIX_WORKER
+worker_file: spicemix_worker.py
+server_file: spicemix_mcp_server.py
+source_env: spicemix_env
+import_check: __future__
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spicemix.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_spicemix
+  category: spatial_analysis

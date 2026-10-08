@@ -1,0 +1,19 @@
+server_key: bulk2space
+worker_kind: python
+env_prefix: BULK2SPACE
+override_vars:
+  BULK2SPACE_PYTHON: /opt/conda/envs/bulk2space_env/bin/python
+worker_var: BULK2SPACE_WORKER
+worker_file: bulk2space_worker.py
+server_file: bulk2space_mcp_server.py
+source_env: bulk2space_env
+import_check: bulk2space
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/bulk2space.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_bulk2space
+  category: deconvolution

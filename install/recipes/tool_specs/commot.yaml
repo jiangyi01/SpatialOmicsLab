@@ -1,0 +1,19 @@
+server_key: commot
+worker_kind: python
+env_prefix: COMMOT
+override_vars:
+  COMMOT_PYTHON: /opt/conda/envs/COMMOT/bin/python
+worker_var: COMMOT_WORKER
+worker_file: commot_worker.py
+server_file: commot_mcp_server.py
+source_env: COMMOT
+import_check: commot
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/commot.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: commot_spatial_communication
+  category: spatial_communication

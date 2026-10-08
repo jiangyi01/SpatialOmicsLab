@@ -1,0 +1,19 @@
+server_key: spatrio
+worker_kind: python
+env_prefix: SPATRIO
+override_vars:
+  SPATRIO_PYTHON: /opt/conda/envs/spatrio/bin/python
+worker_var: SPATRIO_WORKER
+worker_file: spatrio_worker.py
+server_file: spatrio_mcp_server.py
+source_env: spatrio
+import_check: spatrio
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spatrio.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: spatrio_align_multiomics
+  category: spatial_alignment

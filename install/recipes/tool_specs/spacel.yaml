@@ -1,0 +1,21 @@
+server_key: spacel
+worker_kind: python
+env_prefix: SPACEL
+override_vars:
+  SPACEL_PYTHON: /opt/conda/envs/spacel_env/bin/python3.9
+worker_var: SPACEL_WORKER
+worker_file: spacel_worker.py
+server_file: spacel_mcp_server.py
+source_env: spacel_env
+import_check: SPACEL
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spacel.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_spacel_splane
+  category: spatial_clustering
+- name: run_spacel_scube
+  category: spatial_analysis

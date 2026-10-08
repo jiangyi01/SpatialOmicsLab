@@ -1,0 +1,37 @@
+# Cell-type aggregation table — slideseqv2_rca_deconvolution
+#
+# Dataset: Slide-seqV2 human right coronary artery (slide_seqV2_right_coronary_artery)
+# GT: spatial.h5ad obs['cell_type'] — 6 vascular lineages
+#   • blood vessel smooth muscle cell, fibroblast, lymphocyte,
+#     endothelial cell of artery, macrophage,
+#     microcirculation associated smooth muscle cell
+# SC reference: scRNA_seq_vascular_tissue (113,304 cells, 7 cell_type categories
+#               INCLUDING "unknown" which is NOT in this GT).
+#
+# Asymmetry handling
+# ------------------
+# Tools that use the SC reference will emit "unknown" as a 7th prediction column.
+# This YAML omits "unknown" from the mapping entirely → evaluate_deconvolution_aggregated()
+# routes the column to `_unmapped_columns` and DROPS its mass before computing metrics
+# (line 949-950 in evaluator.py: unmapped columns are tracked then skipped, NOT redistributed).
+# Effect: only the 6 GT-aligned cell types contribute to mean_pearson_r / RMSE / MAE / JSD.
+#
+# Coverage check: 6 GT classes = 6 mapping entries (intentionally fewer than the 7 SC types).
+
+dataset: slideseqv2_rca_deconvolution
+gt_classes:
+  - "blood vessel smooth muscle cell"
+  - "fibroblast"
+  - "lymphocyte"
+  - "endothelial cell of artery"
+  - "macrophage"
+  - "microcirculation associated smooth muscle cell"
+
+mapping:
+  "blood vessel smooth muscle cell":              "blood vessel smooth muscle cell"
+  "fibroblast":                                   "fibroblast"
+  "lymphocyte":                                   "lymphocyte"
+  "endothelial cell of artery":                   "endothelial cell of artery"
+  "macrophage":                                   "macrophage"
+  "microcirculation associated smooth muscle cell": "microcirculation associated smooth muscle cell"
+  # Intentionally NO entry for "unknown" — predictions for that class are dropped.

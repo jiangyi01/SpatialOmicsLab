@@ -1,0 +1,56 @@
+# Minimal agent-core deps for spatialomicsgym_env (pins from spatialomicsgym_e1).
+# Excludes torch/transformers/tokenizers/safetensors + all per-tool bio packages.
+langchain==0.3.27
+langchain-core==0.3.79
+langchain-anthropic==0.3.22
+langchain-openai==0.3.35
+langgraph==0.3.18
+langsmith==0.4.42
+pydantic==2.11.10
+pydantic_core==2.33.2
+python-dotenv==1.2.1
+PyYAML
+httpx
+requests
+numpy==2.2.6
+pandas
+pyarrow==21.0.0
+anndata==0.12.10
+scanpy==1.11.5
+scipy
+h5py==3.15.1
+mcp==1.27.0
+fastmcp==3.2.3
+nest_asyncio==1.6.0
+anthropic==0.72.1
+openai==2.38.0
+tiktoken==0.12.0
+tenacity
+rich==14.2.0
+tqdm==4.67.1
+gradio==5.49.1
+jsonpatch==1.33
+numexpr==2.14.1
+scikit-learn==1.7.2
+pytest==9.0.1
+ruff==0.14.5
+
+# --- the five this file used to drop -------------------------------------- #
+# The yml header offers this file as an equally-blessed way to build the same env. It was not one:
+# these were in the yml, each with a comment saying why it must not be lost, and absent here. Of
+# them only python-multipart was covered by accident (gradio requires it); nothing in this file
+# pulled the other four, and `sc.tl.leiden(flavor="igraph")` -- which the know-how corpus tells the
+# agent to run inline -- raised ImportError in a venv built this way.
+python-igraph==1.0.0
+leidenalg==0.12.0
+harmonypy==0.0.10
+python-multipart==0.0.32
+langchain-text-splitters==0.3.11
+# in-process bio tools (hunt 2026-09-30, uT5-molbio-48)
+biopython==1.88
+beautifulsoup4==4.15.0
+scikit-image==0.26.0
+opencv-python-headless==5.0.0.93
+trackpy==0.7
+rdkit==2025.9.1
+fcsparser==0.2.4

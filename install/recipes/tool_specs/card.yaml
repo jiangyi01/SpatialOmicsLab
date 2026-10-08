@@ -1,0 +1,19 @@
+server_key: card
+worker_kind: rscript
+env_prefix: CARD
+override_vars:
+  CARD_PYTHON: /opt/conda/envs/card_env/bin/Rscript
+worker_var: CARD_WORKER
+worker_file: card_worker.R
+server_file: card_mcp_server.py
+source_env: card_env
+import_check: CARD
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/card.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_card
+  category: deconvolution

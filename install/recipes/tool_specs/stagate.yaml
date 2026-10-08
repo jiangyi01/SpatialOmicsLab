@@ -1,0 +1,19 @@
+server_key: stagate
+worker_kind: python
+env_prefix: STAGATE
+override_vars:
+  STAGATE_PYTHON: /opt/conda/envs/stagate_pyg/bin/python
+worker_var: STAGATE_WORKER
+worker_file: stagate_worker.py
+server_file: stagate_mcp_server.py
+source_env: stagate_pyg
+import_check: STAGATE_pyG
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/stagate.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: stagate_spatial_domains
+  category: spatial_clustering

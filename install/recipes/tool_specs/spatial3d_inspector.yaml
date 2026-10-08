@@ -1,0 +1,27 @@
+server_key: spatial3d_inspector
+worker_kind: python
+env_prefix: SPATIAL3D
+override_vars:
+  SPATIAL3D_PYTHON: /opt/conda/envs/spatialomicsgym_env/bin/python
+worker_var: SPATIAL3D_WORKER
+worker_file: spatial3d_worker.py
+server_file: spatial3d_inspector_mcp_server.py
+source_env: null
+import_check: spatialomicsgym.spatial3d
+# The read-only half, split from spatial3d for the reason viz_inspector is split from spatial_viz:
+# a caller orienting itself should not have to choose an output directory, and a function that
+# cannot write cannot be blamed for a file that appeared. Same worker, same interpreter, same
+# absence of anything to build.
+build_strategy: none
+recipe: null
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: inspect_3d_coordinates
+  category: spatial_alignment
+- name: explain_3d_contract
+  category: spatial_alignment
+- name: list_aligner_adapters
+  category: spatial_alignment

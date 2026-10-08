@@ -1,0 +1,20 @@
+name: bio_env_py310
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - cnvkit
+  - samtools
+  - bedtools
+  - pip
+
+# Purpose: Python 3.10 compatibility environment for tools not yet supporting newer Python versions.
+# NOT created by setup.sh -- this line used to say it was, and setup.sh never names this file
+# (hunt 2026-09-30, u38a-packaging-4). Create it by hand with the command below.
+# Contains tools that require Python 3.10 or earlier versions.
+# Can be create with:
+#   micromamba create -f bio_env_py310.yml   OR   conda env create -f bio_env_py310.yml
+# Use tools via:
+#   conda run -n bio_env_py310 <command> ...

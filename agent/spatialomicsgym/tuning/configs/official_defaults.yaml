@@ -1,0 +1,3085 @@
+# Official default hyperparameters recovered from tool source code.
+#
+# Provenance tracking:
+#   source: official_repo | documentation | paper | spatialomicsgym_config | inferred
+#   source_file: GitHub URL, config path, or paper reference
+#   confidence: high | medium | low
+#   version: tool version if relevant
+#   adopted: false  -> recorded for provenance only; we deliberately run something else
+#
+# Priority: official_repo > documentation > paper > spatialomicsgym_config > inferred
+#
+# A row is a *recovered upstream value*, not automatically a value we use. Where the notes read
+# "<upstream> default X; SpatialOmicsLab uses Y", the row is documenting a divergence we chose, and
+# adopting it would undo that choice. Those rows carry "adopted: false" and get_official_defaults
+# withholds them, so the mcp_config default stands. Omitting the field means adopted -- the common
+# case. Add it whenever a note says we run something other than the recorded value; without it,
+# overlaying the row silently reinstates the value the note says we rejected.
+
+tools:
+  # ============================================================
+  # SPATIAL CLUSTERING TOOLS
+  # ============================================================
+
+  run_scanpy_spatial_domain:
+    resolution:
+      value: 1.0
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/scverse/scanpy/blob/master/src/scanpy/tools/_leiden.py"
+      confidence: high
+      version: "scanpy>=1.9"
+      notes: "Leiden default resolution=1.0 in scanpy; SpatialOmicsLab uses 0.6"
+    n_neighbors:
+      value: 15
+      source: official_repo
+      source_file: "https://github.com/scverse/scanpy/blob/master/src/scanpy/neighbors/__init__.py"
+      confidence: high
+      version: "scanpy>=1.9"
+      notes: "Default n_neighbors=15 in sc.pp.neighbors"
+    n_pcs:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/scverse/scanpy/blob/master/src/scanpy/neighbors/__init__.py"
+      confidence: high
+      version: "scanpy>=1.9"
+      notes: "Default n_pcs=None (uses all available, typically 50); SpatialOmicsLab now aligned to 50"
+
+  graphst_spatial_clustering:
+    cluster_tool:
+      value: "mclust"
+      source: official_repo
+      source_file: "https://github.com/JinmiaoChenLab/GraphST/blob/main/GraphST/utils.py"
+      confidence: high
+      version: "1.1.1"
+      notes: "Default method='mclust' in GraphST.utils.clustering()"
+    radius:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/JinmiaoChenLab/GraphST/blob/main/GraphST/utils.py"
+      confidence: high
+      notes: "Default radius=50 for spatial neighbor refinement"
+
+  stagate_spatial_domains:
+    rad_cutoff:
+      value: 150.0
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGATE/blob/main/STAGATE_pyG/utils.py"
+      confidence: high
+      notes: "Cal_Spatial_Net default rad_cutoff=None; 150 is the tutorial value for the DLPFC full-resolution pixel coordinates (spot spacing ~137), where it links each spot to its six-spot ring. Not adopted: a fixed radius depends on the coordinate units (150 links no spots on slides whose spacing exceeds it), so the portal default 0 derives the radius from the spot spacing, which rebuilds that six-neighbour ring."
+    n_epochs:
+      value: 1000
+      adopted: false
+      source: paper
+      source_file: "https://doi.org/10.1038/s41467-022-29439-6"
+      confidence: medium
+      notes: "Paper uses 1000 epochs; SpatialOmicsLab uses 200"
+    n_clusters:
+      value: 7
+      adopted: false
+      source: inferred
+      source_file: "dataset-dependent"
+      confidence: low
+      notes: "n_clusters is dataset-dependent; no universal default"
+
+  deepst_identify_domains:
+    pre_epochs:
+      value: 800
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/spatial-data-lab/DeepST/blob/main/deepst/DeepST.py"
+      confidence: medium
+      notes: "DeepST default pre_epochs=800; SpatialOmicsLab uses 500"
+    epochs:
+      value: 500
+      source: official_repo
+      source_file: "https://github.com/spatial-data-lab/DeepST/blob/main/deepst/DeepST.py"
+      confidence: medium
+      notes: "Training epochs default 500 in official code"
+    pca_n_comps:
+      value: 200
+      source: official_repo
+      source_file: "https://github.com/spatial-data-lab/DeepST/blob/main/deepst/DeepST.py"
+      confidence: high
+      notes: "Default PCA components = 200"
+
+  run_sedr:
+    n_clusters:
+      value: 7
+      source: inferred
+      source_file: "https://github.com/JinmiaoChenLab/SEDR"
+      confidence: low
+      notes: "Dataset-dependent; DLPFC tutorial uses 7"
+    using_dec:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/JinmiaoChenLab/SEDR/blob/master/src/SEDR_train.py"
+      confidence: high
+      notes: "DEC refinement of the SEDR embedding is upstream's tutorial default (train_with_dec); the domains are KMeans labels in both modes"
+
+  run_miso:
+    n_clusters:
+      value: 7
+      adopted: false
+      source: inferred
+      source_file: "https://github.com/MISe-Omics/MISO"
+      confidence: low
+      notes: "Dataset-dependent; no universal default"
+
+  stlearn_spatial_clustering:
+    n_pcs:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/BiomedicalMachineLearning/stLearn"
+      confidence: high
+      notes: "stLearn default n_pcs=50; SpatialOmicsLab also uses 50"
+    n_neighbors:
+      value: 25
+      source: official_repo
+      source_file: "https://github.com/BiomedicalMachineLearning/stLearn"
+      confidence: medium
+      notes: "stLearn tutorials use 25 neighbors"
+    resolution:
+      value: 1.0
+      source: official_repo
+      source_file: "https://github.com/BiomedicalMachineLearning/stLearn"
+      confidence: medium
+      notes: "Default Leiden resolution in stLearn tutorials"
+
+  precast_spatial_clustering:
+    K:
+      value: 7
+      source: inferred
+      source_file: "https://github.com/feiyoung/PRECAST"
+      confidence: low
+      notes: "K (n_clusters) is dataset-dependent"
+    gene_number:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/feiyoung/PRECAST"
+      confidence: medium
+      notes: "Default HVG selection count"
+
+  prost_pnn_domains:
+    n_neighbors:
+      value: 20
+      source: official_repo
+      source_file: "https://github.com/PROST-library/PROST"
+      confidence: medium
+    n_eigs:
+      value: 30
+      source: official_repo
+      source_file: "https://github.com/PROST-library/PROST"
+      confidence: medium
+
+  cellcharter_cluster_spatial_domains:
+    n_layers:
+      value: 3
+      source: official_repo
+      source_file: "https://github.com/CSOgroup/cellcharter"
+      confidence: high
+    n_clusters_min:
+      value: 3
+      source: official_repo
+      source_file: "https://github.com/CSOgroup/cellcharter"
+      confidence: medium
+    n_clusters_max:
+      value: 12
+      source: official_repo
+      source_file: "https://github.com/CSOgroup/cellcharter"
+      confidence: medium
+
+  seurat_qc_cluster:
+    n_hvgs:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+      notes: "FindVariableFeatures default nfeatures=2000"
+    n_pcs:
+      value: 30
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+      notes: "RunPCA default npcs=50; 30 is common tutorial value"
+    resolution:
+      value: 0.8
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+      notes: "FindClusters default resolution=0.8"
+
+  run_bass:
+    burn_in:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/zhengli09/BASS"
+      confidence: medium
+    n_samples:
+      value: 5000
+      source: official_repo
+      source_file: "https://github.com/zhengli09/BASS"
+      confidence: medium
+
+  spiral_integrate:
+    n_epochs:
+      value: 100
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/guott15/SPIRAL/tree/main/Demo"
+      confidence: high
+      notes: "Every real-data demo (run_spiral_DLPFC/coronal/sagittal/mouse_ob.ipynb) trains 100 epochs and the simulation demo 200; no demo uses 300. SpatialOmicsLab keeps its portal default 200."
+    hidden_dim:
+      value: 32
+      source: official_repo
+      source_file: "https://github.com/guott15/SPIRAL/tree/main/Demo"
+      confidence: high
+      notes: "Every demo sets AEdims=[N,[512],32] and GSdims=[512,32]. This wrapper's hidden layers are hidden_dim*16 wide (HIDDEN_WIDTH_FACTOR in tools/spiral_worker.py), so upstream's 512 is hidden_dim=32. The old value 256 meant 4096-wide layers, 8x upstream."
+    latent_dim:
+      value: 32
+      source: official_repo
+      source_file: "https://github.com/guott15/SPIRAL"
+      confidence: medium
+
+  run_iris:
+    n_clusters:
+      value: 7
+      source: inferred
+      source_file: "dataset-dependent"
+      confidence: low
+
+  run_spacel_splane:
+    # resolution is accepted and ignored by the portal (Splane clusters with KMeans(n_clusters)); it
+    # is not a tunable knob and is deliberately absent here.
+    n_clusters:
+      value: 7
+      source: inferred
+      source_file: "dataset-dependent"
+      confidence: low
+
+  # ============================================================
+  # SVG DETECTION TOOLS
+  # ============================================================
+
+  hotspot_spatial_modules:
+    model:
+      value: "danb"
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+      notes: "Default model='danb' (depth-adjusted negative binomial)"
+    n_neighbors:
+      value: 30
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+      notes: "Default n_neighbors=30 in Hotspot"
+    autocorr_fdr:
+      value: 0.05
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot"
+      confidence: high
+    min_gene_threshold:
+      value: 30
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot"
+      confidence: high
+
+  spagft_identify_svg:
+    n_neighbors:
+      value: 20
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: high
+      notes: "Our from-scratch substitute's KNN size, not a SpaGFT parameter: SpaGFT.detect_svg sets K = ceil(sqrt(n_spots)/2) (4 at <= 500 spots) itself, and the worker lists n_neighbors in params.ignored on a SpaGFT run"
+    n_eigs:
+      value: 50
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: high
+      notes: "Our substitute's eigenpair count, not a SpaGFT parameter: detect_svg uses ceil(sqrt(n_spots)) low- and high-frequency modes (ratio_low_freq/ratio_high_freq='infer'); listed in params.ignored on a SpaGFT run"
+    n_top_genes:
+      value: 200
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: high
+      notes: "Our cap on spagft_top_svg_genes.csv and predicted_genes.json; SpaGFT has no such parameter (detect_svg scores every gene)"
+
+  prost_index_svg:
+    n_neighbors:
+      value: 20
+      source: official_repo
+      source_file: "https://github.com/PROST-library/PROST"
+      confidence: medium
+    n_top_genes:
+      value: 200
+      source: official_repo
+      source_file: "https://github.com/PROST-library/PROST"
+      confidence: medium
+
+  spark_svg_detection:
+    pval_cutoff:
+      value: 0.05
+      source: official_repo
+      source_file: "https://github.com/xzhoulab/SPARK"
+      confidence: high
+
+  spatialde_run_svg:
+    top_k_genes:
+      value: 200
+      source: inferred
+      source_file: "https://github.com/Teichlab/SpatialDE"
+      confidence: medium
+      notes: "SpatialDE returns all genes sorted by significance; top_k is a post-filter"
+
+  svgbit_run:
+    # Put beside the installed svgbit 0.2.17 (svgbit/run.py: ``k: int = 6, n_svgs: int = 1000``), which
+    # the portal also defaults to. 10 / 200 were filed here as upstream's but were an old local choice
+    # -- the svgbit_run_expansion rows below say so -- and were overlaid on every baseline trial and
+    # injected into the agent's prompt as "official defaults" (hunt 2026-09-30, u32-tuning-13).
+    k:
+      value: 6
+      source: official_repo
+      source_file: "https://github.com/CPenglab/svgbit/blob/master/svgbit/run.py"
+      confidence: high
+      notes: "svgbit.run default k=6 (kNN network); the portal default is the same"
+    n_svgs:
+      value: 1000
+      source: official_repo
+      source_file: "https://github.com/CPenglab/svgbit/blob/master/svgbit/run.py"
+      confidence: high
+      notes: "svgbit.run default n_svgs=1000; the portal default is the same"
+
+  spvc_svg_detection:
+    pval_cutoff:
+      value: 0.05
+      source: official_repo
+      source_file: "https://github.com/xzhoulab/SPARK"
+      confidence: medium
+      notes: "SPVC shares SPARK-X framework"
+
+  bsp_identify_svg:
+    top_k_genes:
+      value: 200
+      source: inferred
+      source_file: "BSP implementation"
+      confidence: medium
+
+  seurat_spatial_variable_features:
+    nfeatures:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+
+  squidpy_spatial_autocorr:
+    n_neighs:
+      value: 6
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+      notes: "Squidpy default for Visium hexagonal grid"
+    mode:
+      value: "moran"
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+
+  # ============================================================
+  # DECONVOLUTION TOOLS
+  # ============================================================
+
+  run_cell2location:
+    n_cells_per_location:
+      value: 8.0
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/BayraktarLab/cell2location/blob/master/cell2location/models/_cell2location_module.py"
+      confidence: high
+      notes: "The module default is N_cells_per_location=8.0 (LocationModelLinearDependentWMultiExperimentLocationBackgroundNormLevelGeneAlphaPyroModel); setup_anndata takes no such argument. The tutorials pass 30, which is the portal default and stands (hunt 2026-09-30, u32-tuning-13)."
+    detection_alpha:
+      value: 20.0
+      source: official_repo
+      source_file: "https://github.com/BayraktarLab/cell2location/blob/main/cell2location/models/Cell2location.py"
+      confidence: high
+      notes: "Default detection_alpha=20.0"
+    max_epochs_ref:
+      value: 250
+      adopted: false
+      source: documentation
+      source_file: "https://cell2location.readthedocs.io/"
+      confidence: medium
+      notes: "Tutorials use 250. Until 2026-09-29 the worker CLI defaulted to 50 when the portal omitted the flag; since then portal and worker both default to 250."
+    max_epochs_map:
+      value: 30000
+      adopted: false
+      source: documentation
+      source_file: "https://cell2location.readthedocs.io/"
+      confidence: medium
+      notes: "Tutorials recommend 30000. Until 2026-09-29 the worker CLI defaulted to 2000 when the portal omitted the flag; since then portal and worker both default to 30000."
+    cell_count_cutoff:
+      value: 5
+      source: official_repo
+      source_file: "https://github.com/BayraktarLab/cell2location"
+      confidence: high
+    cell_percentage_cutoff2:
+      value: 0.03
+      source: official_repo
+      source_file: "https://github.com/BayraktarLab/cell2location"
+      confidence: high
+    nonz_mean_cutoff:
+      value: 1.12
+      source: official_repo
+      source_file: "https://github.com/BayraktarLab/cell2location"
+      confidence: high
+
+  tangram_map_sc_to_spatial:
+    num_epochs:
+      value: 1000
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/broadinstitute/Tangram/blob/main/tangram/mapping_utils.py"
+      confidence: high
+      notes: "Default num_epochs=1000 in tg.map_cells_to_space(); SpatialOmicsLab uses 500"
+    density_prior:
+      value: "rna_count_based"
+      source: official_repo
+      source_file: "https://github.com/broadinstitute/Tangram"
+      confidence: high
+    n_markers_per_class:
+      value: 100
+      source: documentation
+      source_file: "https://github.com/broadinstitute/Tangram"
+      confidence: medium
+
+  graphst_deconvolution:
+    epochs:
+      value: 1200
+      source: official_repo
+      source_file: "https://github.com/JinmiaoChenLab/GraphST"
+      confidence: medium
+    retain_percent:
+      value: 0.15
+      source: official_repo
+      source_file: "https://github.com/JinmiaoChenLab/GraphST"
+      confidence: medium
+
+  tacco_annotate:
+    method:
+      value: "OT"
+      source: official_repo
+      source_file: "https://github.com/simonwm/tacco"
+      confidence: high
+    multi_center:
+      value: 3
+      source: official_repo
+      source_file: "https://github.com/simonwm/tacco"
+      confidence: high
+    lamb:
+      value: 0.001
+      source: official_repo
+      source_file: "https://github.com/simonwm/tacco"
+      confidence: medium
+
+  spacexr_rctd_deconvolution:
+    mode:
+      value: "doublet"
+      source: official_repo
+      source_file: "https://github.com/dmcable/spacexr"
+      confidence: high
+      notes: "RCTD default mode is 'doublet' (allows 1-2 cell types per spot)"
+
+  run_card:
+    min_count_gene:
+      value: 100
+      source: official_repo
+      source_file: "https://github.com/YingMa0107/CARD"
+      confidence: medium
+    min_count_spot:
+      value: 5
+      source: official_repo
+      source_file: "https://github.com/YingMa0107/CARD"
+      confidence: medium
+
+  run_destvi:
+    # Put beside the installed scvi-tools 1.3.3 in destvi_env. 500 / 2500 matched neither upstream nor
+    # the portal (100 / 2000), and as light parameters they were the tuning baseline and the agent's
+    # injected "official defaults" (hunt 2026-09-30, u32-tuning-13).
+    max_epochs_sc:
+      value: 300
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/scverse/scvi-tools/blob/main/src/scvi/model/_condscvi.py"
+      confidence: high
+      notes: "CondSCVI.train default max_epochs=300; the portal trains the reference model for 100"
+    max_epochs_st:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/scverse/scvi-tools/blob/main/src/scvi/model/_destvi.py"
+      confidence: high
+      notes: "DestVI.train default max_epochs=2000; the portal default is the same"
+
+  run_stdeconvolve:
+    n_topics:
+      value: 15
+      adopted: false
+      source: inferred
+      source_file: "https://github.com/JEFworks-Lab/STdeconvolve"
+      confidence: low
+      notes: "n_topics is dataset-dependent; no universal default"
+
+  run_spotlight:
+    n_top:
+      value: 3000
+      source: inferred
+      source_file: "https://github.com/MarcElosua/SPOTlight"
+      confidence: medium
+      notes: "Not an upstream default: SPOTlight 1.6.7 has n_top = NULL, which trainNMF turns into max(table(mgs$cluster)), every marker of each cell type. 3000 exceeds the per-type marker count after the mean.AUC > 0.8 filter (at most 330 on the 44-type mini reference, 2026-09-29), so serving it reproduces that; the portal default of 100 caps it."
+    min_cont:
+      value: 0.09
+      source: official_repo
+      source_file: "https://github.com/MarcElosua/SPOTlight"
+      confidence: medium
+      notes: "SPOTlight 1.x calls this threshold min_prop (1.6.7 default 0.01); tools/spotlight_worker.R passes min_cont to SPOTlight as min_prop."
+
+  run_gist:
+    prior_lambda:
+      value: 0.1
+      source: official_repo
+      source_file: "https://github.com/jhu-statcomputing/GIST"
+      confidence: medium
+      notes: "Ignored by this tool: GIST reads prior_lambda only in its image-guided model, which needs a per-spot prior the wrapper does not take; the base model runs (reported in params.ignored). The GIST() signature default is 50."
+
+  bayestme_deconvolution:
+    knn_k:
+      value: 6
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme"
+      confidence: medium
+
+  starfysh_deconvolution:
+    n_genes:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/alevits/starfysh"
+      confidence: medium
+    # Put beside the installed starfysh (utils.py ``run_starfysh(..., lr=1e-4, epochs=100, ...)``). 300
+    # matched neither upstream nor the portal (200); 1e-3 is the portal's own choice, which the
+    # starfysh_deconvolution_expansion row calls 10x upstream's. Both are recorded, not adopted, so
+    # the portal defaults stand (hunt 2026-09-30, u32-tuning-13).
+    epochs:
+      value: 100
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py"
+      confidence: high
+      notes: "run_starfysh default epochs=100; the portal trains for 200"
+    lr:
+      value: 0.0001
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py"
+      confidence: high
+      notes: "run_starfysh default lr=1e-4; the portal uses 1e-3"
+
+  # ============================================================
+  # ADDITIONAL TOOL DEFAULTS (expanded coverage)
+  # Tools researched from GitHub source code / README defaults
+  # ============================================================
+
+  stride_deconvolution:
+    normalize:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/wanglabtongji/STRIDE"
+      confidence: medium
+      notes: "STRIDE CLI --normalize is common default in tutorials"
+    annotation_key:
+      value: "CellType"
+      source: documentation
+      source_file: "https://github.com/wanglabtongji/STRIDE"
+      confidence: medium
+      notes: "STRIDE tutorial expects obs['CellType'] for cell-type labels"
+    outprefix:
+      value: "stride"
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+      notes: >-
+        Output prefix is spatialomicsgym-chosen, no upstream canonical value. Mirrors
+        stride_mcp_server.py's own default, which is what a call that omits the argument sends;
+        this row is overlaid on top of the mcp_config baseline in executor._step1_load_defaults,
+        so a value that disagrees with the portal makes the baseline trial run a configuration no
+        ordinary call produces.
+
+  commot_spatial_communication:
+    dis_thr:
+      value: null
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/zcang/COMMOT/blob/main/commot/tools/_spatial_communication.py"
+      confidence: high
+      notes: "commot.tl.spatial_communication default dis_thr=None (a distance in obsm['spatial'] units); the SpatialOmicsLab portal default is 0 = automatic 200 um, converted with the slide's scalefactors (spot_diameter_fullres / 65 um)"
+    heteromeric:
+      value: false
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/zcang/COMMOT/blob/main/commot/tools/_spatial_communication.py"
+      confidence: high
+      notes: "Default heteromeric=False in spatial_communication(); SpatialOmicsLab uses True"
+    pathway_sum:
+      value: false
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/zcang/COMMOT/blob/main/commot/tools/_spatial_communication.py"
+      confidence: high
+      notes: "Default pathway_sum=False; SpatialOmicsLab uses True"
+    lr_database:
+      value: "CellChat"
+      source: documentation
+      source_file: "https://github.com/zcang/COMMOT"
+      confidence: high
+      notes: "Tutorial default is CellChat LR database"
+    species:
+      value: "human"
+      source: documentation
+      source_file: "https://github.com/zcang/COMMOT"
+      confidence: medium
+
+  mist_regions_impute:
+    species:
+      value: "Human"
+      source: documentation
+      source_file: "https://github.com/yli183/ReST"
+      confidence: medium
+      notes: "MIST/ReST tutorial default species is Human"
+    hvg_prop:
+      value: 0.8
+      source: documentation
+      source_file: "https://github.com/yli183/ReST"
+      confidence: medium
+      notes: "Tutorial default 0.8 HVG proportion"
+    n_pcs:
+      value: 10
+      source: documentation
+      source_file: "https://github.com/yli183/ReST"
+      confidence: medium
+    min_sim:
+      value: 0.1
+      source: documentation
+      source_file: "https://github.com/yli183/ReST"
+      confidence: medium
+    min_size:
+      value: 20
+      source: documentation
+      source_file: "https://github.com/yli183/ReST"
+      confidence: medium
+    gap:
+      value: 0.02
+      source: documentation
+      source_file: "https://github.com/yli183/ReST"
+      confidence: medium
+    n_experts:
+      value: 3
+      source: documentation
+      source_file: "https://github.com/yli183/ReST"
+      confidence: medium
+      notes: "Ignored by this tool: the worker runs ReST's spKNN imputer, which has no experts (reported in params.ignored)."
+
+  spotgf_denoise:
+    binsize:
+      value: 70
+      source: documentation
+      source_file: "https://github.com/STOmics/SpotGF"
+      confidence: medium
+      notes: "SpotGF tutorial default binsize=70"
+    proportion:
+      value: 0.9
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/STOmics/SpotGF"
+      confidence: low
+      notes: "Tutorial example uses proportion=0.9; SpatialOmicsLab uses 0.5"
+    alpha:
+      value: 0.0
+      source: documentation
+      source_file: "https://github.com/STOmics/SpotGF"
+      confidence: medium
+      notes: "0 means auto-optimize alpha"
+    max_iterations:
+      value: 10000
+      source: documentation
+      source_file: "https://github.com/STOmics/SpotGF"
+      confidence: medium
+    auto_threshold:
+      value: true
+      source: documentation
+      source_file: "https://github.com/STOmics/SpotGF"
+      confidence: medium
+
+  xfuse_build_config:
+    network_depth:
+      value: 6
+      adopted: false
+      source: documentation
+      source_file: "https://github.com/ludvb/xfuse"
+      confidence: high
+      notes: "XFuse example config uses network_depth=6; SpatialOmicsLab uses 2"
+    epochs:
+      value: 100000
+      adopted: false
+      source: documentation
+      source_file: "https://github.com/ludvb/xfuse"
+      confidence: high
+      notes: "XFuse tutorial recommends 100000 epochs; SpatialOmicsLab uses 50 for quick testing"
+    batch_size:
+      value: 3
+      adopted: false
+      source: documentation
+      source_file: "https://github.com/ludvb/xfuse"
+      confidence: high
+      notes: "XFuse example batch_size=3; SpatialOmicsLab uses 8"
+    patch_size:
+      value: 768
+      adopted: false
+      source: documentation
+      source_file: "https://github.com/ludvb/xfuse"
+      confidence: high
+      notes: "XFuse recommends patch_size as multiple of 2^network_depth (768); SpatialOmicsLab uses 64"
+    prediction_num_samples:
+      value: 10
+      source: documentation
+      source_file: "https://github.com/ludvb/xfuse"
+      confidence: medium
+    de_num_samples:
+      value: 10
+      source: documentation
+      source_file: "https://github.com/ludvb/xfuse"
+      confidence: medium
+    de_genes_per_batch:
+      value: 100
+      source: documentation
+      source_file: "https://github.com/ludvb/xfuse"
+      confidence: medium
+
+  istar_full_pipeline:
+    device:
+      value: "cuda"
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/daviddaiweizhang/istar/blob/master/run.sh"
+      confidence: high
+      notes: "iStar run.sh sets device=cuda; SpatialOmicsLab forced default to cpu for portability"
+    pixel_size:
+      value: 0.5
+      source: official_repo
+      source_file: "https://github.com/daviddaiweizhang/istar/blob/master/run.sh"
+      confidence: high
+      notes: "Default analysis pixel size in iStar run.sh is 0.5"
+    n_genes:
+      value: 1000
+      source: official_repo
+      source_file: "https://github.com/daviddaiweizhang/istar/blob/master/run.sh"
+      confidence: high
+      notes: "iStar select_genes.py default --n-top is 1000"
+    impute_epochs:
+      value: 400
+      source: official_repo
+      source_file: "https://github.com/daviddaiweizhang/istar/blob/master/run.sh"
+      confidence: high
+      notes: "iStar impute.py default --epochs=400"
+    filter_size:
+      value: 8
+      source: official_repo
+      source_file: "https://github.com/daviddaiweizhang/istar/blob/master/run.sh"
+      confidence: high
+      notes: "iStar cluster.py default --filter-size=8"
+    min_cluster_size:
+      value: 20
+      source: official_repo
+      source_file: "https://github.com/daviddaiweizhang/istar/blob/master/run.sh"
+      confidence: high
+      notes: "iStar cluster.py default --min-cluster-size=20"
+    run_celltype:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/daviddaiweizhang/istar"
+      confidence: medium
+      notes: "Cell-type inference is optional in iStar"
+    run_signature_scores:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/daviddaiweizhang/istar"
+      confidence: medium
+
+  stage_run:
+    data_type:
+      value: "10x"
+      source: documentation
+      source_file: "https://github.com/zhengang-zhang/STAGE"
+      confidence: medium
+      notes: "STAGE supports 10x, ST_KTH, Slide-seq; 10x is most common"
+    experiment:
+      value: "generation"
+      source: documentation
+      source_file: "https://github.com/zhengang-zhang/STAGE"
+      confidence: medium
+      notes: "STAGE has recovery/generation/3d_model modes"
+    train_epoch:
+      value: 1000
+      source: documentation
+      source_file: "https://github.com/zhengang-zhang/STAGE"
+      confidence: medium
+      notes: "STAGE tutorial default train_epoch=1000"
+    w_recon:
+      value: 0.1
+      source: documentation
+      source_file: "https://github.com/zhengang-zhang/STAGE"
+      confidence: medium
+    w_w:
+      value: 0.1
+      source: documentation
+      source_file: "https://github.com/zhengang-zhang/STAGE"
+      confidence: medium
+    w_l1:
+      value: 0.1
+      source: documentation
+      source_file: "https://github.com/zhengang-zhang/STAGE"
+      confidence: medium
+    relu:
+      value: true
+      source: documentation
+      source_file: "https://github.com/zhengang-zhang/STAGE"
+      confidence: medium
+    gap:
+      value: 0.05
+      source: documentation
+      source_file: "https://github.com/zhengang-zhang/STAGE"
+      confidence: medium
+      notes: "Default gap for 3d_model is 0.05 (between sections)"
+
+  spaotsc_run:
+    use_landmark:
+      value: true
+      source: documentation
+      source_file: "https://github.com/zcang/SpaOTsc"
+      confidence: medium
+      notes: "Tutorial uses use_landmark=True for cell-cell distance speedup"
+    run_mapping:
+      value: true
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+      notes: "Core mapping step; default enabled"
+    run_cellcell_distance:
+      value: true
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+      notes: "Commonly enabled in tutorial workflow"
+
+  moscot_run:
+    epsilon:
+      value: 0.001
+      source: documentation
+      source_file: "https://github.com/theislab/moscot"
+      confidence: medium
+      notes: "Tutorial typical epsilon=1e-3 for entropic OT"
+    alpha:
+      value: 0.5
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/theislab/moscot/blob/main/src/moscot/problems/space/_mapping.py"
+      confidence: high
+      notes: "MappingProblem.solve() default alpha=0.5; SpatialOmicsLab uses 0.8"
+    device:
+      value: "cpu"
+      source: documentation
+      source_file: "https://github.com/theislab/moscot"
+      confidence: medium
+    spatial_key:
+      value: "spatial"
+      source: documentation
+      source_file: "https://github.com/theislab/moscot"
+      confidence: high
+    policy:
+      value: "sequential"
+      source: documentation
+      source_file: "https://github.com/theislab/moscot"
+      confidence: medium
+      notes: "Temporal/alignment policy default is sequential"
+
+  st_gears_reconstruct_3d:
+    bin_step:
+      value: 2
+      source: documentation
+      source_file: "https://github.com/STOmics/ST-GEARS"
+      confidence: high
+      notes: "ST-GEARS README default bin_step=2"
+    uniform_weight:
+      value: false
+      source: documentation
+      source_file: "https://github.com/STOmics/ST-GEARS"
+      confidence: high
+      notes: "Default uses Distributive Constraints (uniform_weight=False)"
+    filter_by_label:
+      value: true
+      source: documentation
+      source_file: "https://github.com/STOmics/ST-GEARS"
+      confidence: high
+    tune_alpha_li:
+      value: [0.8, 0.2, 0.05, 0.013]
+      source: documentation
+      source_file: "https://github.com/STOmics/ST-GEARS"
+      confidence: high
+      notes: "ST-GEARS README default tune list for regularization"
+    num_itermax:
+      value: 200
+      source: documentation
+      source_file: "https://github.com/STOmics/ST-GEARS"
+      confidence: high
+    fil_pc:
+      value: 20
+      source: documentation
+      source_file: "https://github.com/STOmics/ST-GEARS"
+      confidence: high
+    sigma:
+      value: 1.0
+      source: documentation
+      source_file: "https://github.com/STOmics/ST-GEARS"
+      confidence: high
+    binning_on:
+      value: true
+      source: documentation
+      source_file: "https://github.com/STOmics/ST-GEARS"
+      confidence: medium
+
+  paste_pairwise_align:
+    alpha:
+      value: 0.1
+      source: official_repo
+      source_file: "https://github.com/raphael-group/paste/blob/main/src/paste/PASTE.py"
+      confidence: high
+      notes: "paste.pairwise_align default alpha=0.1"
+    use_gpu:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/raphael-group/paste/blob/main/src/paste/PASTE.py"
+      confidence: high
+
+  paste_center_align:
+    alpha:
+      value: 0.1
+      source: official_repo
+      source_file: "https://github.com/raphael-group/paste/blob/main/src/paste/PASTE.py"
+      confidence: high
+      notes: "paste.center_align default alpha=0.1"
+    use_gpu:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/raphael-group/paste/blob/main/src/paste/PASTE.py"
+      confidence: high
+    use_spatial_init:
+      value: false
+      source: documentation
+      source_file: "https://github.com/raphael-group/paste"
+      confidence: medium
+      notes: "pis_init optional; None default"
+
+  seurat_integrate_qc_cluster:
+    n_hvgs:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+    n_pcs:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+    resolution:
+      value: 0.8
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+
+  seurat_find_markers:
+    logfc_threshold:
+      value: 0.1
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat/blob/main/R/differential_expression.R"
+      confidence: high
+      notes: "FindMarkers default logfc.threshold=0.1 (Seurat v5); SpatialOmicsLab uses 0.25 (old default)"
+    min_pct:
+      value: 0.01
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat/blob/main/R/differential_expression.R"
+      confidence: high
+      notes: "FindMarkers default min.pct=0.01 (Seurat v5); SpatialOmicsLab uses 0.1"
+    test_use:
+      value: "wilcox"
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat/blob/main/R/differential_expression.R"
+      confidence: high
+      notes: "Default test.use is Wilcoxon rank-sum"
+    ident_key:
+      value: "seurat_clusters"
+      source: documentation
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: medium
+
+  seurat_dimplot:
+    reduction:
+      value: "umap"
+      source: documentation
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+      notes: "DimPlot tutorial default is umap"
+    label:
+      value: false
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+      notes: "DimPlot default label=FALSE; SpatialOmicsLab uses true"
+    group_by:
+      value: "seurat_clusters"
+      source: documentation
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+
+  seurat_spatial_qc_cluster:
+    n_hvgs:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+    n_pcs:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+    resolution:
+      value: 0.8
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+      notes: "SpatialOmicsLab uses 0.6 for spatial (slightly lower than default)"
+    sv_selection_method:
+      value: "moransi"
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: medium
+      notes: "Seurat v5 recommended method changed to moransi; SpatialOmicsLab uses markvariogram"
+    sv_nfeatures:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+
+  seurat_spatial_feature_plot:
+    image_alpha:
+      value: 1.0
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: medium
+      notes: "SpatialFeaturePlot default image.alpha=1.0; SpatialOmicsLab uses 0.8"
+    spot_size:
+      value: 1.6
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: medium
+      notes: "Default pt.size.factor=1.6; SpatialOmicsLab uses 1.5"
+    ncol:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: medium
+
+  seurat_spatial_dimplot:
+    image_alpha:
+      value: 1.0
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: medium
+    spot_size:
+      value: 1.6
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: medium
+    label:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+      notes: "SpatialDimPlot default label=FALSE"
+
+  somde_run:
+    som_dim:
+      value: 20
+      source: documentation
+      source_file: "https://github.com/WhirlFirst/somde"
+      confidence: medium
+      notes: "SOMDE tutorial uses SomNode(X, 20)"
+    max_genes:
+      value: 2000
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: low
+      notes: "SOMDE doesn't have explicit max_genes; SpatialOmicsLab enforces 2000 for memory"
+    min_counts:
+      value: 1
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: high
+      notes: "SOMDE has no count threshold; its whole public API is SomNode(X, k, homogeneous_codebook) plus mtx/norm/run and the string min_counts does not occur in the installed 0.1.8 package. The filter is ours -- tools/somde_worker.py::_subset_genes_simple applies gene_sum >= min_counts before SOMDE is called -- so 1 is our portal default, not the authors' choice. Was filed as source: documentation citing the SOMDE repository."
+
+  spatialprompt_deconvolution:
+    sc_label_key:
+      value: "cell_type"
+      source: documentation
+      source_file: "https://github.com/osmanbeyoglulab/SpatialPrompt"
+      confidence: medium
+      notes: "Tutorial default obs key for cell types"
+
+  spatialprompt_cluster:
+    n_clust:
+      value: 8
+      source: spatialomicsgym_config
+      source_file: "MCP_server/mcp_config.yaml"
+      confidence: high
+      notes: "Not upstream's default: fit_predict's n_cluster defaults to \"auto\", which picks k by
+        agglomerative clustering at a fixed distance threshold. 8 is our portal's choice."
+
+  ucdeconvolve_base:
+    split:
+      value: true
+      source: documentation
+      source_file: "https://github.com/dpeerlab/ucdeconvolve"
+      confidence: high
+      notes: "ucd.tl.base default split=True"
+    sort:
+      value: true
+      source: documentation
+      source_file: "https://github.com/dpeerlab/ucdeconvolve"
+      confidence: high
+    propagate:
+      value: true
+      source: documentation
+      source_file: "https://github.com/dpeerlab/ucdeconvolve"
+      confidence: high
+    use_raw:
+      value: true
+      source: documentation
+      source_file: "https://github.com/dpeerlab/ucdeconvolve"
+      confidence: high
+    key_added:
+      value: "ucdbase"
+      source: documentation
+      source_file: "https://github.com/dpeerlab/ucdeconvolve"
+      confidence: high
+    assign_top_celltypes:
+      value: true
+      source: documentation
+      source_file: "https://github.com/dpeerlab/ucdeconvolve"
+      confidence: medium
+    n_neighbors:
+      value: 10
+      source: documentation
+      source_file: "https://github.com/dpeerlab/ucdeconvolve"
+      confidence: medium
+
+  convert_h5ad_to_seurat_rds:
+    project:
+      value: "SeuratProject"
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+      notes: "Seurat CreateSeuratObject default project='SeuratProject'"
+    assay:
+      value: "RNA"
+      source: official_repo
+      source_file: "https://github.com/satijalab/seurat"
+      confidence: high
+      notes: "Seurat default assay name is RNA"
+
+  convert_h5ad_to_csv:
+    transpose_counts:
+      value: true
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+      notes: "Default reflects R-convention (genes x cells)"
+
+  convert_csv_to_h5ad:
+    counts_transposed:
+      value: true
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+    spatial_columns:
+      value: "x,y"
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+
+  novosparc_reconstruct_spatial:
+    alpha:
+      value: 0.5
+      source: documentation
+      source_file: "https://github.com/rajewsky-lab/novosparc"
+      confidence: medium
+      notes: "novoSpaRc alpha_linear default in tutorials"
+    num_locations:
+      value: 1000
+      source: documentation
+      source_file: "https://github.com/rajewsky-lab/novosparc"
+      confidence: medium
+      notes: "Tutorial example uses num_locations=1000"
+    n_hvg:
+      value: 2000
+      source: documentation
+      source_file: "https://github.com/rajewsky-lab/novosparc"
+      confidence: medium
+
+  scdot_map_cells_to_spots:
+    n_hvg:
+      value: 7000
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/gersteinlab/scDOT -- src/data.py (read at $SCDOT_SRC/data.py)"
+      confidence: high
+      notes: >-
+        Upstream reduces the single-cell reference with n_top_genes=7000 (subset=True,
+        flavor="seurat_v3", layer="counts"), six times over -- once per entry point in src/data.py.
+        The 2000 recorded here previously was upstream's spatial-side call, which passes no subset=
+        and is immediately followed by an intersection on the full var_names: it writes
+        var['highly_variable'] and selects nothing. Our portal default of 2000 is what actually
+        drives the reference-side subset, so adopting 7000 would change every scDOT run and move
+        every recorded benchmark score; recorded for provenance only, and whether to adopt it is a
+        separate call.
+    annotation_key:
+      value: "cell_type"
+      source: documentation
+      source_file: "https://github.com/gersteinlab/scDOT"
+      confidence: medium
+    device:
+      value: "cpu"
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+
+  run_spotsweeper:
+    n_neighbors:
+      value: 36
+      source: official_repo
+      source_file: "https://github.com/MicTott/SpotSweeper"
+      confidence: high
+      notes: "SpotSweeper localOutliers default n_neighbors=36 (about three hexagonal rings of Visium spots: 6 + 12 + 18)"
+    threshold:
+      value: 3.0
+      source: official_repo
+      source_file: "https://github.com/MicTott/SpotSweeper"
+      confidence: high
+      notes: "Default modified z-score threshold=3.0"
+
+  slat_align_slices:
+    feature_type:
+      value: "DPCA"
+      source: documentation
+      source_file: "https://github.com/gao-lab/SLAT"
+      confidence: medium
+      notes: "scSLAT load_anndatas default feature='DPCA'"
+    k_cutoff:
+      value: 10
+      source: documentation
+      source_file: "https://github.com/gao-lab/SLAT"
+      confidence: medium
+    epochs:
+      value: 6
+      source: documentation
+      source_file: "https://github.com/gao-lab/SLAT"
+      confidence: medium
+      notes: "scSLAT tutorial uses epochs=6"
+
+  gpsa_run_alignment:
+    n_spatial_dims:
+      value: 2
+      source: documentation
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment"
+      confidence: high
+      notes: "GPSA default for 2D tissue"
+    n_latent_gps:
+      value: 3
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: low
+      notes: "Upstream default is None (auto); spatialomicsgym picks 3"
+    num_epochs:
+      value: 3000
+      source: documentation
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment"
+      confidence: medium
+      notes: "GPSA tutorial uses N_EPOCHS=3000; SpatialOmicsLab uses 500 for speed"
+    learning_rate:
+      value: 0.01
+      source: documentation
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment"
+      confidence: medium
+      notes: "GPSA tutorial uses lr=1e-2; SpatialOmicsLab uses 1e-3"
+    n_top_genes:
+      value: 2000
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: low
+
+  run_smart:
+    n_topics:
+      value: 10
+      source: inferred
+      source_file: "https://github.com/RuiyuRayWang/smart_spatial"
+      confidence: low
+      notes: "Dataset-dependent; tutorials use 10"
+    iterations:
+      value: 2000
+      adopted: false
+      source: official_repo
+      source_file: "SMART::SMART_base formals (installed package, /opt/conda/envs/smart_env)"
+      confidence: high
+      version: "SMART 0.0.2"
+      notes: "RECORDED, NOT RUN. SMART_base(stData, markerGs, noMarkerCts = 1, outDir, seed = 1, iterations = 2000, priors = NULL); SpatialOmicsLab has always run 500 (formerly hard-coded in tools/smart_spatial_worker.R) and keeps it as the portal default."
+
+  run_cellpose_segmentation:
+    model_type:
+      value: "cpsam"
+      source: official_repo
+      source_file: "https://github.com/MouseLand/cellpose/blob/main/cellpose/models.py"
+      confidence: high
+      notes: "cellpose 4.x ships one model: models.py MODEL_NAMES = ['cpsam'] and CellposeModel(pretrained_model='cpsam'); model_type is not used in v4.0.1+ (upstream logs 'Ignoring this argument')"
+    diameter:
+      value: null
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/MouseLand/cellpose/blob/main/cellpose/models.py"
+      confidence: high
+      notes: "Cellpose eval() default diameter=None means no rescaling (image_scaling=1.0); 4.x has no size model, so nothing is estimated. SpatialOmicsLab uses 30.0, which rescales identically (30/30)"
+    flow_threshold:
+      value: 0.4
+      source: official_repo
+      source_file: "https://github.com/MouseLand/cellpose/blob/main/cellpose/models.py"
+      confidence: high
+      notes: "Cellpose eval() default flow_threshold=0.4"
+    cellprob_threshold:
+      value: 0.0
+      source: official_repo
+      source_file: "https://github.com/MouseLand/cellpose/blob/main/cellpose/models.py"
+      confidence: high
+      notes: "Cellpose eval() default cellprob_threshold=0.0"
+    channels:
+      value: null
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/MouseLand/cellpose/blob/main/cellpose/models.py"
+      confidence: high
+      notes: "Cellpose 4.x does not use channels (eval logs 'channels deprecated in v4.0.1+'); the portal keeps the parameter, echoes it and lists it under params.ignored"
+
+  run_deepcell_segmentation:
+    model_type:
+      value: "mesmer"
+      source: documentation
+      source_file: "https://github.com/vanvalenlab/deepcell-tf"
+      confidence: high
+      notes: "Mesmer is the recommended model for tissue segmentation"
+    compartment:
+      value: "whole-cell"
+      source: official_repo
+      source_file: "https://github.com/vanvalenlab/deepcell-tf"
+      confidence: high
+      notes: "Mesmer default compartment is whole-cell"
+    image_mpp:
+      value: 0.5
+      source: official_repo
+      source_file: "https://github.com/vanvalenlab/deepcell-tf"
+      confidence: high
+      notes: "Mesmer was trained on 0.5 microns per pixel"
+
+  run_bidcell:
+    model_type:
+      value: "default"
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: low
+      notes: "'default' runs BIDCell's own network (model_params.name='custom'), or a config_path file's model_params.name; any other value is a segmentation_models_pytorch encoder name"
+
+  run_clustermap:
+    num_dims:
+      value: 3
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/wanglab-broad/ClusterMap/blob/master/ClusterMap/clustermap.py"
+      confidence: high
+      notes: "ClusterMap default num_dims=3; SpatialOmicsLab defaults to 2"
+    min_spots:
+      value: 5
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+      notes: "No upstream explicit default; 5 is a reasonable lower bound"
+
+  stalign_align_points:
+    niter:
+      value: 5000
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/JEFworks-Lab/STalign/blob/main/STalign/STalign.py"
+      confidence: high
+      notes: "STalign LDDMM default niter=5000; SpatialOmicsLab uses 200 for speed"
+
+  stalign_align_to_image:
+    niter:
+      value: 5000
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/JEFworks-Lab/STalign/blob/main/STalign/STalign.py"
+      confidence: high
+      notes: "STalign LDDMM default niter=5000; SpatialOmicsLab uses 200 for speed"
+
+  spacet_run_deconvolution:
+    cancer_type:
+      value: "BRCA"
+      source: documentation
+      source_file: "https://github.com/data2intelligence/SpaCET"
+      confidence: medium
+      notes: "SpaCET tutorial example uses BRCA"
+    platform:
+      value: "Visium"
+      source: documentation
+      source_file: "https://github.com/data2intelligence/SpaCET"
+      confidence: high
+    organism:
+      value: "human"
+      source: documentation
+      source_file: "https://github.com/data2intelligence/SpaCET"
+      confidence: high
+    run_cci:
+      value: false
+      source: documentation
+      source_file: "https://github.com/data2intelligence/SpaCET"
+      confidence: medium
+
+  ncem_cell_communication:
+    n_neighbors:
+      value: 10
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: low
+      notes: "NCEM does not have a fixed default; 10 is common for Visium"
+    model_type:
+      value: "linear"
+      source: documentation
+      source_file: "https://github.com/theislab/ncem"
+      confidence: medium
+      notes: "Upstream NCEM has linear and nonlinear models; this wrapper implements only 'linear' (sklearn Ridge on neighbourhood composition; the ncem package is not run)"
+
+  bayestme_svg_detection:
+    knn_k:
+      value: 6
+      source: documentation
+      source_file: "https://github.com/tansey-lab/bayestme"
+      confidence: medium
+      notes: "Tutorial default KNN k=6 for Visium"
+    n_svi_steps:
+      value: 20000
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme/blob/main/src/bayestme/cli/common.py"
+      confidence: high
+      notes: "BayesTME CLI default n_svi_steps=20000; SpatialOmicsLab uses 10000"
+    n_samples:
+      value: 100
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme/blob/main/src/bayestme/cli/common.py"
+      confidence: high
+    use_spatial_guide:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme/blob/main/src/bayestme/cli/common.py"
+      confidence: high
+    n_marker_genes:
+      value: 10
+      source: documentation
+      source_file: "https://github.com/tansey-lab/bayestme"
+      confidence: medium
+    alpha:
+      value: 0.05
+      source: documentation
+      source_file: "https://github.com/tansey-lab/bayestme"
+      confidence: medium
+      notes: "Default FDR threshold for marker gene selection"
+
+  bayestme_clustering:
+    knn_k:
+      value: 6
+      source: documentation
+      source_file: "https://github.com/tansey-lab/bayestme"
+      confidence: medium
+
+  spark_identify_svg:
+    pval_cutoff:
+      value: 0.05
+      source: official_repo
+      source_file: "https://github.com/xzhoulab/SPARK"
+      confidence: high
+      notes: "Standard p-value cutoff in SPARK tutorial"
+    n_cores:
+      value: 1
+      source: documentation
+      source_file: "https://github.com/xzhoulab/SPARK"
+      confidence: medium
+      notes: "Default serial execution; users increase for HPC"
+
+  spark_x_identify_svg:
+    pval_cutoff:
+      value: 0.05
+      source: official_repo
+      source_file: "https://github.com/xzhoulab/SPARK"
+      confidence: high
+
+  spatialglue_integrate:
+    epochs:
+      value: 600
+      source: official_repo
+      source_file: "https://github.com/JinmiaoChenLab/SpatialGlue/blob/main/SpatialGlue/SpatialGlue_pyG.py"
+      confidence: high
+      notes: "SpatialGlue default epochs=600 (for SPOTS datatype; varies 200-1600)"
+    dim_output:
+      value: 64
+      source: official_repo
+      source_file: "https://github.com/JinmiaoChenLab/SpatialGlue/blob/main/SpatialGlue/SpatialGlue_pyG.py"
+      confidence: high
+      notes: "Default output latent dim=64"
+    n_neighbors:
+      value: 3
+      source: documentation
+      source_file: "https://github.com/JinmiaoChenLab/SpatialGlue"
+      confidence: medium
+      notes: "Tutorial uses 3 neighbors for SpatialGlue construct_neighbor_graph"
+    datatype:
+      value: "10X"
+      source: documentation
+      source_file: "https://github.com/JinmiaoChenLab/SpatialGlue"
+      confidence: high
+    cluster_method:
+      value: "leiden"
+      source: documentation
+      source_file: "https://github.com/JinmiaoChenLab/SpatialGlue"
+      confidence: medium
+    resolution:
+      value: 1.0
+      source: official_repo
+      source_file: "https://github.com/JinmiaoChenLab/SpatialGlue"
+      confidence: medium
+
+  run_cellpie:
+    n_components:
+      value: 10
+      source: inferred
+      source_file: "https://github.com/ManchesterBioinference/CellPie"
+      confidence: low
+      notes: "Dataset-dependent; tutorial uses 10"
+
+  deeplinc_cell_interactions:
+    n_neighbors:
+      value: 10
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: low
+      notes: "k of the symmetrised k-NN graph the cell-type edge enrichment is scored on (the DeepLinc VGAE is not run); 10 is common"
+    n_hvg:
+      value: 2000
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: low
+      notes: "Ignored by the worker: no expression is read (reported in params.ignored); kept only because the portal still accepts it"
+
+  run_celldart:
+    n_top_genes:
+      value: 2000
+      source: documentation
+      source_file: "https://github.com/mex3004/CellDART"
+      confidence: medium
+      notes: "Tutorial example uses 2000 HVGs"
+    gpu:
+      value: false
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+
+  run_celina:
+    num_cores:
+      value: 1
+      source: official_repo
+      source_file: "CELINA 1.0 Testing_interaction_all(object, kernel_mat, celltype_to_test, num_cores)"
+      confidence: high
+      version: "1.0"
+      adopted: false
+      notes: "Upstream gives num_cores NO default, so every caller must choose. The portal sends 1;
+        recording that here would only restate the portal. The retired n_neighbors row cited a
+        kernel neighbour knob that does not exist in CELINA 1.0 -- Calculate_Kernel is bandwidth-driven
+        (bandwidthtype = 'Silverman') and takes no neighbour argument."
+
+  mistyr_spatial_modeling:
+    cv_folds:
+      value: 10
+      source: official_repo
+      source_file: "https://github.com/saezlab/mistyR"
+      confidence: medium
+      notes: "run_misty default cv.folds=10"
+    bypass_intra:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/saezlab/mistyR"
+      confidence: medium
+      notes: "Default bypass.intra=FALSE (includes intrinsic view)"
+    l:
+      value: null
+      source: spatialomicsgym_config
+      source_file: "MCP_server/mcp_config.yaml"
+      confidence: high
+      notes: "Not upstream's default: mistyR 1.18.0's add_paraview(current.views, positions, l, ...)
+        declares l with no default at all. The portal leaves l unset and the worker sets it to 10x the
+        median nearest-spot distance (mistyR's vignette uses l = 10 on a unit-spacing grid). The old fixed
+        10.0 was in coordinate units and zeroed every paraview weight on pixel coordinates. null serves
+        nothing, so the worker's measured value stands."
+
+  run_spatialdecon:
+    normalize:
+      value: true
+      source: documentation
+      source_file: "https://github.com/Nanostring-Biostats/SpatialDecon"
+      confidence: medium
+      notes: "SpatialDecon normalize counts as default preprocessing"
+
+  run_spatialscope:
+    cell_type_key:
+      value: "cell_type"
+      source: documentation
+      source_file: "https://github.com/YangLabHKUST/SpatialScope"
+      confidence: medium
+
+  neighborseq_interaction_network:
+    n_trees:
+      value: 500
+      source: official_repo
+      source_file: "https://github.com/ezgreenberg/Neighborseq"
+      confidence: medium
+      notes: "Portal default only, and NOT RUN: Neighborseq::multiplet_rf hard-codes xgboost num_parallel_tree = 200 (nround = 1, max_depth = 20) and no argument of neighborseq() reaches it, so tools/neighborseq_worker.R lists n_trees under params.ignored and reports params.num_parallel_tree = 200. The earlier note (Random Forest default ntree=500) described randomForest, which Neighborseq does not use."
+    pval_cutoff:
+      value: 0.05
+      source: documentation
+      source_file: "https://github.com/ezgreenberg/Neighborseq"
+      confidence: medium
+      notes: "Portal default only, and NOT RUN: Neighborseq applies no p-value cutoff (every tested pair is written with its pval and padj), so the worker lists pval_cutoff under params.ignored."
+    n_markers:
+      value: 50
+      source: official_repo
+      source_file: "Neighborseq::prep_cell_mat formals (installed package, /opt/conda/envs/neighborseq)"
+      confidence: high
+      notes: "Read out of the installed package rather than its prose: prep_cell_mat(ge, celltypes,
+        logfc.threshold = 1, min.pct = 0.25, max.cells = 200, topn = 50, res = 0.8) keeps the topn
+        strongest markers per cluster, and topn = 50 is the value here. Our portal exposes no
+        n_markers -- it declares n_top, which is the number of interactions reported, a different
+        quantity -- so this row is provenance only. tools/neighborseq_worker.R hardcodes the same 50
+        in its own Seurat-v5-compatible reimplementation of prep_cell_mat."
+    logfc_threshold:
+      value: 1
+      source: official_repo
+      source_file: "Neighborseq::prep_cell_mat formals (installed package, /opt/conda/envs/neighborseq)"
+      confidence: high
+      adopted: false
+      notes: "RECORDED, NOT RUN. Upstream prep_cell_mat defaults logfc.threshold = 1 and passes it
+        to FindAllMarkers. Our Seurat-v5-compatible reimplementation at
+        tools/neighborseq_worker.R (MARKER_LOGFC_THRESHOLD) passes 0.25, which is Seurat's own default rather than the
+        value Neighborseq raised it to -- four times looser. Adopting 1 would change the marker
+        panel of every neighborseq run and move any recorded result, so the row records the
+        divergence and the worker stands. See also the min_pct row, which diverges the same way."
+    min_pct:
+      value: 0.25
+      source: official_repo
+      source_file: "Neighborseq::prep_cell_mat formals (installed package, /opt/conda/envs/neighborseq)"
+      confidence: high
+      adopted: false
+      notes: "RECORDED, NOT RUN. Upstream prep_cell_mat defaults min.pct = 0.25; our reimplementation
+        at tools/neighborseq_worker.R (MARKER_MIN_PCT) passes 0.1, again Seurat's own default. min.pct is a
+        detection-rate floor, not a fold-change one, so the looser value admits genes seen in as few
+        as 10 percent of a cluster -- and because the panel is then cut with top_n on log fold
+        change, those rarely-detected genes rank high rather than being trimmed. The divergence is
+        therefore directional and not merely wider. The same call no longer passes max.cells.per.ident
+        = 200 (upstream max.cells = 200): the marker test now uses every cell, a deliberate divergence
+        under the no-subsampling policy."
+
+  run_dstg:
+    # The portal's n_clusters is the k of the spot+cell kNN graph the GCN propagates on (historical
+    # name); it is dataset-dependent and not a DSTG-documented default, so it is absent here.
+    learning_rate:
+      value: 0.01
+      source: documentation
+      source_file: "https://github.com/Su-informatics-lab/DSTG"
+      confidence: medium
+      notes: "GCN default learning rate 0.01 (the worker runs a DSTG-style GCN reimplementation, not upstream DSTG)"
+    epochs:
+      value: 200
+      source: documentation
+      source_file: "https://github.com/Su-informatics-lab/DSTG"
+      confidence: medium
+
+  celltrek_spatial_mapping:
+    n_components:
+      value: 30
+      source: documentation
+      source_file: "https://github.com/navinlabcode/CellTrek"
+      confidence: medium
+      notes: "CellTrek tutorial uses 30 PCs"
+    reduction:
+      value: "pca"
+      source: documentation
+      source_file: "https://github.com/navinlabcode/CellTrek"
+      confidence: high
+    celltype_col:
+      value: "cell_type"
+      source: documentation
+      source_file: "https://github.com/navinlabcode/CellTrek"
+      confidence: medium
+
+  redeconve_deconvolution:
+    n_top_genes:
+      value: 0
+      source: official_repo
+      source_file: "Redeconve 1.1.2 deconvoluting(genemode = 'default'): gene.list = intersect(rownames(ref), rownames(st))"
+      confidence: high
+      version: "1.1.2"
+      notes: "Redeconve has no top-N gene knob; its genemode = 'default' uses every gene the reference and
+        the slide share, which the portal spells n_top_genes = 0. The earlier row (500, 'Redeconve default
+        uses top 500 genes') matched nothing upstream and was inert while the worker ignored n_top_genes;
+        now that the worker applies it, overlaying 500 would cut every benchmark run to 500 genes."
+
+  starfysh_extended_nf:
+    aa_r:
+      value: 30
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/AA.py"
+      confidence: high
+      notes: "aa_r is forwarded to ArchetypalAnalysis.compute_archetypes(cn=...); upstream default cn=30 (AA.py compute_archetypes). The constructor's r=100 (archetype merge granularity) is a different knob and is not exposed."
+    aa_n_markers:
+      value: 30
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/AA.py"
+      confidence: high
+      notes: "AA default n_markers=30 (confirmed)"
+    n_repeats:
+      value: 3
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/starfysh.py"
+      confidence: high
+    lr:
+      value: 0.0001
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/starfysh.py"
+      confidence: high
+      notes: "run_starfysh default lr=1e-4; SpatialOmicsLab uses 1e-3"
+    epochs:
+      value: 100
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/starfysh.py"
+      confidence: high
+      notes: "run_starfysh default epochs=100; SpatialOmicsLab uses 300"
+    window_size:
+      value: 1
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py"
+      confidence: high
+      notes: "VisiumArguments default window_size=1; SpatialOmicsLab uses 30"
+    patch_r:
+      value: 16
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py"
+      confidence: high
+      notes: "VisiumArguments default patch_r=16; SpatialOmicsLab uses 13"
+    n_anchors:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py"
+      confidence: high
+      notes: "Default n_anchors=adata.shape[0] (all spots); SpatialOmicsLab uses 60"
+    signature_mode:
+      value: "auto"
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+
+  run_cytospace:
+    n_cells:
+      value: 0
+      source: official_repo
+      source_file: "https://github.com/digitalcytometry/cytospace/blob/main/cytospace/cytospace.py"
+      confidence: high
+      notes: "0 = the whole reference. Upstream main_cytospace samples placed cells from the entire scRNA-seq reference and has no reference-cell cap; the 10000 recorded here before is the fraction-estimation downsample inside get_cellfracs_seuratv3.R, which this wrapper does not run."
+    n_top_genes:
+      value: 5000
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: low
+
+  run_spotclean:
+    gene_cutoff:
+      value: 10
+      source: documentation
+      source_file: "https://github.com/MeichenDong/SpotClean"
+      confidence: medium
+      notes: "Tutorial default gene_cutoff=10"
+    spot_cutoff:
+      value: 100
+      source: documentation
+      source_file: "https://github.com/MeichenDong/SpotClean"
+      confidence: medium
+    verbose:
+      value: true
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+
+  run_stdgcn:
+    n_epochs:
+      value: 200
+      source: documentation
+      source_file: "https://github.com/Su-informatics-lab/STdGCN"
+      confidence: medium
+    device:
+      value: "CPU"
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+
+  run_stplus:
+    n_neighbors:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/xy-chen16/stPlus"
+      confidence: medium
+      notes: "stPlus tutorial default n_neighbors=50"
+    n_epochs:
+      value: 10000
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/xy-chen16/stPlus"
+      confidence: medium
+      notes: "stPlus() signature default max_epoch_num=10000 (stPlus/model.py), a maximum: training stops once the loss changes by < converge_ratio=0.004; SpatialOmicsLab uses 200 for speed"
+    batch_size:
+      value: 512
+      source: documentation
+      source_file: "https://github.com/xy-chen16/stPlus"
+      confidence: medium
+
+  spacel_scube:
+    spatial_h5ad_paths:
+      value: null
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+      notes: "No upstream default; must be user-provided"
+
+  run_spatialpca:
+    n_components:
+      value: 20
+      source: documentation
+      source_file: "https://github.com/shangll123/SpatialPCA"
+      confidence: medium
+      notes: "SpatialPCA default number of spatial PCs"
+
+  run_celloscope:
+    n_iterations:
+      value: 15000
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/szczurek-lab/Celloscope"
+      confidence: high
+      notes: "Celloscope example/data/params.txt runs 15000 iterations with burn in 10000 and thinning 10; SpatialOmicsLab uses 1000 (burn-in max(5, n // 2)) and reports data.mcmc_start_correlation"
+
+  run_bass_extended:
+    n_cell_types:
+      value: 4
+      source: inferred
+      source_file: "https://github.com/zhengli09/BASS/blob/master/R/BASS.R"
+      confidence: low
+      notes: "Mis-recovered: createBASSObject's k = 4 is the minimum number of spatial neighbours per spot, not a cell-type count; C (number of cell types) has no upstream default. Unreachable: no tool is registered as run_bass_extended."
+
+  squidpy_neighborhood_enrichment:
+    n_neighs:
+      value: 6
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+      notes: "Squidpy spatial_neighbors default n_neighs=6 (Visium hexagonal)"
+    n_perms:
+      value: 1000
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+      notes: "Default permutation count for z-score testing"
+
+  squidpy_spatial_neighbors:
+    n_neighs:
+      value: 6
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+    n_rings:
+      value: 1
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+    delaunay:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+    coord_type:
+      value: "generic"
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+
+  squidpy_co_occurrence:
+    n_steps:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+
+  squidpy_ripley:
+    mode:
+      value: "F"
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+      notes: "Squidpy ripley default mode='F'; SpatialOmicsLab uses 'L'"
+    n_steps:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+    n_simulations:
+      value: 100
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+
+  squidpy_centrality_scores:
+    n_neighs:
+      value: 6
+      source: official_repo
+      source_file: "https://github.com/scverse/squidpy"
+      confidence: high
+
+  stacker_register:
+    mode:
+      value: "affine"
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+      notes: "Affine is simplest / fastest Stacker mode"
+
+  run_spicemix:
+    n_epochs:
+      value: 100
+      source: documentation
+      source_file: "https://github.com/ma-compbio/SpiceMix"
+      confidence: medium
+      notes: "SpiceMix tutorial uses ~100 epochs"
+    device:
+      value: "cpu"
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+
+  run_destvi_extended:
+    n_top_genes:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/scverse/scvi-tools"
+      confidence: medium
+      notes: "DestVI tutorial uses 2000 HVGs. Extends run_destvi entry."
+    cell_type_key:
+      value: "cell_type"
+      source: documentation
+      source_file: "https://github.com/scverse/scvi-tools"
+      confidence: medium
+
+  deepst_denoise:
+    pre_epochs:
+      value: 800
+      source: official_repo
+      source_file: "https://github.com/spatial-data-lab/DeepST/blob/main/deepst/DeepST.py"
+      confidence: medium
+    epochs:
+      value: 500
+      source: official_repo
+      source_file: "https://github.com/spatial-data-lab/DeepST/blob/main/deepst/DeepST.py"
+      confidence: medium
+
+  run_spacel_scube:
+    output_dir:
+      value: "./work"
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: low
+      notes: "No upstream canonical default for output paths"
+
+  # ============================================================
+  # Deep-dive expansion (round 3)
+  # Researched from GitHub source files for 15 high-coverage tools
+  # ============================================================
+
+  starfysh_deconvolution_expansion:
+    # VisiumArguments defaults (starfysh/utils.py)
+    sample_id:
+      value: "ST"
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py#L1"
+      confidence: high
+      notes: "VisiumArguments params default sample_id='ST'; SpatialOmicsLab uses V1_Human_Lymph_Node"
+    n_anchors:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py#L1"
+      confidence: high
+      notes: "Default n_anchors=int(adata.shape[0]) i.e. all spots; SpatialOmicsLab uses 60"
+    patch_r:
+      value: 16
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py#L1"
+      confidence: high
+      notes: "Starfysh VisiumArguments default patch_r=16; SpatialOmicsLab uses 13"
+    window_size:
+      value: 1
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py#L1"
+      confidence: high
+      notes: "VisiumArguments default window_size=1; SpatialOmicsLab uses 30"
+    signif_level:
+      value: 3
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py#L1"
+      confidence: high
+      notes: "VisiumArguments params default signif_level=3"
+    n_img_chan:
+      value: 1
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/utils.py#L1"
+      confidence: high
+    # run_starfysh defaults (starfysh/starfysh.py)
+    n_repeats:
+      value: 3
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/starfysh.py#L1"
+      confidence: high
+      notes: "run_starfysh default n_repeats=3 (matches SpatialOmicsLab)"
+    lr:
+      value: 0.0001
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/starfysh.py#L1"
+      confidence: high
+      notes: "run_starfysh default lr=1e-4; SpatialOmicsLab uses 1e-3 (10x too fast)"
+    epochs:
+      value: 100
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/starfysh.py#L1"
+      confidence: high
+      notes: "run_starfysh default epochs=100; SpatialOmicsLab uses 300"
+    batch_size:
+      value: 32
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/starfysh.py#L1"
+      confidence: high
+      notes: "run_starfysh default batch_size=32 (not exposed in SpatialOmicsLab config)"
+    alpha_mul:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/starfysh.py#L1"
+      confidence: high
+      notes: "run_starfysh default alpha_mul=50 (Dirichlet concentration multiplier)"
+    poe:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/starfysh.py#L1"
+      confidence: high
+      notes: "Default use_poe=False in run_starfysh (matches SpatialOmicsLab)"
+    seed:
+      value: 0
+      source: official_repo
+      source_file: "https://github.com/azizilab/starfysh/blob/main/starfysh/starfysh.py#L1"
+      confidence: high
+
+  spaceflow_spatial_domains:
+    n_top_genes:
+      value: null
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+      notes: "preprocessing_data default n_top_genes=None (no HVG filter); SpatialOmicsLab uses 3000"
+    preprocess_n_neighbors:
+      value: 10
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+      notes: "preprocessing_data default n_neighbors=10 (spatial graph construction)"
+    spatial_regularization_strength:
+      value: 0.1
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+      notes: "train() default 0.1 (matches SpatialOmicsLab)"
+    z_dim:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+    lr:
+      value: 0.001
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+    epochs:
+      value: 1000
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+    max_patience:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+    min_stop:
+      value: 100
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+    random_seed:
+      value: 42
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+    gpu:
+      value: 0
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+      notes: "Default GPU index 0; -1 means CPU"
+    regularization_acceleration:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+    edge_subset_sz:
+      value: 1000000
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+    seg_n_neighbors:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+      notes: "segmentation() default n_neighbors=50"
+    seg_resolution:
+      value: 1.0
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+    psm_n_neighbors:
+      value: 20
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+    psm_resolution:
+      value: 1.0
+      source: official_repo
+      source_file: "https://github.com/hongleir/SpaceFlow/blob/master/SpaceFlow/SpaceFlow.py"
+      confidence: high
+      notes: "No effect on pSM values: upstream runs Leiden at this resolution only for a PAGA graph that sc.tl.dpt (n_branchings=0) never reads; the worker lists it under params.ignored"
+
+  spaotsc_run_expansion:
+    # SpaOTsc transport_plan defaults
+    alpha:
+      value: 0.1
+      source: official_repo
+      source_file: "https://github.com/zcang/SpaOTsc/blob/master/spaotsc/SpaOTsc.py"
+      confidence: high
+      notes: "transport_plan default alpha=0.1 (quadratic-linear tradeoff)"
+    epsilon:
+      value: 1.0
+      source: official_repo
+      source_file: "https://github.com/zcang/SpaOTsc/blob/master/spaotsc/SpaOTsc.py"
+      confidence: high
+      notes: "transport_plan default epsilon=1.0; cell_cell_distance default epsilon=0.01"
+    rho:
+      value: 100.0
+      source: official_repo
+      source_file: "https://github.com/zcang/SpaOTsc/blob/master/spaotsc/SpaOTsc.py"
+      confidence: high
+      notes: "transport_plan default rho=100.0; cell_cell_distance default rho=np.Inf"
+    scaling:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/zcang/SpaOTsc/blob/master/spaotsc/SpaOTsc.py"
+      confidence: high
+      notes: "transport_plan default scaling=False"
+    use_landmark:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/zcang/SpaOTsc/blob/master/spaotsc/SpaOTsc.py"
+      confidence: high
+      notes: "cell_cell_distance default use_landmark=False; SpatialOmicsLab flips to True (speedup)"
+    n_landmark:
+      value: 100
+      source: official_repo
+      source_file: "https://github.com/zcang/SpaOTsc/blob/master/spaotsc/SpaOTsc.py"
+      confidence: high
+    # Clustering defaults
+    res_sc:
+      value: 0.5
+      source: official_repo
+      source_file: "https://github.com/zcang/SpaOTsc/blob/master/spaotsc/SpaOTsc.py"
+      confidence: high
+      notes: "clustering() default res_sc=0.5"
+    res_is:
+      value: 0.3
+      source: official_repo
+      source_file: "https://github.com/zcang/SpaOTsc/blob/master/spaotsc/SpaOTsc.py"
+      confidence: high
+      notes: "clustering() default res_is=0.3"
+    min_n:
+      value: 3
+      source: official_repo
+      source_file: "https://github.com/zcang/SpaOTsc/blob/master/spaotsc/SpaOTsc.py"
+      confidence: high
+
+  spatialde_run_svg_expansion:
+    regress_formula:
+      value: "np.log(total_counts)"
+      source: documentation
+      source_file: "https://github.com/Teichlab/SpatialDE"
+      confidence: high
+      notes: "SpatialDE README example uses np.log(total_counts); SpatialOmicsLab uses ~np.log(total_counts)"
+    aeh_C:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/Teichlab/SpatialDE/blob/master/Python-module/SpatialDE/aeh.py"
+      confidence: high
+      notes: "spatial_patterns() has no default for C (number of patterns); must be user-chosen"
+    aeh_l:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/Teichlab/SpatialDE/blob/master/Python-module/SpatialDE/aeh.py"
+      confidence: high
+      notes: "spatial_patterns() has no default for l (lengthscale); README suggests ~1.5-1.8"
+    kernel_space_SE:
+      value: [5.0, 25.0, 50.0]
+      source: official_repo
+      source_file: "https://github.com/Teichlab/SpatialDE/blob/master/Python-module/SpatialDE/base.py"
+      confidence: high
+      notes: "dyn_de's own default; SpatialDE.base.run (what anndata.spatialde_test calls) replaces it with np.logspace(log10(l_min), log10(l_max), 10) from get_l_limits, so [5,25,50] never reaches a spatialde_run_svg run"
+
+  svgbit_run_expansion:
+    k:
+      value: 6
+      source: official_repo
+      source_file: "https://github.com/CPenglab/svgbit/blob/master/svgbit/run.py"
+      confidence: high
+      notes: "svgbit.run default k=6 (kNN network); SpatialOmicsLab uses 10"
+    n_svgs:
+      value: 1000
+      source: official_repo
+      source_file: "https://github.com/CPenglab/svgbit/blob/master/svgbit/run.py"
+      confidence: high
+      notes: "svgbit.run default n_svgs=1000; SpatialOmicsLab uses 200"
+    n_svg_clusters:
+      value: 8
+      source: official_repo
+      source_file: "https://github.com/CPenglab/svgbit/blob/master/svgbit/run.py"
+      confidence: high
+      notes: "svgbit.run default n_svg_clusters=8; SpatialOmicsLab uses 5"
+    cores:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/CPenglab/svgbit/blob/master/svgbit/run.py"
+      confidence: high
+      notes: "svgbit.run default cores=cpu_count(); SpatialOmicsLab forces 1"
+    cluster_threshold:
+      value: 0.3
+      source: official_repo
+      source_file: "https://github.com/CPenglab/svgbit/blob/master/svgbit/core/cluster.py"
+      confidence: high
+      notes: "cluster() default threshold=0.3"
+    normalization:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/CPenglab/svgbit/blob/master/svgbit/__main__.py"
+      confidence: high
+      notes: "CLI default normalization=None; SpatialOmicsLab enforces normalize=True (logcpm)"
+    n_top_genes_cli:
+      value: null
+      source: inferred
+      source_file: "https://github.com/CPenglab/svgbit"
+      confidence: low
+      notes: "No upstream max_genes cap; SpatialOmicsLab imposes 2000 for memory"
+    repository_note:
+      value: "https://github.com/CPenglab/svgbit"
+      source: official_repo
+      source_file: "https://pypi.org/pypi/svgbit/json"
+      confidence: high
+      notes: "Upstream repo is CPenglab/svgbit (not SGGBlab nor DavidBiose); PyPI v0.2.17"
+
+  ucdeconvolve_base_expansion:
+    split:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/dchary/ucdeconvolve/blob/main/ucdeconvolve/_tools/_base.py"
+      confidence: high
+      notes: "deconvolve_base default split=True"
+    sort:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/dchary/ucdeconvolve/blob/main/ucdeconvolve/_tools/_base.py"
+      confidence: high
+    propagate:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/dchary/ucdeconvolve/blob/main/ucdeconvolve/_tools/_base.py"
+      confidence: high
+    key_added:
+      value: "ucdbase"
+      source: official_repo
+      source_file: "https://github.com/dchary/ucdeconvolve/blob/main/ucdeconvolve/_tools/_base.py"
+      confidence: high
+    use_raw:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/dchary/ucdeconvolve/blob/main/ucdeconvolve/_tools/_base.py"
+      confidence: high
+    return_results:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/dchary/ucdeconvolve/blob/main/ucdeconvolve/_tools/_base.py"
+      confidence: high
+    verbosity:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/dchary/ucdeconvolve/blob/main/ucdeconvolve/_tools/_base.py"
+      confidence: high
+      notes: "Default verbosity=None (falls back to package setting)"
+    repository_note:
+      value: "https://github.com/dchary/ucdeconvolve"
+      source: official_repo
+      source_file: "https://pypi.org/project/ucdeconvolve/"
+      confidence: high
+      notes: "Upstream is dchary/ucdeconvolve (not dpeerlab/UniCell-Deconvolve)"
+
+  gpsa_align_slices:
+    n_spatial_dims:
+      value: 2
+      source: official_repo
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment/blob/main/gpsa/models/vgpsa.py"
+      confidence: high
+      notes: "VariationalGPSA default n_spatial_dims=2"
+    n_noise_variance_params:
+      value: 2
+      source: official_repo
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment/blob/main/gpsa/models/vgpsa.py"
+      confidence: high
+    n_latent_gps:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment/blob/main/gpsa/models/vgpsa.py"
+      confidence: high
+      notes: "Default n_latent_gps=None (use modality P dimensions); SpatialOmicsLab hardcodes 3"
+    data_init:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment/blob/main/gpsa/models/vgpsa.py"
+      confidence: high
+    minmax_init:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment/blob/main/gpsa/models/vgpsa.py"
+      confidence: high
+    grid_init:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment/blob/main/gpsa/models/vgpsa.py"
+      confidence: high
+    mean_function:
+      value: "identity_fixed"
+      source: official_repo
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment/blob/main/gpsa/models/vgpsa.py"
+      confidence: high
+    mean_penalty_param:
+      value: 0.0
+      source: official_repo
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment/blob/main/gpsa/models/vgpsa.py"
+      confidence: high
+    num_epochs:
+      value: 3000
+      adopted: false
+      source: documentation
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment"
+      confidence: medium
+      notes: "Tutorial uses N_EPOCHS=3000; SpatialOmicsLab uses 500 for speed"
+    learning_rate:
+      value: 0.01
+      adopted: false
+      source: documentation
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment"
+      confidence: medium
+      notes: "Tutorial uses lr=1e-2; SpatialOmicsLab uses 1e-3"
+    print_every:
+      value: 100
+      source: documentation
+      source_file: "https://github.com/andrewcharlesjones/spatial-alignment"
+      confidence: medium
+
+  xfuse_build_config_expansion:
+    network_depth:
+      value: 6
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+      notes: "XFuse _config.py default network_depth=6; SpatialOmicsLab uses 2"
+    network_width:
+      value: 16
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+      notes: "Default network_width=16 (not exposed in SpatialOmicsLab)"
+    min_counts:
+      value: 1
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+      notes: "Default [xfuse].min_counts=1"
+    gene_regex:
+      value: "^(?!RPS|RPL|MT-).*"
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+      notes: "Default excludes mitochondrial and ribosomal genes"
+    batch_size:
+      value: 4
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+      notes: "Upstream default batch_size=4 (not 3 as SpatialOmicsLab assumed); SpatialOmicsLab uses 8"
+    epochs:
+      value: 20000
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+      notes: "Upstream default epochs=20000 (not 100000); SpatialOmicsLab uses 50 for test"
+    learning_rate:
+      value: 0.0003
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+      notes: "Default learning_rate=3e-4"
+    patch_size:
+      value: 768
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+      notes: "Default patch_size=768; SpatialOmicsLab uses 64"
+    purge_interval:
+      value: 1000
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+      notes: "Default metagene purging interval (epochs)"
+    expansion_strategy:
+      value: "DropAndSplit"
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+    cache_data:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+    data_workers:
+      value: 8
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/_config.py"
+      confidence: high
+    prediction_num_samples:
+      value: 1
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/analyze/prediction.py"
+      confidence: high
+      notes: "predict() default num_samples=1 (not 10 as SpatialOmicsLab tool default)"
+    prediction_genes_per_batch:
+      value: 10
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/analyze/prediction.py"
+      confidence: high
+    de_num_samples:
+      value: 50
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/analyze/differential_expression.py"
+      confidence: high
+      notes: "DE default num_samples=50 (not 10 as SpatialOmicsLab assumes)"
+    de_genes_per_batch:
+      value: 100000
+      source: official_repo
+      source_file: "https://github.com/ludvb/xfuse/blob/master/xfuse/analyze/differential_expression.py"
+      confidence: high
+      notes: "DE default genes_per_batch=100000 (huge batch); SpatialOmicsLab uses 100"
+
+  moscot_run_expansion:
+    epsilon:
+      value: 0.01
+      source: official_repo
+      source_file: "https://github.com/theislab/moscot/blob/main/src/moscot/problems/space/_mapping.py"
+      confidence: high
+      notes: "MappingProblem.solve default epsilon=1e-2 (not 1e-3 as SpatialOmicsLab uses)"
+    alpha:
+      value: 0.5
+      source: official_repo
+      source_file: "https://github.com/theislab/moscot/blob/main/src/moscot/problems/space/_mapping.py"
+      confidence: high
+      notes: "MappingProblem.solve default alpha=0.5; SpatialOmicsLab uses 0.5 (matches)"
+    tau_a:
+      value: 1.0
+      source: official_repo
+      source_file: "https://github.com/theislab/moscot/blob/main/src/moscot/problems/space/_mapping.py"
+      confidence: high
+      notes: "Default tau_a=1.0 (balanced OT)"
+    tau_b:
+      value: 1.0
+      source: official_repo
+      source_file: "https://github.com/theislab/moscot/blob/main/src/moscot/problems/space/_mapping.py"
+      confidence: high
+    rank:
+      value: -1
+      source: official_repo
+      source_file: "https://github.com/theislab/moscot/blob/main/src/moscot/problems/space/_mapping.py"
+      confidence: high
+      notes: "Default rank=-1 (full rank)"
+    spatial_key:
+      value: "spatial"
+      source: documentation
+      source_file: "https://github.com/theislab/moscot"
+      confidence: high
+    policy:
+      value: "sequential"
+      source: documentation
+      source_file: "https://github.com/theislab/moscot"
+      confidence: medium
+    device:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/theislab/moscot/blob/main/src/moscot/problems/space/_mapping.py"
+      confidence: high
+      notes: "Default device=None (keep on original device); SpatialOmicsLab forces cpu"
+    batch_size:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/theislab/moscot/blob/main/src/moscot/problems/space/_mapping.py"
+      confidence: high
+
+  bayestme_deconvolution_expansion:
+    n_svi_steps:
+      value: 20000
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme/blob/main/src/bayestme/cli/common.py"
+      confidence: high
+      notes: "CLI default n_svi_steps=20000; SpatialOmicsLab uses 10000 for speed"
+    n_samples:
+      value: 100
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme/blob/main/src/bayestme/cli/common.py"
+      confidence: high
+    use_spatial_guide:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme/blob/main/src/bayestme/cli/common.py"
+      confidence: high
+    seed:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme/blob/main/src/bayestme/cli/common.py"
+      confidence: high
+      notes: "CLI default seed=None"
+    n_components:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme/blob/main/src/bayestme/cli/common.py"
+      confidence: high
+      notes: "No upstream default; BayesTME raises if not provided and no expression_truth"
+    spatial_smoothing_parameter:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme/blob/main/src/bayestme/cli/common.py"
+      confidence: high
+      notes: "aka deconvolution.rho; the CLI default None is not a default: deconvolve() passes it over BayesTME_VI's rho=0.5 and the spatial guide then crashes (Tensor * None). The SpatialOmicsLab worker uses BayesTME_VI's class default 0.5 when rho is unset and reports it as params.rho."
+    expression_truth:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/tansey-lab/bayestme/blob/main/src/bayestme/cli/common.py"
+      confidence: high
+    filter_ribosomal_genes:
+      value: false
+      source: documentation
+      source_file: "https://github.com/tansey-lab/bayestme"
+      confidence: medium
+      notes: "No filtering by default in tutorials"
+
+  run_gist_expansion:
+    prior_lambda:
+      value: 0.1
+      source: inferred
+      source_file: "https://github.com/tansey-lab/gist"
+      confidence: low
+      notes: "Ignored by this tool: the base model runs (no per-spot image prior), so prior_lambda is reported in params.ignored. The GIST() signature default is 50. Extends run_gist entry."
+    impute_st:
+      value: true
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+      notes: "KNN smoothing enabled by default in SpatialOmicsLab wrapper"
+    impute_k:
+      value: 5
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+      notes: "No explicit upstream default; 5 is common KNN choice"
+    impute_d:
+      value: 10
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+    normalize:
+      value: "sct"
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+      notes: "sct (SCTransform) is a common default for spatial normalization"
+    num_cores:
+      value: 1
+      source: spatialomicsgym_config
+      source_file: "mcp_config.yaml"
+      confidence: medium
+    repository_note:
+      value: "https://github.com/tansey-lab/gist"
+      source: inferred
+      source_file: "GIST paper Yu et al. 2023"
+      confidence: low
+      notes: "Task description suggested jhu-statcomputing/GIST (wrong); SpatialOmicsLab's GIST is Bayesian deconvolution. Could not conclusively locate canonical repo; candidate is tansey-lab/gist."
+
+  stage_run_expansion:
+    data_type:
+      value: "10x"
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+      notes: "STAGE() default data_type='10x'"
+    experiment:
+      value: "generation"
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    train_epoch:
+      value: 2000
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+      notes: "STAGE() default train_epoch=2000 (not 1000 as SpatialOmicsLab uses)"
+    batch_size:
+      value: 512
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+      notes: "Default batch_size=512 for 10x"
+    learning_rate:
+      value: 0.001
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    coord_sf:
+      value: 77
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+      notes: "Default coord_sf=77 for 10x Visium"
+    down_ratio:
+      value: 0.5
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    sec_name:
+      value: "section"
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    select_section:
+      value: [1, 3, 5, 6, 8]
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    gap:
+      value: 0.05
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    expand_time:
+      value: 5
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    rad_off:
+      value: 1
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    seed:
+      value: 1234
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    w_recon:
+      value: 0.1
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    w_w:
+      value: 0.1
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    w_l1:
+      value: 0.1
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    step_size:
+      value: 500
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    gamma:
+      value: 1
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    relu:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+    device:
+      value: "cpu"
+      source: official_repo
+      source_file: "https://github.com/zhanglabtools/STAGE/blob/main/STAGE/model.py"
+      confidence: high
+      notes: "STAGE default device='cpu'; switches to cuda if available"
+    repository_note:
+      value: "https://github.com/zhanglabtools/STAGE"
+      source: official_repo
+      source_file: "README"
+      confidence: high
+      notes: "Upstream is zhanglabtools/STAGE (not QIFEIDKN nor zhengang-zhang)"
+
+  spiral_align:
+    alpha:
+      value: 0.5
+      source: official_repo
+      source_file: "https://github.com/guott15/SPIRAL/blob/main/spiral/CoordAlignment.py"
+      confidence: high
+      notes: "CoordAlignment default alpha=0.5 (matches SpatialOmicsLab)"
+    numItermax:
+      value: 200
+      source: official_repo
+      source_file: "https://github.com/guott15/SPIRAL/blob/main/spiral/CoordAlignment.py"
+      confidence: high
+      notes: "CoordAlignment default numItermax=200"
+    dissimilarity:
+      value: "euc"
+      source: official_repo
+      source_file: "https://github.com/guott15/SPIRAL/blob/main/spiral/CoordAlignment.py"
+      confidence: high
+    norm:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/guott15/SPIRAL/blob/main/spiral/CoordAlignment.py"
+      confidence: high
+    loss_fun:
+      value: "square_loss"
+      source: official_repo
+      source_file: "https://github.com/guott15/SPIRAL/blob/main/spiral/CoordAlignment.py"
+      confidence: high
+    types:
+      value: "weighted_mean"
+      source: official_repo
+      source_file: "https://github.com/guott15/SPIRAL/blob/main/spiral/CoordAlignment.py"
+      confidence: high
+    znoise_dim:
+      value: 4
+      source: official_repo
+      source_file: "https://github.com/guott15/SPIRAL/blob/main/spiral/CoordAlignment.py"
+      confidence: high
+      notes: "CoordAlignment.inputs default znoise_dim=4"
+
+  spacet_deconvolution:
+    cancer_type:
+      value: null
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/data2intelligence/SpaCET/blob/main/R/deconvolution.R"
+      confidence: high
+      notes: "SpaCET.deconvolution has no default for cancerType (required positional)"
+    adjacentNormal:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/data2intelligence/SpaCET/blob/main/R/deconvolution.R"
+      confidence: high
+      notes: "SpaCET default adjacentNormal=FALSE"
+    coreNo:
+      value: 6
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/data2intelligence/SpaCET/blob/main/R/deconvolution.R"
+      confidence: high
+      notes: "SpaCET default coreNo=6 (auto-reduced on Windows/low-core hosts); SpatialOmicsLab uses 1"
+    signatureType:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/data2intelligence/SpaCET/blob/main/R/deconvolution.R"
+      confidence: high
+      notes: "Default signatureType=NULL (uses both CNA and expression signatures)"
+    platform:
+      value: "Visium"
+      source: documentation
+      source_file: "https://github.com/data2intelligence/SpaCET"
+      confidence: high
+      notes: "SpaCET.dataLoad default platform='Visium' in tutorials"
+    organism:
+      value: "human"
+      source: documentation
+      source_file: "https://github.com/data2intelligence/SpaCET"
+      confidence: high
+
+  hotspot_spatial_modules_expansion:
+    model:
+      value: "danb"
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+      notes: "Hotspot __init__ default model='danb'"
+    layer_key:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+      notes: "Default layer_key=None (uses adata.X); SpatialOmicsLab's '' means the same (adata.X)"
+    latent_obsm_key:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+      notes: "No universal default; spatial is common setting"
+    umi_counts_obs_key:
+      value: null
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+    use_gpu:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+    n_neighbors:
+      value: 30
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+      notes: "create_knn_graph default n_neighbors=30"
+    weighted_graph:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+    neighborhood_factor:
+      value: 3
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+    approx_neighbors:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+    min_gene_threshold:
+      value: 20
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+      notes: "create_modules default min_gene_threshold=20 (SpatialOmicsLab uses 30)"
+    module_fdr_threshold:
+      value: 0.05
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+      notes: "create_modules default fdr_threshold=0.05"
+    core_only:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+    compute_autocorr_jobs:
+      value: 1
+      source: official_repo
+      source_file: "https://github.com/YosefLab/Hotspot/blob/master/hotspot/hotspot.py"
+      confidence: high
+      notes: "compute_autocorrelations default jobs=1; SpatialOmicsLab uses 4"
+
+  # ============================================================
+  # FUNCTIONAL ENRICHMENT (pathway_enrichment portal, 2026-09-20)
+  # ============================================================
+
+  run_pathway_enrichment:
+    permutations:
+      value: 1000
+      source: official_repo
+      source_file: "https://github.com/saezlab/decoupler-py/blob/v1.9.2/decoupler/method_gsea.py"
+      confidence: high
+      version: "decoupler==1.9.2; gseapy==1.3.1 (prerank permutation_num=1000)"
+      notes: "Both backends default to 1000 permutations; the worker refuses fewer than 10"
+    min_set_size:
+      value: 5
+      source: official_repo
+      source_file: "https://github.com/saezlab/decoupler-py/blob/v1.9.2/decoupler/method_gsea.py"
+      confidence: high
+      version: "decoupler==1.9.2"
+      notes: "decoupler min_n=5; gseapy prerank's own default is min_size=15 -- the portal passes 5 to both"
+    max_set_size:
+      value: 500
+      source: official_repo
+      source_file: "https://github.com/zqfang/GSEApy/blob/v1.3.1/gseapy/gsea.py"
+      confidence: high
+      version: "gseapy==1.3.1"
+      notes: "gseapy prerank max_size=500; decoupler has no upper bound and the portal applies this one to both"
+    top_n:
+      value: 200
+      source: spatialomicsgym_config
+      source_file: "MCP_server/mcp_config.yaml"
+      confidence: medium
+      notes: "How many of the ranked genes ORA tests; no upstream default -- the SVG tools write 200-gene tables"
+
+  run_pathway_activity:
+    top_progeny:
+      value: 100
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/saezlab/decoupler-py/blob/v1.9.2/decoupler/omnip.py"
+      confidence: high
+      version: "decoupler==1.9.2"
+      notes: "dc.get_progeny(top=100) upstream; SpatialOmicsLab caches top=500 and trims per call"
+    min_set_size:
+      value: 5
+      source: official_repo
+      source_file: "https://github.com/saezlab/decoupler-py/blob/v1.9.2/decoupler/method_ulm.py"
+      confidence: high
+      version: "decoupler==1.9.2"
+      notes: "run_ulm / run_ora min_n=5"
+    top_k_maps:
+      value: 6
+      source: spatialomicsgym_config
+      source_file: "MCP_server/mcp_config.yaml"
+      confidence: medium
+      notes: "How many pathways the tissue map draws; no upstream counterpart"
+
+  # ============================================================
+  # SERIAL-SECTION ALIGNMENT (PASTE2, CAST)
+  # ============================================================
+
+  paste2_partial_align:
+    alpha:
+      value: 0.1
+      source: official_repo
+      source_file: "https://github.com/raphael-group/paste2/blob/main/src/paste2/PASTE2.py"
+      confidence: high
+      version: "paste2==1.0.1"
+      notes: "partial_pairwise_align(alpha=0.1)"
+    dissimilarity:
+      value: glmpca
+      source: official_repo
+      source_file: "https://github.com/raphael-group/paste2/blob/main/src/paste2/PASTE2.py"
+      confidence: high
+      version: "paste2==1.0.1"
+      notes: "Upstream default and ours. An order of magnitude slower than kl or euclidean, which
+        is stated in the parameter description rather than diverged from."
+    norm:
+      value: true
+      source: official_repo
+      source_file: "https://github.com/raphael-group/paste2/blob/main/src/paste2/PASTE2.py"
+      confidence: high
+      version: "paste2==1.0.1"
+    armijo:
+      value: false
+      source: official_repo
+      source_file: "https://github.com/raphael-group/paste2/blob/main/src/paste2/PASTE2.py"
+      confidence: high
+      version: "paste2==1.0.1"
+
+  cast_align_slices:
+    epochs:
+      value: 400
+      source: official_repo
+      source_file: "https://github.com/wanglab-broad/CAST/blob/main/CAST/main.py"
+      confidence: high
+      version: "CAST@3ebcf4f"
+      notes: "CAST_MARK's epoch default. Kept: measured at 61 s for two sections of 1,415 cells on
+        CPU, which is usable, so there is no reason to diverge."
+    affine_iterations:
+      value: 500
+      source: official_repo
+      source_file: "https://github.com/wanglab-broad/CAST/blob/main/CAST/main.py"
+      confidence: high
+      version: "CAST@3ebcf4f"
+      notes: "reg_params(iterations=500) in CAST_STACK's own params_dist branch."
+    ffd_iterations:
+      value: 400
+      source: official_repo
+      source_file: "https://github.com/wanglab-broad/CAST/blob/main/CAST/main.py"
+      confidence: high
+      version: "CAST@3ebcf4f"
+      notes: "reg_params(iterations_bs=[400]). Setting it to 0 gives an affine-only alignment,
+        which is the right choice for a class-B stack."
+    graph_strategy:
+      value: convex
+      adopted: false
+      source: official_repo
+      source_file: "https://github.com/wanglab-broad/CAST/blob/main/CAST/main.py"
+      confidence: high
+      version: "CAST@3ebcf4f"
+      notes: "CAST_MARK default graph_strategy='convex'; SpatialOmicsLab uses 'delaunay'. Both
+        work with the pinned libpysal 4.8.1. Measured on this box for 300 points: delaunay 0.01 s
+        and pure scipy/networkx, convex 0.21 s through libpysal.cg.voronoi_frames and
+        weights.Rook.from_dataframe, which also emits a deprecation warning and puts libpysal,
+        geopandas, Rtree, pyproj and shapely on the critical path. The divergence is speed and
+        dependency surface, not correctness."

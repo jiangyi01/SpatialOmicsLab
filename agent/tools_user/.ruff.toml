@@ -1,0 +1,30 @@
+# Ruff configuration for tools_user/ -- the SECOND path to the same worker code.
+#
+# This directory holds two kinds of file, and both need the floor that `tools/.ruff.toml` sets:
+#
+#   1. `base_mcp.py` and `worker_utils.py` are SYMLINKS to the `tools/` originals. Ruff's directory
+#      walk follows file symlinks, and it resolves configuration from the path it was handed -- so a
+#      single `ruff check --fix .` from the repo root reads each of those modules twice, once as
+#      `tools/x.py` (3.7, correct) and once as `tools_user/x.py` (3.11, wrong). The 3.11 pass
+#      rewrites the file THROUGH the link, into `tools/`, and leaves the link itself untouched, so
+#      `git status` reports nothing here and the guard looks like it is holding. Every worker in the
+#      fleet imports `worker_utils`; `str | None` in one of its signatures is a TypeError at import
+#      on 3.7/3.8/3.9 and takes the whole fleet down at once.
+#
+#   2. The generated `*_worker.py` are run by their own tool's conda env, exactly like `tools/`,
+#      and a self-created tool's env is routinely older than this package's `requires-python`.
+#
+# See the module docstring of `test/test_workers_are_old_python_safe.py` for the two rewrite
+# mechanisms (UP045 at import, B905 mid-run) and the real failures they caused. That test enforces
+# this file, and enforces that both paths to a shared module resolve the same floor.
+#
+# One floor for the whole directory, matching `tools/`: the management modules here do run on the
+# agent's own interpreter, but a per-file pin would leave `unresolved_target_version` at 3.11 for
+# anything a future contributor adds, and the cost of the uniform floor is only that pyupgrade
+# declines to modernise seven files that sit next to code it must not touch.
+#
+# `extend` is required: a config file in a subdirectory REPLACES the parent's settings rather than
+# merging with them, so without it these files would be linted against ruff's defaults instead of
+# the repo's rule selection and line length.
+extend = "../../pyproject.toml"
+target-version = "py37"

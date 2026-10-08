@@ -1,0 +1,19 @@
+server_key: bsp
+worker_kind: python
+env_prefix: BSP
+override_vars:
+  BSP_PYTHON: /opt/conda/envs/bsp/bin/python
+worker_var: BSP_WORKER
+worker_file: bsp_worker.py
+server_file: bsp_mcp_server.py
+source_env: bsp
+import_check: scbsp
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/bsp.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: bsp_identify_svg
+  category: svg_detection

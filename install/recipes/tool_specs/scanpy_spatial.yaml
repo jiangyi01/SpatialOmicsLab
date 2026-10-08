@@ -1,0 +1,19 @@
+server_key: scanpy_spatial
+worker_kind: python
+env_prefix: SCANPY_SPATIAL
+override_vars:
+  SCANPY_SPATIAL_PYTHON: /opt/conda/envs/SpaGCN/bin/python
+worker_var: SCANPY_SPATIAL_WORKER
+worker_file: scanpy_spatial_worker.py
+server_file: scanpy_spatial_mcp_server.py
+source_env: SpaGCN
+import_check: scanpy
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/scanpy_spatial.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_scanpy_spatial_domain
+  category: spatial_clustering

@@ -1,0 +1,19 @@
+server_key: spagft
+worker_kind: python
+env_prefix: SPAGFT
+override_vars:
+  SPAGFT_PYTHON: /opt/conda/envs/spagft_env/bin/python
+worker_var: SPAGFT_WORKER
+worker_file: spagft_worker.py
+server_file: spagft_mcp_server.py
+source_env: spagft_env
+import_check: SpaGFT
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spagft.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: spagft_identify_svg
+  category: svg_detection

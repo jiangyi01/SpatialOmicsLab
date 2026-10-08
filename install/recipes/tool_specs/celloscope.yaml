@@ -1,0 +1,19 @@
+server_key: celloscope
+worker_kind: python
+env_prefix: CELLOSCOPE
+override_vars:
+  CELLOSCOPE_PYTHON: /opt/conda/envs/celloscope_env/bin/python3.8
+worker_var: CELLOSCOPE_WORKER
+worker_file: celloscope_worker.py
+server_file: celloscope_mcp_server.py
+source_env: celloscope_env
+import_check: __future__
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/celloscope.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_celloscope
+  category: deconvolution

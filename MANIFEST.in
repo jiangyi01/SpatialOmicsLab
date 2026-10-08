@@ -1,0 +1,104 @@
+# MANIFEST.in
+#
+# The checkout has two source roots (pyproject ``packages.find where``): agent/ (spatialomicsgym,
+# skills, benchmarks) and install/ (sog_install). Every path below is
+# repository-relative, so each one carries its root's prefix.
+
+# Include all python files from the two package trees
+recursive-include agent/spatialomicsgym *.py
+recursive-include install/sog_install *.py
+
+# Include the .pkl database files
+recursive-include agent/spatialomicsgym/tool/schema_db *.pkl
+
+# Ship every runtime data file the agent loads from its INSTALLED package dir (each is resolved via
+# ``Path(__file__).parent`` / ``os.path.dirname(spatialomicsgym.__file__)``, so a non-editable
+# ``pip install .`` — a Docker image, ``git+https://…``, or a built wheel — MUST contain them or the
+# feature silently breaks). ``recursive-include agent/spatialomicsgym *.py`` above ships only code;
+# without the lines below the wheel installs but the agent has no know-how corpus and no protocols:
+#   * know_how/*.md + know_how/resource/**  — curated know-how/skill corpus (know_how/loader.py globs this)
+#   * know_how/packs/**  (*.md + MANIFEST.yaml)  — the tier-2 merged skill packs and their manifest
+#   * tool/protocols/*.txt                  — list_protocols()/get_protocol() read these; without them the
+#                                             tool returns a "Protocols directory not found" error at runtime
+#   * tuning/configs/*.yaml                 — Optuna tuning presets (the optional ``tuning`` extra)
+#   * data/*.json + data/*.csv              — empirical_leaderboard.json + the packaged copy of the SVG
+#                                             routing table (agent/empirical_leaderboard.py falls back to
+#                                             it when the benchmarks/ tree is absent, i.e. any wheel install)
+recursive-include agent/spatialomicsgym/know_how *.md *.txt *.csv *.yaml
+recursive-include agent/spatialomicsgym/tool/protocols *.txt
+recursive-include agent/spatialomicsgym/tuning/configs *.yaml *.yml
+recursive-include agent/spatialomicsgym/data *.json *.csv
+
+# The conda recipes and setup scripts, but NOT the vendored CLI-tools tree (below).
+#
+# The directory is ``agent/spatialomicsgym/spatialomicsgym_env`` — nested inside the package. Not one
+# of its 17 files is a ``.py``, so ``recursive-include agent/spatialomicsgym *.py`` above does not reach
+# them; this line is the only thing that does. (It once said a TOP-LEVEL ``spatialomicsgym_env``,
+# upstream Biomni's layout carried in verbatim, and selected nothing.)
+#
+# It matters on a NON-editable install. With no checkout, ``sog-setup``'s base-env phase falls back to
+# the copy inside the installed package -- ``<site-packages>/spatialomicsgym/spatialomicsgym_env/
+# spatialomicsgym_env.yml``, exactly where a wheel puts this directory. Without these files
+# ``sog-setup`` hands conda a path to nothing and its base-env phase fails on a package that installed
+# cleanly.
+recursive-include agent/spatialomicsgym/spatialomicsgym_env *.py *.sh *.yml *.yaml *.txt *.md *.json *.R
+
+# Exclude specific directories that are not part of the package.
+#
+# ``prune`` is applied in file order, so this stays BELOW the include above — it is what keeps the
+# include from sweeping in a contributor's local build. ``install_cli_tools.sh`` sets
+# ``TOOLS_DIR="$(pwd)/spatialomicsgym_tools"``, so running the full environment setup from the recipe
+# directory leaves a multi-GB vendored CLI-tools tree right beside the recipes, containing a generated
+# ``setup_path.sh`` that the ``*.sh`` pattern would otherwise match. Neither target is tracked; both
+# prunes are defence against a dirty working tree, and a prune that matches nothing costs nothing.
+prune tutorials/data
+prune agent/spatialomicsgym/spatialomicsgym_env/spatialomicsgym_tools
+
+# ``benchmarks`` stays a runtime package (the optional ``tuning`` extra imports
+# ``benchmarks.evaluation.evaluator``), but its ``manuscript/`` and ``results/`` subtrees are large
+# NON-package research artifacts, not shippable library code. The authoritative fix that keeps them out of
+# the wheel — and prevents a HARD ``build_py`` crash on the dangling scratch symlink some benchmark runs
+# leave under ``manuscript/code/evaluation/`` — is the ``packages.find`` ``exclude`` in pyproject.toml
+# (setuptools would otherwise namespace-walk every data subdir into a spurious package). These ``prune``
+# lines are complementary sdist hygiene: they also keep the artifacts out of ``python -m build --sdist``.
+prune agent/benchmarks/manuscript
+prune agent/benchmarks/results
+
+# Exclude build artifacts and caches
+global-exclude *.py[co]
+global-exclude __pycache__
+global-exclude .ruff_cache
+prune build
+prune dist
+prune *.egg-info
+
+# Include other necessary files
+include README.md
+include LICENSE
+include pyproject.toml
+
+# --- self-contained wheel payload (Workstream W) -----------------------------------------------
+# The sdist must carry the platform trees so a wheel built FROM the sdist can inject
+# ``spatialomicsgym/_platform/`` (see setup.py; the payload spec is
+# ``agent/spatialomicsgym/platform_root.py::PLATFORM_PAYLOAD`` -- keep these directives in step with it).
+# ``include`` with a directory-level glob is deliberately non-recursive: ``agent/tools/`` on a dev box
+# carries multi-GB gitignored trees (``tools/data``, ``tools/third_party``) that a recursive-include
+# would sweep into the sdist. The two prunes below are belt-and-braces against exactly that.
+#
+# The creation-demo fixtures (``test/test_data/creation_demo``) are no longer part of the payload: the
+# test tree is untracked since 2026-10-07, so neither a clone nor an sdist can carry them.
+include setup.py
+include agent/tools/*.py agent/tools/*.R agent/tools/.ruff.toml
+include agent/MCP_server/mcp_config.yaml
+include install/recipes/tool_specs/*.yaml
+include install/recipes/tool_specs/env/*.yaml
+include agent/tools_user/.ruff.toml agent/tools_user/base_mcp.py agent/tools_user/worker_utils.py
+include agent/tools_user/knowledge_manager.py agent/tools_user/memory_manager.py agent/tools_user/self_review.py
+include agent/tools_user/trash_manager.py agent/tools_user/user_skill.py
+include agent/tools_user/create_all_21_tools.py agent/tools_user/seed_tool_creation_memory.py
+# The declarative tool tier (the REPL imports it) and the env
+# reclaimer. Neither shipped, so a wheel built from the sdist could not import them at all
+# (hunt 2026-09-30, u38a-packaging-1).
+include agent/tools_user/declarative.py agent/tools_user/reclaim_envs.py
+prune agent/tools/data
+prune agent/tools/third_party

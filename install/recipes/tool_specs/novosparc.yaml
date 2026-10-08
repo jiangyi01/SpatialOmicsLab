@@ -1,0 +1,19 @@
+server_key: novosparc
+worker_kind: python
+env_prefix: NOVOSPARC
+override_vars:
+  NOVOSPARC_PYTHON: /opt/conda/envs/novosparc/bin/python
+worker_var: NOVOSPARC_WORKER
+worker_file: novosparc_worker.py
+server_file: novosparc_mcp_server.py
+source_env: novosparc
+import_check: novosparc
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/novosparc.env.yaml
+gpu: false
+shared_env: true
+est_gb: null
+service_keys: []
+functions:
+- name: novosparc_reconstruct_spatial
+  category: deconvolution

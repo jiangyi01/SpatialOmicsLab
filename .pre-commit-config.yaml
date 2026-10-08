@@ -1,0 +1,129 @@
+fail_fast: false
+default_language_version:
+    python: python3
+default_stages:
+    - pre-commit
+    - pre-push
+# 3.2.0 is the first release that accepts the `pre-commit`/`pre-push` stage names used above (earlier
+# ones said commit/push). At 2.16.0 an older pre-commit passed this floor and then died on an unknown
+# stage instead of saying which version it needs (hunt 2026-09-30, u38a-packaging-15).
+minimum_pre_commit_version: 3.2.0
+repos:
+    - repo: https://github.com/biomejs/pre-commit
+      rev: v2.3.10
+      hooks:
+          # `byte_exact` names files whose bytes are the point, which no fixing hook may rewrite: the
+          # built Next.js bundle (minified, content-hashed, rebuilt and committed whole per D-035; no
+          # biome.json governs it), the verbatim third-party licence copies merge_packs checks by
+          # sha256, and staged patch files, where trailing whitespace belongs to a context line
+          # (hunt 2026-09-30, u38a-packaging-14).
+          - id: biome-format
+            exclude: &byte_exact ^(THIRD_PARTY_LICENSES/.*\.txt$|.*\.patch$)
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.14.11
+      hooks:
+          - id: ruff-check
+            args: [--fix, --exit-non-zero-on-fix, --unsafe-fixes]
+          - id: ruff-format
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v6.0.0
+      hooks:
+          # A plain substring check for PEM/PuTTY armor headers. These four files quote a bare header
+          # as a redaction fixture or in prose, so every `--all-files` run failed on them
+          # (hunt 2026-09-30, u38a-packaging-14). A new fixture should build the header by concatenation.
+          - id: detect-private-key
+            exclude: ^(docs/audit/t3_deps_secrets\.md|test/test_(one_secret_shape_list|redaction_does_not_eat_english|the_degrade_note_masks_what_every_other_surface_masks)\.py)$
+          - id: check-ast
+          - id: end-of-file-fixer
+            exclude: *byte_exact
+          - id: mixed-line-ending
+            args: [--fix=lf]
+            exclude: *byte_exact
+          - id: trailing-whitespace
+            exclude: *byte_exact
+          - id: check-case-conflict
+          - id: check-added-large-files
+          - id: check-toml
+          - id: check-yaml
+          - id: check-merge-conflict
+          - id: no-commit-to-branch
+            args: ["--branch=main"]
+    # detect-private-key above matches PEM headers and nothing else, so an API key, a bearer token or
+    # the uc_ shape of CRIT-1 committed cleanly. This runs the repository's own credential list --
+    # agent/spatialomicsgym/redaction.py SECRET_RE, loaded by path, so there is no second definition to
+    # drift -- over the lines a commit ADDS (hunt 2026-09-30, uL1-security-5). Two deliberate limits,
+    # both measured over the last 400 commits. A bare 32+ hex run passes when its line names no
+    # credential (redaction.CREDENTIAL_NAME_RE) and says no "bearer": 28 of those commits added content
+    # hashes such as KNOW_HOW_HASH, and none would be refused. A line carrying
+    # "pragma: allowlist secret" is skipped, for the fake keys redaction tests must contain
+    # (13 commits). It prints file:line, never the token.
+    # The first version skipped every hex run, so AZURE_OPENAI_API_KEY=<32 hex> and a hex Bearer token
+    # committed cleanly. It also dropped every line of a file whose path git quotes (non-ASCII, a
+    # quote or a backslash) or whose b/ prefix a user's diff.noprefix/mnemonicPrefix changed, and it
+    # took an added "++ " line after a removed "-- " line for a new file header (hunt 2026-09-30,
+    # uL1-security-5, repair). The prefixes and quoting are now fixed on the command line, and a
+    # header is read only between "diff --git" and the first "@@".
+    - repo: local
+      hooks:
+          - id: credential-shapes
+            name: credential-shaped tokens in staged lines (redaction.SECRET_RE)
+            language: system
+            pass_filenames: false
+            always_run: true
+            stages: [pre-commit]
+            entry: |
+                python3 -c '
+                import importlib.util, re, subprocess, sys
+                spec = importlib.util.spec_from_file_location("sog_redaction", "agent/spatialomicsgym/redaction.py")
+                redaction = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(redaction)
+                diff = subprocess.run(
+                    ["git", "-c", "core.quotePath=false", "diff", "--cached", "--no-color", "--no-ext-diff",
+                     "--no-textconv", "--src-prefix=a/", "--dst-prefix=b/", "-U0", "--diff-filter=d"],
+                    capture_output=True, text=True, errors="replace", check=True,
+                ).stdout
+                C_ESCAPES = {"a": "\a", "b": "\b", "t": "\t", "n": "\n", "v": "\v", "f": "\f", "r": "\r"}
+                def staged_path(header):
+                    name = header[4:].rstrip("\t")
+                    if len(name) > 1 and name[0] == name[-1] == "\"":
+                        name = re.sub(r"\\([0-7]{3}|.)", lambda m: chr(int(m.group(1), 8)) if len(m.group(1)) == 3
+                                      else C_ESCAPES.get(m.group(1), m.group(1)), name[1:-1])
+                    return name[2:] if name.startswith("b/") else name
+                def names_a_credential(text):
+                    return re.search(r"(?i)bearer", text) is not None or any(
+                        redaction.CREDENTIAL_NAME_RE.search(word.replace("-", "_"))
+                        for word in re.findall(r"[A-Za-z0-9_-]+", text))
+                path, lineno, found, in_header = "<unknown path>", 0, [], False
+                for line in diff.splitlines():
+                    if line.startswith("diff --git "):
+                        in_header = True
+                    elif in_header:
+                        if line.startswith("+++ "):
+                            path = staged_path(line)
+                        elif line.startswith("@@"):
+                            in_header = False
+                            lineno = int(re.search(r"\+(\d+)", line).group(1)) - 1
+                    elif line.startswith("@@"):
+                        lineno = int(re.search(r"\+(\d+)", line).group(1)) - 1
+                    elif line.startswith("+"):
+                        lineno += 1
+                        text = line[1:]
+                        if "pragma: allowlist secret" in text:
+                            continue
+                        for match in redaction.SECRET_RE.finditer(text):
+                            if not re.fullmatch(r"[0-9A-Fa-f]+", match.group(0)) or names_a_credential(text):
+                                found.append(f"{path}:{lineno}")
+                                break
+                for where in found:
+                    print(f"credential-shaped token staged at {where}")
+                if found:
+                    print("Unstage it -- or, for a deliberate fake, end that line with a pragma: allowlist secret comment.")
+                sys.exit(1 if found else 0)
+                '
+    #- repo: https://github.com/pre-commit/mirrors-mypy
+    # rev: v1.16.1
+    #  hooks:
+    #      - id: mypy
+    #        args: [--no-strict-optional, --ignore-missing-imports]
+    #        additional_dependencies:
+    #            ["types-setuptools", "types-requests", "types-attrs"]

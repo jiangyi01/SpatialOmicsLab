@@ -1,0 +1,21 @@
+server_key: prost
+worker_kind: python
+env_prefix: PROST
+override_vars:
+  PROST_PYTHON: /opt/conda/envs/PROST_ENV/bin/python
+worker_var: PROST_WORKER
+worker_file: prost_worker.py
+server_file: prost_mcp_server.py
+source_env: PROST_ENV
+import_check: PROST
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/prost.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: prost_index_svg
+  category: svg_detection
+- name: prost_pnn_domains
+  category: spatial_analysis

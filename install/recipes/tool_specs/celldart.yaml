@@ -1,0 +1,19 @@
+server_key: celldart
+worker_kind: python
+env_prefix: CELLDART
+override_vars:
+  CELLDART_PYTHON: /opt/conda/envs/celldart_env/bin/python
+worker_var: CELLDART_WORKER
+worker_file: celldart_worker.py
+server_file: celldart_mcp_server.py
+source_env: celldart_env
+import_check: CellDART
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/celldart.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_celldart
+  category: deconvolution

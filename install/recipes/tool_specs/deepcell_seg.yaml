@@ -1,0 +1,19 @@
+server_key: deepcell_seg
+worker_kind: python
+env_prefix: DEEPCELL
+override_vars:
+  DEEPCELL_PYTHON: /opt/conda/envs/deepcell_env/bin/python
+worker_var: DEEPCELL_WORKER
+worker_file: deepcell_worker.py
+server_file: deepcell_mcp_server.py
+source_env: deepcell_env
+import_check: deepcell
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/deepcell_seg.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: run_deepcell_segmentation
+  category: cell_segmentation

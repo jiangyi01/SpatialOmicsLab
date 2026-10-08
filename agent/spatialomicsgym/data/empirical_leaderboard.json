@@ -1,0 +1,880 @@
+{
+  "_meta": {
+    "built_at": "2026-05-12T05:25:54+00:00",
+    "min_cells_threshold": 2,
+    "n_source_rows": 188,
+    "score_keys_per_task": {
+      "deconvolution": "mean_pearson_r",
+      "spatial_clustering": "ARI",
+      "svg_detection": "F1_hvg"
+    },
+    "sources": {
+      "clustering": "/workspace/hands_by_myself/results/_unified_domain_results.csv",
+      "deconvolution": "/workspace/hands_by_myself/results/_unified_deconv_results.csv",
+      "svg_canonical": "agent/spatialomicsgym/data/unified_svg_hvg_filtered.csv",
+      "svg_fallback": "/workspace/hands_by_myself/results/_unified_svg_results.csv"
+    }
+  },
+  "deconvolution": {
+    "MERFISH": {
+      "run_card": {
+        "datasets": [
+          "merfish_deconvolution"
+        ],
+        "max_score": 0.5845,
+        "min_score": 0.5533,
+        "n_cells": 2,
+        "score": 0.5689,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0156
+      },
+      "tacco_annotate": {
+        "datasets": [
+          "merfish_deconvolution"
+        ],
+        "max_score": 0.7495,
+        "min_score": 0.7055,
+        "n_cells": 2,
+        "score": 0.7275,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.022
+      },
+      "tangram_map_sc_to_spatial": {
+        "datasets": [
+          "merfish_deconvolution"
+        ],
+        "max_score": 0.6248,
+        "min_score": 0.5818,
+        "n_cells": 2,
+        "score": 0.6033,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0215
+      }
+    },
+    "Slide-seqV2": {
+      "biomni_no_mcp": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.5014,
+        "min_score": 0.4626,
+        "n_cells": 2,
+        "score": 0.482,
+        "sides": [
+          "other_agent"
+        ],
+        "stddev": 0.0194
+      },
+      "dsgym": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.4951,
+        "min_score": 0.4067,
+        "n_cells": 2,
+        "score": 0.4509,
+        "sides": [
+          "other_agent"
+        ],
+        "stddev": 0.0442
+      },
+      "run_card": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.3593,
+        "min_score": 0.0007,
+        "n_cells": 4,
+        "score": 0.1909,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.1526
+      },
+      "run_cell2location": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.4849,
+        "min_score": 0.3946,
+        "n_cells": 2,
+        "score": 0.4397,
+        "sides": [
+          "manual"
+        ],
+        "stddev": 0.0451
+      },
+      "run_celldart": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.3945,
+        "min_score": 0.1527,
+        "n_cells": 4,
+        "score": 0.2803,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0983
+      },
+      "run_destvi": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.5379,
+        "min_score": 0.4029,
+        "n_cells": 2,
+        "score": 0.4704,
+        "sides": [
+          "manual"
+        ],
+        "stddev": 0.0675
+      },
+      "run_spatialscope": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.6405,
+        "min_score": 0.2986,
+        "n_cells": 4,
+        "score": 0.4961,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.1249
+      },
+      "run_spotlight": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.2983,
+        "min_score": 0.2487,
+        "n_cells": 4,
+        "score": 0.2651,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0198
+      },
+      "run_stdeconvolve": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.1535,
+        "min_score": -0.0395,
+        "n_cells": 2,
+        "score": 0.057,
+        "sides": [
+          "agent"
+        ],
+        "stddev": 0.0965
+      },
+      "spacexr_rctd_deconvolution": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.5499,
+        "min_score": 0.1855,
+        "n_cells": 4,
+        "score": 0.3974,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.1572
+      },
+      "spatialprompt_deconvolution": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.4498,
+        "min_score": 0.3234,
+        "n_cells": 4,
+        "score": 0.3892,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0519
+      },
+      "tacco_annotate": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.5211,
+        "min_score": 0.4052,
+        "n_cells": 4,
+        "score": 0.4694,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0441
+      },
+      "tangram_map_sc_to_spatial": {
+        "datasets": [
+          "slideseqv2_aorta_deconvolution",
+          "slideseqv2_rca_deconvolution"
+        ],
+        "max_score": 0.4249,
+        "min_score": 0.348,
+        "n_cells": 4,
+        "score": 0.3853,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0277
+      }
+    },
+    "Visium": {
+      "run_bulk2space": {
+        "datasets": [
+          "visium_deconvolution"
+        ],
+        "max_score": 0.3774,
+        "min_score": 0.3164,
+        "n_cells": 2,
+        "score": 0.3469,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0305
+      },
+      "run_card": {
+        "datasets": [
+          "visium_deconvolution"
+        ],
+        "max_score": 0.4899,
+        "min_score": 0.4256,
+        "n_cells": 2,
+        "score": 0.4577,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0322
+      },
+      "run_cell2location": {
+        "datasets": [
+          "visium_deconvolution"
+        ],
+        "max_score": 0.4857,
+        "min_score": 0.4598,
+        "n_cells": 2,
+        "score": 0.4728,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.013
+      },
+      "run_celldart": {
+        "datasets": [
+          "visium_deconvolution"
+        ],
+        "max_score": 0.4782,
+        "min_score": 0.4337,
+        "n_cells": 2,
+        "score": 0.4559,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0223
+      },
+      "run_spatialscope": {
+        "datasets": [
+          "visium_deconvolution"
+        ],
+        "max_score": 0.5246,
+        "min_score": 0.5093,
+        "n_cells": 2,
+        "score": 0.517,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0076
+      },
+      "run_spotlight": {
+        "datasets": [
+          "visium_deconvolution"
+        ],
+        "max_score": 0.447,
+        "min_score": 0.4409,
+        "n_cells": 2,
+        "score": 0.444,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.003
+      },
+      "spacexr_rctd_deconvolution": {
+        "datasets": [
+          "visium_deconvolution"
+        ],
+        "max_score": 0.5433,
+        "min_score": 0.5337,
+        "n_cells": 2,
+        "score": 0.5385,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0048
+      },
+      "spatialprompt_deconvolution": {
+        "datasets": [
+          "visium_deconvolution"
+        ],
+        "max_score": 0.3056,
+        "min_score": 0.2596,
+        "n_cells": 2,
+        "score": 0.2826,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.023
+      },
+      "tacco_annotate": {
+        "datasets": [
+          "visium_deconvolution"
+        ],
+        "max_score": 0.4966,
+        "min_score": 0.4842,
+        "n_cells": 2,
+        "score": 0.4904,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0062
+      },
+      "tangram_map_sc_to_spatial": {
+        "datasets": [
+          "visium_deconvolution"
+        ],
+        "max_score": 0.4846,
+        "min_score": 0.4138,
+        "n_cells": 2,
+        "score": 0.4492,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0354
+      }
+    }
+  },
+  "spatial_clustering": {
+    "Visium": {
+      "cellcharter_cluster_spatial_domains": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.2692,
+        "min_score": 0.2553,
+        "n_cells": 2,
+        "score": 0.2622,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0069
+      },
+      "deepst_identify_domains": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.5213,
+        "min_score": 0.3593,
+        "n_cells": 2,
+        "score": 0.4403,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.081
+      },
+      "precast_spatial_clustering": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.3595,
+        "min_score": 0.2861,
+        "n_cells": 2,
+        "score": 0.3228,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0367
+      },
+      "prost_pnn_domains": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.2293,
+        "min_score": 0.1984,
+        "n_cells": 2,
+        "score": 0.2138,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0155
+      },
+      "run_bass": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.4875,
+        "min_score": 0.459,
+        "n_cells": 2,
+        "score": 0.4733,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0142
+      },
+      "run_miso": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.1636,
+        "min_score": 0.1209,
+        "n_cells": 2,
+        "score": 0.1422,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0214
+      },
+      "run_scanpy_spatial_domain": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.1787,
+        "min_score": 0.1598,
+        "n_cells": 2,
+        "score": 0.1693,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0095
+      },
+      "run_sedr": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.2406,
+        "min_score": 0.1695,
+        "n_cells": 2,
+        "score": 0.2051,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0355
+      },
+      "seurat_qc_cluster": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.3878,
+        "min_score": 0.3721,
+        "n_cells": 2,
+        "score": 0.38,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0078
+      },
+      "spaceflow_spatial_domains": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.31,
+        "min_score": 0.2291,
+        "n_cells": 2,
+        "score": 0.2696,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0404
+      },
+      "stagate_spatial_domains": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.3399,
+        "min_score": 0.2941,
+        "n_cells": 2,
+        "score": 0.317,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.0229
+      },
+      "stlearn_spatial_clustering": {
+        "datasets": [
+          "visium_dlpfc_domain"
+        ],
+        "max_score": 0.4842,
+        "min_score": 0.2633,
+        "n_cells": 2,
+        "score": 0.3738,
+        "sides": [
+          "agent",
+          "manual"
+        ],
+        "stddev": 0.1105
+      }
+    }
+  },
+  "svg_detection": {
+    "MERFISH": {
+      "bsp_identify_svg": {
+        "datasets": [
+          "merfish_svg"
+        ],
+        "max_score": 0.0791,
+        "min_score": 0.0791,
+        "n_cells": 2,
+        "score": 0.0791,
+        "sides": [
+          "agent:legacy_default",
+          "manual"
+        ],
+        "stddev": 0.0
+      },
+      "hotspot_spatial_modules": {
+        "datasets": [
+          "merfish_svg"
+        ],
+        "max_score": 0.0758,
+        "min_score": 0.0757,
+        "n_cells": 2,
+        "score": 0.0758,
+        "sides": [
+          "agent:legacy_default",
+          "manual"
+        ],
+        "stddev": 0.0
+      },
+      "prost_index_svg": {
+        "datasets": [
+          "merfish_svg"
+        ],
+        "max_score": 0.0732,
+        "min_score": 0.0167,
+        "n_cells": 2,
+        "score": 0.0449,
+        "sides": [
+          "agent:legacy_default",
+          "manual"
+        ],
+        "stddev": 0.0283
+      },
+      "somde_run": {
+        "datasets": [
+          "merfish_svg"
+        ],
+        "max_score": 0.0723,
+        "min_score": 0.0636,
+        "n_cells": 2,
+        "score": 0.068,
+        "sides": [
+          "agent:legacy_default",
+          "manual"
+        ],
+        "stddev": 0.0044
+      },
+      "spagft_identify_svg": {
+        "datasets": [
+          "merfish_svg"
+        ],
+        "max_score": 0.0768,
+        "min_score": 0.0723,
+        "n_cells": 2,
+        "score": 0.0746,
+        "sides": [
+          "agent:legacy_default",
+          "manual"
+        ],
+        "stddev": 0.0022
+      },
+      "spatialde_run_svg": {
+        "datasets": [
+          "merfish_svg"
+        ],
+        "max_score": 0.0872,
+        "min_score": 0.0754,
+        "n_cells": 2,
+        "score": 0.0813,
+        "sides": [
+          "agent:legacy_default",
+          "manual"
+        ],
+        "stddev": 0.0059
+      },
+      "squidpy_spatial_autocorr": {
+        "datasets": [
+          "merfish_svg"
+        ],
+        "max_score": 0.0771,
+        "min_score": 0.0672,
+        "n_cells": 2,
+        "score": 0.0721,
+        "sides": [
+          "agent:legacy_default",
+          "manual"
+        ],
+        "stddev": 0.005
+      },
+      "svca_variance_decomposition": {
+        "datasets": [
+          "merfish_svg"
+        ],
+        "max_score": 0.0969,
+        "min_score": 0.0421,
+        "n_cells": 2,
+        "score": 0.0695,
+        "sides": [
+          "agent:legacy_default",
+          "manual"
+        ],
+        "stddev": 0.0274
+      },
+      "svgbit_run": {
+        "datasets": [
+          "merfish_svg"
+        ],
+        "max_score": 0.0723,
+        "min_score": 0.0693,
+        "n_cells": 2,
+        "score": 0.0708,
+        "sides": [
+          "agent:legacy_default",
+          "manual"
+        ],
+        "stddev": 0.0015
+      }
+    },
+    "Visium": {
+      "bsp_identify_svg": {
+        "datasets": [
+          "visium_svg"
+        ],
+        "max_score": 0.3851,
+        "min_score": 0.2522,
+        "n_cells": 6,
+        "score": 0.3047,
+        "sides": [
+          "agent:legacy_default",
+          "manual",
+          "multi:gpt-5.2-codex",
+          "multi:gpt-5.3-codex",
+          "multi:gpt-5.4",
+          "multi:gpt-5.4-mini"
+        ],
+        "stddev": 0.0594
+      },
+      "hotspot_spatial_modules": {
+        "datasets": [
+          "visium_svg"
+        ],
+        "max_score": 0.2885,
+        "min_score": 0.2715,
+        "n_cells": 6,
+        "score": 0.276,
+        "sides": [
+          "agent:legacy_default",
+          "manual",
+          "multi:gpt-5.2-codex",
+          "multi:gpt-5.3-codex",
+          "multi:gpt-5.4",
+          "multi:gpt-5.4-mini"
+        ],
+        "stddev": 0.0063
+      },
+      "prost_index_svg": {
+        "datasets": [
+          "visium_svg"
+        ],
+        "max_score": 0.2462,
+        "min_score": 0.1008,
+        "n_cells": 5,
+        "score": 0.211,
+        "sides": [
+          "agent:legacy_default",
+          "multi:gpt-5.2-codex",
+          "multi:gpt-5.3-codex",
+          "multi:gpt-5.4",
+          "multi:gpt-5.4-mini"
+        ],
+        "stddev": 0.0564
+      },
+      "somde_run": {
+        "datasets": [
+          "visium_svg"
+        ],
+        "max_score": 0.3623,
+        "min_score": 0.309,
+        "n_cells": 6,
+        "score": 0.3447,
+        "sides": [
+          "agent:legacy_default",
+          "manual",
+          "multi:gpt-5.2-codex",
+          "multi:gpt-5.3-codex",
+          "multi:gpt-5.4",
+          "multi:gpt-5.4-mini"
+        ],
+        "stddev": 0.0224
+      },
+      "spagft_identify_svg": {
+        "datasets": [
+          "visium_svg"
+        ],
+        "max_score": 0.341,
+        "min_score": 0.155,
+        "n_cells": 6,
+        "score": 0.2448,
+        "sides": [
+          "agent:legacy_default",
+          "manual",
+          "multi:gpt-5.2-codex",
+          "multi:gpt-5.3-codex",
+          "multi:gpt-5.4",
+          "multi:gpt-5.4-mini"
+        ],
+        "stddev": 0.0538
+      },
+      "spatialde_run_svg": {
+        "datasets": [
+          "visium_svg"
+        ],
+        "max_score": 0.3856,
+        "min_score": 0.2721,
+        "n_cells": 6,
+        "score": 0.2958,
+        "sides": [
+          "agent:legacy_default",
+          "manual",
+          "multi:gpt-5.2-codex",
+          "multi:gpt-5.3-codex",
+          "multi:gpt-5.4",
+          "multi:gpt-5.4-mini"
+        ],
+        "stddev": 0.0402
+      },
+      "spvc_svg_detection": {
+        "datasets": [
+          "visium_svg"
+        ],
+        "max_score": 0.0418,
+        "min_score": 0.0,
+        "n_cells": 5,
+        "score": 0.0084,
+        "sides": [
+          "agent:legacy_default",
+          "manual",
+          "multi:gpt-5.2-codex",
+          "multi:gpt-5.3-codex",
+          "multi:gpt-5.4-mini"
+        ],
+        "stddev": 0.0167
+      },
+      "squidpy_spatial_autocorr": {
+        "datasets": [
+          "visium_svg"
+        ],
+        "max_score": 0.3009,
+        "min_score": 0.2553,
+        "n_cells": 6,
+        "score": 0.2814,
+        "sides": [
+          "agent:legacy_default",
+          "manual",
+          "multi:gpt-5.2-codex",
+          "multi:gpt-5.3-codex",
+          "multi:gpt-5.4",
+          "multi:gpt-5.4-mini"
+        ],
+        "stddev": 0.0157
+      },
+      "svca_variance_decomposition": {
+        "datasets": [
+          "visium_svg"
+        ],
+        "max_score": 0.3647,
+        "min_score": 0.046,
+        "n_cells": 6,
+        "score": 0.1817,
+        "sides": [
+          "agent:legacy_default",
+          "manual",
+          "multi:gpt-5.2-codex",
+          "multi:gpt-5.3-codex",
+          "multi:gpt-5.4",
+          "multi:gpt-5.4-mini"
+        ],
+        "stddev": 0.1279
+      },
+      "svgbit_run": {
+        "datasets": [
+          "visium_svg"
+        ],
+        "max_score": 0.3861,
+        "min_score": 0.2597,
+        "n_cells": 6,
+        "score": 0.354,
+        "sides": [
+          "agent:legacy_default",
+          "manual",
+          "multi:gpt-5.2-codex",
+          "multi:gpt-5.3-codex",
+          "multi:gpt-5.4",
+          "multi:gpt-5.4-mini"
+        ],
+        "stddev": 0.0452
+      }
+    }
+  }
+}

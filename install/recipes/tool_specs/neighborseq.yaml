@@ -1,0 +1,19 @@
+server_key: neighborseq
+worker_kind: rscript
+env_prefix: NEIGHBORSEQ
+override_vars:
+  NEIGHBORSEQ_PYTHON: /opt/conda/envs/neighborseq/bin/Rscript
+worker_var: NEIGHBORSEQ_WORKER
+worker_file: neighborseq_worker.R
+server_file: neighborseq_mcp_server.py
+source_env: neighborseq
+import_check: Neighborseq
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/neighborseq.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: neighborseq_interaction_network
+  category: spatial_communication

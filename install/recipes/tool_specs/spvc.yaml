@@ -1,0 +1,19 @@
+server_key: spvc
+worker_kind: rscript
+env_prefix: SPVC
+override_vars:
+  SPVC_PYTHON: /opt/conda/envs/spvc/bin/Rscript
+worker_var: SPVC_WORKER
+worker_file: spvc_worker.R
+server_file: spvc_mcp_server.py
+source_env: spvc
+import_check: spVC
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/spvc.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: spvc_svg_detection
+  category: svg_detection

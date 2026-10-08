@@ -1,0 +1,19 @@
+server_key: svca
+worker_kind: python
+env_prefix: SVCA
+override_vars:
+  SVCA_PYTHON: /opt/conda/envs/spatialomicsgym_e1/bin/python
+worker_var: SVCA_WORKER
+worker_file: svca_worker.py
+server_file: svca_mcp_server.py
+source_env: spatialomicsgym_e1
+import_check: __future__
+build_strategy: conda_clone
+recipe: install/recipes/tool_specs/env/svca.env.yaml
+gpu: false
+shared_env: false
+est_gb: null
+service_keys: []
+functions:
+- name: svca_variance_decomposition
+  category: spatial_analysis
