@@ -241,6 +241,9 @@ data/ddinter_raw/
 # Sphinx build
 /docs/build/
 /docs/source/api/
+# Generated at docs build time (see docs/README.md): the AutoAPI reference and the tool catalogue.
+/docs/api/
+/docs/tools/
 
 # Ruff cache
 .ruff_cache/

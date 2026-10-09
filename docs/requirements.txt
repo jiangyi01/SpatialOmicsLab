@@ -1,0 +1,11 @@
+# Documentation build (Read the Docs and `make -C docs html`). Nothing here is a runtime dependency of
+# the package; see pyproject.toml for those. The API reference is parsed statically by sphinx-autoapi,
+# so the package itself does not need to be installed to build the docs.
+sphinx>=7.4,<9
+myst-parser>=4.0,<5
+furo>=2024.8.6
+sphinx-autoapi>=3.3.3,<4
+sphinx-copybutton>=0.5.2
+sphinx-design>=0.6.1,<1
+linkify-it-py>=2.0.3
+pyyaml>=6.0

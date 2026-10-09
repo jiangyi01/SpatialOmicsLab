@@ -1,0 +1,23 @@
+/* SpatialOmicsLab documentation: small adjustments on top of the Furo theme. */
+
+/* Wide reference tables (tool parameters, configuration variables) read better with a little more room. */
+.sog-wide,
+article[role="main"] table.docutils {
+	width: 100%;
+}
+
+/* Keep code in table cells on one line where it fits, wrap descriptions freely. */
+table.docutils td > p > code,
+table.docutils td code {
+	white-space: nowrap;
+}
+
+table.docutils td:last-child code {
+	white-space: normal;
+}
+
+/* The framework figure on the landing page. */
+figure.sog-framework img {
+	max-width: 100%;
+	height: auto;
+}
